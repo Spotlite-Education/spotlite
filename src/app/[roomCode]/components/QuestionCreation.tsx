@@ -1,9 +1,8 @@
-import Link from 'next/link';
 import Button from '../../components/Button';
 import Paper from '../../components/Paper';
-import styles from './page.module.scss';
+import styles from './QuestionCreation.module.scss';
 
-const StudentCreateQuestion = () => {
+const CreateQuestion = () => {
   return (
     <main className={styles.main}>
       <div className={styles.gridContainer}>
@@ -17,4 +16,4 @@ const StudentCreateQuestion = () => {
   );
 };
 
-export default StudentCreateQuestion;
+export default CreateQuestion;

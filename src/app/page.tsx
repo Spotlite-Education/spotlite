@@ -8,10 +8,8 @@ const Home = () => {
     <main className={styles.main}>
       <div className={styles.title}>TOSS-IT!</div>
       <Input className={styles.roomCodeInput} placeholder="Room Code" />
-      <Link href="/teacher/home">
-        <Button className={styles.toTeacherMode}>
-          To Teacher Mode
-        </Button>
+      <Link href="/host">
+        <Button className={styles.toTeacherMode}>To Teacher Mode</Button>
       </Link>
       <div className={styles.box} />
     </main>
