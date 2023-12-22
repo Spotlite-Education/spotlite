@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tldraw/tldraw": "^1.29.2",
+    "framer-motion": "^10.16.16",
+    "jotai": "^2.6.0",
+    "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.0.4"
+    "sass": "^1.69.5",
+    "scss": "^0.2.4",
+    "socket.io-client": "^4.7.2"
   },
   "devDependencies": {
     "typescript": "^5",

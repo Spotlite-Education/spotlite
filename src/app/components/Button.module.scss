@@ -1,0 +1,11 @@
+.wrapper {
+  min-width: 20rem;
+  min-height: 4rem;
+  border: none;
+  border-radius: 99rem;
+  background-color: var(--input-fill-primary);
+
+  &:hover {
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,22 @@
+:root {
+  --text-color: #fff8dd;
+  color: var(--text-color);
+
+  font-size: 62.5%;
+
+  --brand-color: #ffa800;
+  --accent-color: #9546fb;
+
+  --input-fill-primary: rgba(255, 247, 221, 0.51);
+  --input-placeholder-color: #da8506;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+
+  font-family: var(--font-general-sans);
+  font-size: 1.6rem;
+  font-weight: 500;
+}
