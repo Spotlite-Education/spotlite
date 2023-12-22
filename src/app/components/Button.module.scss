@@ -3,6 +3,8 @@
   min-height: 4rem;
   border: none;
   border-radius: 99rem;
+  color: var(--input-placeholder-color);
+  font-weight: 600;
   background-color: var(--input-fill-primary);
 
   &:hover {

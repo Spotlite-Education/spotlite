@@ -1,0 +1,40 @@
+.main {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: var(--brand-color);
+}
+
+.title {
+  font-family: var(--font-rowdies);
+  font-size: 10rem;
+  text-shadow: 4px 6px 0 rgba(0, 0, 0, 0.25);
+}
+
+.forTeachers {
+  margin-top: 1rem;
+  margin-bottom: 3.5rem;
+  color: var(--note-text-color);
+  font-weight: 600;
+}
+
+.toStudentMode {
+  position: absolute;
+  top: 2.5rem;
+  right: 2.5rem;
+  background-color: var(--text-color) !important;
+}
+
+.box {
+  position: absolute;
+  top: 100%;
+  right: -50%;
+  width: 65rem;
+  height: 100rem;
+  transform: rotateZ(-13deg) translate(-50%, -50%);
+  background-color: #fb9e11;
+}
