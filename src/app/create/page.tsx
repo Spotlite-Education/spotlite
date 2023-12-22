@@ -9,7 +9,7 @@ const CreateRoom = () => {
       <div className={styles.forTeachers}>FOR TEACHERS</div>
       <Button>Host Room</Button>
       <Link href="/">
-        <Button className={styles.toStudentMode}>To Student Mode</Button>
+        <Button className={styles.toStudentMode} fill='secondary'>To Student Mode</Button>
       </Link>
       <div className={styles.box} />
     </main>

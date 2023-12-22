@@ -9,7 +9,7 @@ const Home = () => {
       <div className={styles.title}>TOSS-IT!</div>
       <Input className={styles.roomCodeInput} placeholder="Room Code" />
       <Link href="/create">
-        <Button className={styles.toTeacherMode} fill="secondary">
+        <Button className={styles.toTeacherMode}>
           To Teacher Mode
         </Button>
       </Link>

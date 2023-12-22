@@ -1,12 +1,19 @@
 .wrapper {
   border: none;
   border-radius: 99rem;
+  padding: 2rem;
   min-height: 4rem;
+  width: 20%;
   background-color: var(--input-fill-primary);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--input-text-color);
 
   &::placeholder {
-    color: var(--input-placeholder-color);
-    font-size: 1.5rem;
-    font-weight: 600;
+    color: var(--input-text-color);
+  }
+
+  &:focus {
+    outline: none;
   }
 }
