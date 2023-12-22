@@ -1,7 +1,6 @@
-import Header from '../components/Header';
-import Input from '../components/Input';
-import Note from '../components/Note';
-import CreateQuestion from './components/QuestionCreation';
+import Header from '../../components/Header';
+import Input from '../../components/Input';
+import Note from '../../components/Note';
 import styles from './page.module.scss';
 
 const NameSelect = () => {
