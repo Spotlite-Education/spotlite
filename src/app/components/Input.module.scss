@@ -5,13 +5,23 @@
   border-radius: 99rem;
   color: var(--input-placeholder-color);
   text-align: center;
+  padding: 2rem;
+  min-height: 4rem;
+  width: 20%;
   background-color: var(--input-fill-primary);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--input-text-color);
 
   &::placeholder {
     opacity: 0.75;
-    color: var(--input-placeholder-color);
     font-size: inherit;
     font-weight: inherit;
+    color: var(--input-text-color);
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 

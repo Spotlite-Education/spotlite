@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.scss';
-import { GENERAL_SANS, GENERAL_SANS_ITALIC, ROWDIES } from './util/fonts';
+import { REDHAT, ROWDIES } from './util/fonts';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${GENERAL_SANS.className} ${GENERAL_SANS.variable} ${GENERAL_SANS_ITALIC.variable} ${ROWDIES.variable}`}
+        className={`${REDHAT.className} ${REDHAT.variable} ${ROWDIES.variable}`}
       >
         {children}
       </body>

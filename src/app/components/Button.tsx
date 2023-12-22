@@ -16,15 +16,11 @@ const Button = ({
     <button
       className={`${styles.wrapper} ${className}`}
       style={{
-        color: fill === 'secondary' ? 'var(--text-color)' : undefined,
+        color: fill === 'secondary' ? 'var(--input-text-color)' : 'var(--text-color)',
         backgroundColor:
-          fill === 'primary'
-            ? undefined
-            : fill === 'secondary'
-            ? 'var(--accent-color)'
-            : fill
-            ? fill
-            : undefined,
+          fill === 'secondary'
+            ? 'var(--text-color)'
+            : 'var(--accent-color)',
         ...style,
       }}
       {...props}

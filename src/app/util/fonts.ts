@@ -1,5 +1,5 @@
 import { Rowdies } from 'next/font/google';
-import localFont from 'next/font/local';
+import { Red_Hat_Display } from 'next/font/google';
 
 export const ROWDIES = Rowdies({
   subsets: ['latin'],
@@ -7,12 +7,8 @@ export const ROWDIES = Rowdies({
   variable: '--font-rowdies',
 });
 
-export const GENERAL_SANS = localFont({
-  src: '../assets/fonts/GeneralSans-Variable.ttf',
-  variable: '--font-general-sans',
-});
-
-export const GENERAL_SANS_ITALIC = localFont({
-  src: '../assets/fonts/GeneralSans-VariableItalic.ttf',
-  variable: '--font-general-sans-italic',
+export const REDHAT = Red_Hat_Display({
+  subsets: ['latin'],
+  weight: ['300', '400', '700'],
+  variable: '--font-redhat',
 });

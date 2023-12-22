@@ -1,11 +1,13 @@
 .wrapper {
-  min-width: 20rem;
-  min-height: 4rem;
   border: none;
   border-radius: 99rem;
-  color: var(--input-placeholder-color);
-  font-weight: 600;
+  padding: 2rem;
+  min-height: 4rem;
+  width: 15%;
   background-color: var(--input-fill-primary);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--input-text-color);
 
   &:hover {
     cursor: pointer;
