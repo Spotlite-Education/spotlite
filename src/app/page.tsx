@@ -8,7 +8,7 @@ const Home = () => {
     <main className={styles.main}>
       <div className={styles.title}>TOSS-IT!</div>
       <Input className={styles.roomCodeInput} placeholder="Room Code" />
-      <Link href="/create">
+      <Link href="/teacher/home">
         <Button className={styles.toTeacherMode}>
           To Teacher Mode
         </Button>
