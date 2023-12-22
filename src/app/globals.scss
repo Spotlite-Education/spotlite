@@ -22,3 +22,10 @@
   font-size: 1.6rem;
   font-weight: 500;
 }
+
+button,
+a {
+  &:hover {
+    cursor: pointer;
+  }
+}
