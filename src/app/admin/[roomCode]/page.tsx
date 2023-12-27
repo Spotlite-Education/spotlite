@@ -7,6 +7,7 @@ import Button from '@/app/components/Button';
 import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
 import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
+import { formatSeconds } from '@/app/util/format';
 
 const ChooseTopics = () => {
   const [topics, setTopics] = useState<string[]>([]);
@@ -162,23 +163,6 @@ const Countdown = () => {
     return () => clearInterval(intervalId);
   }, [secondsLeft]);
 
-  // formats seconds into hh:mm:ss
-  // TODO: put into a util file
-  const formatSeconds = (time: number): string => {
-    const hours = Math.floor(secondsLeft / (60 * 60));
-    const minutes = Math.floor(secondsLeft / 60);
-    const seconds = time % 60;
-
-    let formatted = '';
-    if (hours > 0) {
-      formatted += hours + ':';
-    }
-    formatted += minutes + ':';
-    formatted += seconds < 10 ? '0' + seconds : seconds;
-
-    return formatted;
-  };
-
   return (
     <div className={styles.centeredWrapper}>
       <div className={styles.header}>Create your quiz questions!</div>
@@ -296,8 +280,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       {/* <Lobby roomCode={params.roomCode} /> */}
       {/* <Countdown /> */}
       {/* <RevealQuizzer /> */}
-      {/* <Leaderboard /> */}
-      <Podium />
+      <Leaderboard />
+      {/* <Podium /> */}
     </main>
   );
 };

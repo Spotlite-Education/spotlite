@@ -1,3 +1,5 @@
+@use '../util.module.scss' as util;
+
 .main {
   width: 100%;
   height: 100vh;
@@ -27,5 +29,125 @@
     font-family: var(--font-rowdies);
     font-size: 5rem;
     font-weight: 600;
+  }
+}
+
+.centeredWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.bigText {
+  font-family: var(--font-rowdies);
+  font-size: 6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.lessBigText {
+  @extend .bigText;
+  font-size: 3.5rem;
+}
+
+.lessLessBigText {
+  @extend .bigText;
+  font-size: 2.5rem;
+}
+
+.subText {
+  opacity: 75%;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.timer {
+  position: absolute;
+  top: 5rem;
+  right: 5rem;
+  font-family: var(--font-rowdies);
+  font-size: 4rem;
+  font-weight: 600;
+}
+
+.answerInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin-top: 2rem;
+
+  .answerInput {
+    width: 30rem;
+    height: 4.5rem;
+  }
+
+  .submitAnswer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    background-color: transparent;
+  }
+}
+
+.pointsChange {
+  font-family: var(--font-rowdies);
+  font-size: 8rem;
+  font-weight: 600;
+  @include util.text-shadow();
+}
+
+.questionSpotlightWrapper {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 35% 1fr;
+  column-gap: 5rem;
+  padding: 5rem;
+  padding-top: 10rem;
+
+  .questionDetails {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5rem;
+
+    .questionDraftWrapper {
+      flex: 3;
+    }
+
+    .questionAnswerWrapper {
+      flex: 2;
+    }
+
+    .lastResponseWrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 3.5rem;
+      border-radius: 99rem;
+      background-color: var(--dark-orange);
+
+      .name {
+        font-family: var(--font-rowdies);
+        font-size: 2.5rem;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .whiteboardWrapper {
+    height: 100%;
+  }
+
+  .timer {
+    @extend .timer;
+    font-size: 3.5rem;
+    top: 2.5rem;
+    right: 2.5rem;
   }
 }
