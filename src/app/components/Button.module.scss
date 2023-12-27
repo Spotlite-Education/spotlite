@@ -1,13 +1,16 @@
 .wrapper {
-  border: none;
-  border-radius: 99rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 2rem;
   min-height: 4rem;
-  width: 15%;
-  background-color: var(--input-fill-primary);
+  min-width: 20rem;
+  border: none;
+  border-radius: 99rem;
+  color: var(--input-text-color);
   font-size: 2rem;
   font-weight: bold;
-  color: var(--input-text-color);
+  background-color: var(--input-fill-primary);
 
   &:hover {
     cursor: pointer;
