@@ -276,11 +276,11 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   return (
     <main className={styles.main}>
-      {/* <ChooseTopics /> */}
+      <ChooseTopics />
       {/* <Lobby roomCode={params.roomCode} /> */}
       {/* <Countdown /> */}
       {/* <RevealQuizzer /> */}
-      <Leaderboard />
+      {/* <Leaderboard /> */}
       {/* <Podium /> */}
     </main>
   );

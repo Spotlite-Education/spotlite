@@ -101,14 +101,34 @@
   @include util.text-shadow();
 }
 
+.questionCreationWrapper {
+  width: 100%;
+  height: 100%;
+  padding: 13rem 15rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  justify-items: stretch;
+  gap: 5rem;
+
+  .gridRight {
+    display: grid;
+    gap: 5rem;
+    grid-template-rows: 5fr 1fr;
+
+    .submitButton {
+      font-size: 3rem;
+      width: 100%;
+    }
+  }
+}
+
 .questionSpotlightWrapper {
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-columns: 35% 1fr;
   column-gap: 5rem;
-  padding: 5rem;
-  padding-top: 10rem;
+  padding: 13rem 15rem;
 
   .questionDetails {
     display: flex;

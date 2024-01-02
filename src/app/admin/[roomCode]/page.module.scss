@@ -11,16 +11,17 @@
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
-  padding: 10rem;
+  padding: 15rem;
 
   .topics {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 3rem;
+    color: var(--input-text-color);
 
     .topic {
       width: 100%;
-      min-height: 5.5rem;
+      min-height: 6rem;
       font-size: 1.6rem;
       text-align: start;
 
@@ -29,6 +30,8 @@
       }
 
       .deleteTopic {
+        color: var(--input-text-color);
+
         display: flex;
         justify-content: center;
         align-items: center;
@@ -39,16 +42,17 @@
   }
 
   .addTopic {
-    width: 5rem;
-    height: 5rem;
+    width: 7rem;
+    height: 7rem;
     display: flex;
     justify-content: center;
     align-items: center;
     border: none;
     border-radius: 99rem;
-    color: var(--input-placeholder-color);
-    font-size: 2.5rem;
+    color: var(--input-text-color);
+    font-size: 5rem;
     background-color: var(--input-fill-primary);
+    box-shadow: 0.3rem 0.3rem;
   }
 
   .hostRoom {
@@ -196,16 +200,16 @@
 .leaderboardWrapper {
   width: 100%;
   height: 100%;
-  padding: 10rem;
+  padding: 15rem;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 4rem;
 
   .leaderboardItem {
     position: relative;
     width: 100%;
-    height: 7rem;
+    height: 8rem;
     display: flex;
     align-items: center;
     padding: 0 5rem;

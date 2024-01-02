@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
 import Header from '../components/Header';
+import Button from '../components/Button';
 import Input from '../components/Input';
 import Note from '../components/Note';
-import CreateQuestion from './components/QuestionCreation';
 import styles from './page.module.scss';
 import { formatSeconds } from '../util/format';
 import { FaChevronRight } from 'react-icons/fa';
@@ -84,6 +84,34 @@ const LeaderboardPosition = () => {
   );
 };
 
+const QuestionCreation = () => {
+  const [topic, setTopic] = useState<string>('topic');
+
+  return (
+    <div className={styles.questionCreationWrapper}>
+      <div className={styles.timer}>{formatSeconds(47)}</div>
+      <div className={styles.drawablePaper}>
+        <Paper drawable>
+          Draft out a quiz question related to{' '}
+          <span
+            style={{
+              color: 'var(--accent-color)',
+              fontSize: 'inherit',
+              fontWeight: 'inherit',
+            }}
+          >
+            {topic}.
+          </span>
+        </Paper>
+      </div>
+      <div className={styles.gridRight}>
+        <Paper>Answer:</Paper>
+        <Button className={styles.submitButton}>Submit Question</Button>
+      </div>
+    </div>
+  );
+};
+
 const QuestionSpotlight = () => {
   return (
     <div className={styles.questionSpotlightWrapper}>
@@ -99,7 +127,7 @@ const QuestionSpotlight = () => {
           <div className={styles.name}>No responses yet</div>
         </div> */}
       </div>
-      <Paper className={styles.whiteboardWrapper}>
+      <Paper drawable className={styles.whiteboardWrapper}>
         <span
           style={{
             color: 'var(--accent-color)',
@@ -120,12 +148,12 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
     <main className={styles.main}>
       {/* <IdleScreen /> */}
       {/* <NameSelect /> */}
-      {/* <CreateQuestion /> */}
+      <QuestionCreation />
       {/* <QuestionSubmitted /> */}
       {/* <AnswerQuestion /> */}
       {/* <AnswerResult /> */}
       {/* <LeaderboardPosition /> */}
-      <QuestionSpotlight />
+      {/* <QuestionSpotlight /> */}
     </main>
   );
 };

@@ -9,6 +9,6 @@ export const ROWDIES = Rowdies({
 
 export const REDHAT = Red_Hat_Display({
   subsets: ['latin'],
-  weight: ['300', '400', '700'],
+  weight: ['700'],
   variable: '--font-redhat',
 });
