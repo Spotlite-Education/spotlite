@@ -103,12 +103,14 @@
 
 .questionCreationWrapper {
   width: 100%;
-  height: 100%;
-  padding: 13rem 15rem;
+  height: 80vh;
+  padding: 0px 15rem 0px 15rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
   justify-items: stretch;
+  align-items: stretch;
   gap: 5rem;
+  overflow: none;
 
   .gridRight {
     display: grid;

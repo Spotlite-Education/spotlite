@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useDraw } from '../hooks/useDraw';
 import { ChromePicker } from 'react-color';
 import styles from './Canvas.module.scss';
@@ -6,6 +6,38 @@ import styles from './Canvas.module.scss';
 const Canvas = ({}) => {
   const [color, setColor] = useState<string>('#000');
   const { canvasRef, onMouseDown, clear } = useDraw(drawLine);
+  const containerRef = useRef(null);
+
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (!containerRef.current) return;
+
+  //     const context = canvasRef.current.getContext('2d');
+
+  //     const imageData = context.getImageData(
+  //       0,
+  //       0,
+  //       canvasRef.current.width,
+  //       canvasRef.current.height
+  //     );
+
+  //     context.canvas.width = containerRef.current?.offsetWidth;
+  //     context.canvas.height = containerRef.current?.offsetHeight;
+
+  //     // Scale the existing drawing elements
+  //     const scaleX = context.canvas.width / imageData.width;
+  //     const scaleY = context.canvas.height / imageData.height;
+
+  //     context.putImageData(imageData, 0, 0);
+  //   };
+
+  //   const resizeObserver = new ResizeObserver(handleResize);
+  //   resizeObserver.observe(containerRef.current);
+
+  //   return () => {
+  //     resizeObserver.unobserve(containerRef.current);
+  //   };
+  // });
 
   function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
     const { x: currX, y: currY } = currentPoint;
@@ -27,12 +59,12 @@ const Canvas = ({}) => {
   }
 
   return (
-    <div className={styles.canvas}>
+    <div className={styles.canvas} ref={containerRef}>
       <canvas
-        width={400}
-        height={300}
         ref={canvasRef}
         onMouseDown={onMouseDown}
+        width={700}
+        height={500}
       />
       <button type="button" onClick={clear}>
         Clear canvas
