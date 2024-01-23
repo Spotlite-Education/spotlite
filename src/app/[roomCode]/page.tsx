@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { MathInput } from '../components/Input';
 import Note from '../components/Note';
 import styles from './page.module.scss';
 import { formatSeconds } from '../util/format';
@@ -91,8 +92,8 @@ const QuestionCreation = () => {
     <div className={styles.questionCreationWrapper}>
       <div className={styles.timer}>{formatSeconds(47)}</div>
       <div className={styles.drawablePaper}>
-        <Paper drawable>
-          Draft out a quiz question related to{' '}
+        <Paper>
+          Create a quiz question related to{' '}
           <span
             style={{
               color: 'var(--accent-color)',
@@ -102,10 +103,24 @@ const QuestionCreation = () => {
           >
             {topic}.
           </span>
+          <div>
+            <Input
+              className={styles.input}
+              placeholder="Write your quiz question here..."
+            />
+          </div>
         </Paper>
       </div>
       <div className={styles.gridRight}>
-        <Paper>Answer:</Paper>
+        <Paper>
+          Answer:
+          <div>
+            <Input
+              className={styles.input}
+              placeholder="Write your answer here..."
+            />
+          </div>
+        </Paper>
         <Button className={styles.submitButton}>Submit Question</Button>
       </div>
     </div>

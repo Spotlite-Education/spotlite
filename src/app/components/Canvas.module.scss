@@ -1,5 +1,12 @@
-.canvas {
-  padding-top: 3cqw;
+.canvasContainer {
+  overflow: none;
+  padding-top: 5rem;
   border-radius: 8rem;
   z-index: 2;
+}
+
+.canvas {
+  outline: var(--input-text-color) dashed 3px;
+  border-radius: 3rem;
+  margin-bottom: 3rem;
 }

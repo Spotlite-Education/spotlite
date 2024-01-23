@@ -102,15 +102,33 @@
 }
 
 .questionCreationWrapper {
+  overflow-y: scroll;
   width: 100%;
-  height: 80vh;
-  padding: 0px 15rem 0px 15rem;
+  height: 100%;
+  padding: 15rem 15rem 15rem 15rem;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   justify-items: stretch;
   align-items: stretch;
   gap: 5rem;
-  overflow: none;
+
+  .input {
+    overflow-wrap: break-word !important;
+    white-space: pre-line !important;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 0px;
+    border-radius: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    color: var(--accent-color);
+
+    &::placeholder {
+      opacity: 50%;
+      color: var(--accent-color);
+    }
+  }
 
   .gridRight {
     display: grid;

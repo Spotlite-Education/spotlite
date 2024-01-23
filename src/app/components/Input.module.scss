@@ -53,3 +53,19 @@
     }
   }
 }
+
+.mathInputWrapper {
+  width: 100%;
+  height: 100%;
+
+  .mathInput {
+    width: 100%;
+    height: auto;
+    resize: none;
+    overflow: hidden;
+    border: none !important;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    font-size: 2rem;
+  }
+}

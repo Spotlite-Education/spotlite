@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDraw } from '../hooks/useDraw';
 import { ChromePicker } from 'react-color';
+import Button from './Button';
 import styles from './Canvas.module.scss';
 
 const Canvas = ({}) => {
@@ -22,7 +23,6 @@ const Canvas = ({}) => {
   //     );
 
   //     context.canvas.width = containerRef.current?.offsetWidth;
-  //     context.canvas.height = containerRef.current?.offsetHeight;
 
   //     // Scale the existing drawing elements
   //     const scaleX = context.canvas.width / imageData.width;
@@ -42,9 +42,10 @@ const Canvas = ({}) => {
   function drawLine({ prevPoint, currentPoint, ctx }: Draw) {
     const { x: currX, y: currY } = currentPoint;
     const lineColor = color;
-    const lineWidth = 5;
+    const lineWidth = 2.5;
 
     let startPoint = prevPoint ?? currentPoint;
+
     ctx.beginPath();
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = lineColor;
@@ -59,17 +60,18 @@ const Canvas = ({}) => {
   }
 
   return (
-    <div className={styles.canvas} ref={containerRef}>
+    <div className={styles.canvasContainer} ref={containerRef}>
       <canvas
+        className={styles.canvas}
+        height={450}
+        width={750}
         ref={canvasRef}
         onMouseDown={onMouseDown}
-        width={700}
-        height={500}
       />
-      <button type="button" onClick={clear}>
+      <Button type="button" onClick={clear}>
         Clear canvas
-      </button>
-      <ChromePicker color={color} onChange={e => setColor(e.hex)} />
+      </Button>
+      {/* <ChromePicker color={color} onChange={e => setColor(e.hex)} /> */}
     </div>
   );
 };
