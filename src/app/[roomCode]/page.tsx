@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { MathInput } from '../components/Input';
+import LongInput from '../components/Input';
 import Note from '../components/Note';
 import styles from './page.module.scss';
 import { formatSeconds } from '../util/format';
@@ -104,7 +104,7 @@ const QuestionCreation = () => {
             {topic}.
           </span>
           <div>
-            <Input
+            <LongInput
               className={styles.input}
               placeholder="Write your quiz question here..."
             />
@@ -115,7 +115,7 @@ const QuestionCreation = () => {
         <Paper>
           Answer:
           <div>
-            <Input
+            <LongInput
               className={styles.input}
               placeholder="Write your answer here..."
             />

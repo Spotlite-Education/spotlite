@@ -1,13 +1,21 @@
+'use client';
 import { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import styles from './Input.module.scss';
-import { addStyles, EditableMathField } from 'react-mathquill';
-import { useState } from 'react';
+//import { addStyles, EditableMathField } from 'react-mathquill';
+import { useState, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 
-type InputProps = { className?: string };
-addStyles();
+type LongInputProps = { className?: string };
+type InputProps = {
+  className?: string;
+} & InputHTMLAttributes<HTMLInputElement>;
+//addStyles();
 
 const Input = ({ className, ...props }: InputProps) => {
+  return <input className={`${styles.wrapper} ${className}`} {...props} />;
+};
+
+const LongInput = ({ className, ...props }: LongInputProps) => {
   return (
     <TextareaAutosize className={`${styles.wrapper} ${className}`} {...props} />
   );
@@ -16,7 +24,7 @@ const Input = ({ className, ...props }: InputProps) => {
 type IconInputProps = {
   left?: React.ReactNode;
   right?: React.ReactNode;
-} & InputProps;
+} & LongInputProps;
 
 export const IconInput = ({
   left,
@@ -33,19 +41,19 @@ export const IconInput = ({
   );
 };
 
-export const MathInput = ({ className, ...props }: InputProps) => {
-  const [latex, setLatex] = useState('');
+// export const MathInput = ({ className, ...props }: InputProps) => {
+//   const [latex, setLatex] = useState('');
 
-  return (
-    <div className={styles.mathInputWrapper}>
-      <EditableMathField
-        className={styles.mathInput}
-        latex={latex}
-        onChange={mathField => {
-          setLatex(mathField.latex());
-        }}
-      />
-    </div>
-  );
-};
+//   return (
+//     <div className={styles.mathInputWrapper}>
+//       <EditableMathField
+//         className={styles.mathInput}
+//         latex={latex}
+//         onChange={mathField => {
+//           setLatex(mathField.latex());
+//         }}
+//       />
+//     </div>
+//   );
+// };
 export default Input;

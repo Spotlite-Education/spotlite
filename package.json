@@ -10,8 +10,10 @@
   },
   "dependencies": {
     "@tldraw/tldraw": "^1.29.2",
+    "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "framer-motion": "^10.16.16",
-    "jotai": "^2.6.0",
+    "jotai": "^2.6.3",
     "next": "14.0.4",
     "node": "^21.2.0",
     "react": "^18",
