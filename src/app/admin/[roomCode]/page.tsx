@@ -8,63 +8,7 @@ import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
 import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
-
-const ChooseTopics = () => {
-  const [topics, setTopics] = useState<string[]>([]);
-
-  const handleAddTopic = () => {
-    setTopics(prev => [...prev, '']);
-  };
-
-  const handleEditTopic = (index: number, value: string) => {
-    const copy = topics.slice();
-    copy[index] = value;
-    setTopics(copy);
-  };
-
-  const handleDeleteTopic = (index: number) => {
-    const copy = topics.slice();
-    copy.splice(index, 1);
-    setTopics(copy);
-  };
-
-  const DeleteTopic = ({ index }: { index: number }) => (
-    <button
-      className={styles.deleteTopic}
-      onClick={() => handleDeleteTopic(index)}
-    >
-      <FaTimes size="2rem" color="var(--input-placeholder-color)" />
-    </button>
-  );
-
-  return (
-    <div className={styles.chooseTopics}>
-      <Header>WHAT TOPICS SHOULD STUDENTS COVER?</Header>
-      <div className={styles.topics}>
-        {topics.length === 0 ? <Note>There's nothing here...</Note> : null}
-        {topics.map((topic, i) => (
-          <IconInput
-            className={styles.topic}
-            placeholder="Some topic..."
-            value={topic}
-            onChange={e => handleEditTopic(i, e.target.value)}
-            right={<DeleteTopic index={i} />}
-          />
-        ))}
-      </div>
-      <button
-        className={styles.addTopic}
-        disabled={topics.length >= 4}
-        onClick={handleAddTopic}
-      >
-        +
-      </button>
-      <Button className={styles.hostRoom} fill="secondary">
-        Host Room
-      </Button>
-    </div>
-  );
-};
+import { render } from 'react-dom';
 
 interface LobbyProps {
   roomCode: string;
@@ -144,6 +88,63 @@ const Lobby = ({ roomCode }: LobbyProps) => {
         </div>
       </div>
       <Button className={styles.startGame}>Start Game</Button>
+    </div>
+  );
+};
+
+const ChooseTopics = () => {
+  const [topics, setTopics] = useState<string[]>([]);
+
+  const handleAddTopic = () => {
+    setTopics(prev => [...prev, '']);
+  };
+
+  const handleEditTopic = (index: number, value: string) => {
+    const copy = topics.slice();
+    copy[index] = value;
+    setTopics(copy);
+  };
+
+  const handleDeleteTopic = (index: number) => {
+    const copy = topics.slice();
+    copy.splice(index, 1);
+    setTopics(copy);
+  };
+
+  const DeleteTopic = ({ index }: { index: number }) => (
+    <button
+      className={styles.deleteTopic}
+      onClick={() => handleDeleteTopic(index)}
+    >
+      <FaTimes size="2rem" color="var(--input-placeholder-color)" />
+    </button>
+  );
+
+  return (
+    <div className={styles.chooseTopics}>
+      <Header>WHAT TOPICS SHOULD STUDENTS COVER?</Header>
+      <div className={styles.topics}>
+        {topics.length === 0 ? <Note>There's nothing here...</Note> : null}
+        {topics.map((topic, i) => (
+          <IconInput
+            className={styles.topic}
+            placeholder="Some topic..."
+            value={topic}
+            onChange={e => handleEditTopic(i, e.target.value)}
+            right={<DeleteTopic index={i} />}
+          />
+        ))}
+      </div>
+      <button
+        className={styles.addTopic}
+        disabled={topics.length >= 4}
+        onClick={handleAddTopic}
+      >
+        +
+      </button>
+      <Button className={styles.hostRoom} fill="secondary">
+        Start Game
+      </Button>
     </div>
   );
 };
@@ -274,16 +275,26 @@ const Podium = () => {
 };
 
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
-  return (
-    <main className={styles.main}>
-      <ChooseTopics />
-      {/* <Lobby roomCode={params.roomCode} /> */}
-      {/* <Countdown /> */}
-      {/* <RevealQuizzer /> */}
-      {/* <Leaderboard /> */}
-      {/* <Podium /> */}
-    </main>
-  );
+  const [status, setStatus] = useState('lobby');
+
+  const renderComponent = (component: string) => {
+    switch (component) {
+      case 'lobby':
+        return <Lobby roomCode={params.roomCode} />;
+      case 'chooseTopics':
+        return <ChooseTopics />;
+      case 'countdown':
+        return <Countdown />;
+      case 'revealQuizzer':
+        return <RevealQuizzer />;
+      case 'leaderboard':
+        return <Leaderboard />;
+      case 'podium':
+        return <Podium />;
+    }
+  };
+
+  return <main className={styles.main}>{renderComponent(status)}</main>;
 };
 
 export default AdminPage;

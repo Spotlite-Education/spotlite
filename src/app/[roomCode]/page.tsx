@@ -10,15 +10,6 @@ import { formatSeconds } from '../util/format';
 import { FaChevronRight } from 'react-icons/fa';
 import Paper from '../components/Paper';
 
-const NameSelect = () => {
-  return (
-    <div className={styles.nameSelect}>
-      <Header>ENTER YOUR NAME:</Header>
-      <Input placeholder="Name" />
-    </div>
-  );
-};
-
 const IdleScreen = () => {
   return (
     <div className={styles.idleScreen}>
@@ -159,18 +150,30 @@ const QuestionSpotlight = () => {
 };
 
 const Room = ({ params }: { params: { roomCode: string } }) => {
-  return (
-    <main className={styles.main}>
-      {/* <IdleScreen /> */}
-      {/* <NameSelect /> */}
-      <QuestionCreation />
-      {/* <QuestionSubmitted /> */}
-      {/* <AnswerQuestion /> */}
-      {/* <AnswerResult /> */}
-      {/* <LeaderboardPosition /> */}
-      {/* <QuestionSpotlight /> */}
-    </main>
-  );
+  const [status, setStatus] = useState('idleScreen');
+
+  const renderComponent = (component: string) => {
+    switch (component) {
+      case 'idleScreen':
+        return <IdleScreen />;
+      case 'questionSubmitted':
+        return <QuestionSubmitted />;
+      case 'answerQuestion':
+        return <AnswerQuestion />;
+      case 'answerResult':
+        return <AnswerResult />;
+      case 'leaderboardPosition':
+        return <LeaderboardPosition />;
+      case 'questionCreation':
+        return <QuestionCreation />;
+      case 'questionSpotlight':
+        return <QuestionSpotlight />;
+      default:
+        return null;
+    }
+  };
+
+  return <main className={styles.main}>{renderComponent(status)}</main>;
 };
 
 export default Room;

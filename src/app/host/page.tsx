@@ -5,16 +5,28 @@ import Button from '../components/Button';
 import styles from './page.module.scss';
 import { socketAtom } from '../../context/socket';
 import { useAtom } from 'jotai';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Header from '@/app/components/Header';
+
+const NameSelect = () => {
+  return (
+    <div className={styles.nameSelect}>
+      <Header>ENTER YOUR NAME:</Header>
+      <Input placeholder="Name" />
+    </div>
+  );
+};
 
 const HostRoom = () => {
   const [socket, setSocket] = useAtom(socketAtom);
+  const router = useRouter();
 
   const handleCreateRoom = e => {
     e.preventDefault();
     console.log('host room clicked');
     socket.emit('createGame', response => {
-      console.log(response.ok);
-      console.log(response.room);
+      router.push('/admin/' + response.room.roomCode);
     });
   };
 

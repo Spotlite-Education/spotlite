@@ -24,7 +24,7 @@ const LongInput = ({ className, ...props }: LongInputProps) => {
 type IconInputProps = {
   left?: React.ReactNode;
   right?: React.ReactNode;
-} & LongInputProps;
+} & InputProps;
 
 export const IconInput = ({
   left,
@@ -35,7 +35,7 @@ export const IconInput = ({
   return (
     <div className={`${styles.iconInputWrapper} ${className}`}>
       {left ? left : <div />}
-      <TextareaAutosize className={styles.iconInput} {...props} />
+      <input className={styles.iconInput} {...props} />
       {right ? right : <div />}
     </div>
   );
