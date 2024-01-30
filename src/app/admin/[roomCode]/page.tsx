@@ -2,58 +2,22 @@
 import Header from '@/app/components/Header';
 import styles from './page.module.scss';
 import Input, { IconInput } from '@/app/components/Input';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Button from '@/app/components/Button';
 import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
 import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
 import { render } from 'react-dom';
+import { socketAtom } from '../../../context/socket';
+import { useAtom } from 'jotai';
 
 interface LobbyProps {
   roomCode: string;
+  players: string[];
 }
 
-const Lobby = ({ roomCode }: LobbyProps) => {
-  const [players, setPlayers] = useState([
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-    'Andrew',
-    'Yuchen',
-    'Sherry',
-    'Soap',
-  ]);
-
+const Lobby = ({ roomCode, players }: LobbyProps) => {
   return (
     <div className={styles.lobby}>
       <div className={styles.roomSettings}>
@@ -80,7 +44,7 @@ const Lobby = ({ roomCode }: LobbyProps) => {
           </div>
         </div>
         <div className={styles.playerList}>
-          {players.map((name, i) => (
+          {players.map(name => (
             <Button key={name} className={styles.item}>
               {name}
             </Button>
@@ -276,11 +240,24 @@ const Podium = () => {
 
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
+  const [players, setPlayers] = useState([]);
+  const [socket, setSocket] = useAtom(socketAtom);
+
+  useEffect(() => {
+    socket.on('updatePlayers', players => {
+      console.log('setting players');
+      setPlayers(players);
+    });
+
+    return () => {
+      socket.off('updatePlayers', players => {});
+    };
+  }, [socket]);
 
   const renderComponent = (component: string) => {
     switch (component) {
       case 'lobby':
-        return <Lobby roomCode={params.roomCode} />;
+        return <Lobby roomCode={params.roomCode} players={players} />;
       case 'chooseTopics':
         return <ChooseTopics />;
       case 'countdown':

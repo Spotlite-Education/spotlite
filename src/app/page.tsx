@@ -40,6 +40,8 @@ const Home = () => {
     socket.emit('joinGame', roomCode, username, response => {
       if (response.ok) {
         console.log('joined game');
+      } else {
+        console.log("didn't join game");
       }
     });
   };
