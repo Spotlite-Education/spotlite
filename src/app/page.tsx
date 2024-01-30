@@ -8,8 +8,8 @@ import React from 'react';
 import { useState } from 'react';
 import { socketAtom } from '../context/socket';
 import { useAtom } from 'jotai';
-
 import Header from '@/app/components/Header';
+import { useRouter } from 'next/navigation';
 
 const NameSelect = ({
   handleJoin,
@@ -35,10 +35,13 @@ const Home = () => {
   const [chooseUser, setChooseUser] = useState(false);
   const [username, setUsername] = React.useState('');
 
+  const router = useRouter();
+
   const handleJoin = e => {
     e.preventDefault();
     socket.emit('joinGame', roomCode, username, response => {
       if (response.ok) {
+        router.push('/' + response.room.roomCode);
         console.log('joined game');
       } else {
         console.log("didn't join game");

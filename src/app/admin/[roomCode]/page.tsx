@@ -17,7 +17,7 @@ import Guess from '@/app/components/Guess';
 interface LobbyProps {
   roomCode: string;
   players: string[];
-  changeStatus: (newStatus: string) => void;
+  changeStatus: (newStatus: string, socketEvent: string) => void;
 }
 
 const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
@@ -56,7 +56,7 @@ const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
       </div>
       <Button
         onClick={e => {
-          changeStatus('chooseTopics');
+          changeStatus('chooseTopics', 'null');
         }}
         className={styles.startGame}
       >
@@ -69,7 +69,7 @@ const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
 const ChooseTopics = ({
   changeStatus,
 }: {
-  changeStatus: (newStatus: string) => void;
+  changeStatus: (newStatus: string, socketEvent: string) => void;
 }) => {
   const [topics, setTopics] = useState<string[]>([]);
 
@@ -121,7 +121,7 @@ const ChooseTopics = ({
         +
       </button>
       <Button
-        onClick={e => changeStatus('countdown')}
+        onClick={e => changeStatus('countdown', 'startGame')}
         className={styles.hostRoom}
         fill="secondary"
       >
@@ -134,7 +134,7 @@ const ChooseTopics = ({
 const Countdown = ({
   changeStatus,
 }: {
-  changeStatus: (newStatus: string) => void;
+  changeStatus: (newStatus: string, socketEvent: string) => void;
 }) => {
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
@@ -144,7 +144,7 @@ const Countdown = ({
         setSecondsLeft(prev => prev - 1);
       } else {
         clearInterval(intervalId);
-        changeStatus('quizQuestion');
+        changeStatus('quizQuestion', 'startQuizzing');
       }
     }, 1000);
 
@@ -196,7 +196,7 @@ const QuizQuestion = () => {
 const Leaderboard = ({
   changeStatus,
 }: {
-  changeStatus: (newStatus: string) => void;
+  changeStatus: (newStatus: string, socketEvent: string) => void;
 }) => {
   const [leaderboard, setLeaderboard] = useState<
     {
@@ -243,7 +243,7 @@ const Leaderboard = ({
         </div>
       ))}
       <Button
-        onClick={e => changeStatus('podium')}
+        onClick={e => changeStatus('podium', 'showPodium')}
         className={styles.nextButton}
       >
         Next
@@ -296,13 +296,15 @@ const Podium = () => {
 };
 
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
-  const [status, setStatus] = useState('quizQuestion');
+  const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
   const [socket, setSocket] = useAtom(socketAtom);
 
-  const changeStatus = (newStatus: string) => {
+  const changeStatus = (newStatus: string, socketEvent: string) => {
     setStatus(newStatus);
-    //socket.emit('changeStatus', newStatus);
+    if (socketEvent !== 'null') {
+      socket.emit(socketEvent);
+    }
   };
 
   useEffect(() => {
