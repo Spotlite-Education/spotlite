@@ -337,3 +337,41 @@
   bottom: 5rem;
   right: 5rem;
 }
+
+.quizQuestionWrapper {
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  padding: 15rem 15rem 15rem 15rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  justify-items: stretch;
+  align-items: stretch;
+  gap: 5rem;
+
+  .quizQuestion {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    color: var(--accent-color);
+
+    &::placeholder {
+      opacity: 50%;
+      color: var(--accent-color);
+    }
+  }
+
+  .gridRight {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+
+    .guesses {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      font-size: 2rem;
+      width: 100%;
+    }
+  }
+}

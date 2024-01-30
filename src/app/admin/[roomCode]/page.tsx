@@ -11,13 +11,16 @@ import { formatSeconds } from '@/app/util/format';
 import { render } from 'react-dom';
 import { socketAtom } from '../../../context/socket';
 import { useAtom } from 'jotai';
+import Paper from '@/app/components/Paper';
+import Guess from '@/app/components/Guess';
 
 interface LobbyProps {
   roomCode: string;
   players: string[];
+  changeStatus: (newStatus: string) => void;
 }
 
-const Lobby = ({ roomCode, players }: LobbyProps) => {
+const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
   return (
     <div className={styles.lobby}>
       <div className={styles.roomSettings}>
@@ -51,12 +54,23 @@ const Lobby = ({ roomCode, players }: LobbyProps) => {
           ))}
         </div>
       </div>
-      <Button className={styles.startGame}>Start Game</Button>
+      <Button
+        onClick={e => {
+          changeStatus('chooseTopics');
+        }}
+        className={styles.startGame}
+      >
+        Start Game
+      </Button>
     </div>
   );
 };
 
-const ChooseTopics = () => {
+const ChooseTopics = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string) => void;
+}) => {
   const [topics, setTopics] = useState<string[]>([]);
 
   const handleAddTopic = () => {
@@ -106,15 +120,23 @@ const ChooseTopics = () => {
       >
         +
       </button>
-      <Button className={styles.hostRoom} fill="secondary">
+      <Button
+        onClick={e => changeStatus('countdown')}
+        className={styles.hostRoom}
+        fill="secondary"
+      >
         Start Game
       </Button>
     </div>
   );
 };
 
-const Countdown = () => {
-  const [secondsLeft, setSecondsLeft] = useState<number>(2.5 * 60);
+const Countdown = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string) => void;
+}) => {
+  const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -122,6 +144,7 @@ const Countdown = () => {
         setSecondsLeft(prev => prev - 1);
       } else {
         clearInterval(intervalId);
+        changeStatus('quizQuestion');
       }
     }, 1000);
 
@@ -145,7 +168,36 @@ const RevealQuizzer = () => {
   );
 };
 
-const Leaderboard = () => {
+const QuizQuestion = () => {
+  return (
+    <div className={styles.quizQuestionWrapper}>
+      <Paper className={styles.quizQuestion}>Andrew is the quizzer...</Paper>
+      <div className={styles.gridRight}>
+        <Paper>Hint:</Paper>
+        <div className={styles.guesses}>
+          <Guess
+            name={'SOAP'}
+            guess={'hello'}
+            correct={true}
+            points={100}
+          ></Guess>
+          <Guess
+            name={'Yuchen'}
+            guess={'poo'}
+            correct={false}
+            points={0}
+          ></Guess>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Leaderboard = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string) => void;
+}) => {
   const [leaderboard, setLeaderboard] = useState<
     {
       player: string;
@@ -190,7 +242,12 @@ const Leaderboard = () => {
           </div>
         </div>
       ))}
-      <Button className={styles.nextButton}>Next</Button>
+      <Button
+        onClick={e => changeStatus('podium')}
+        className={styles.nextButton}
+      >
+        Next
+      </Button>
     </div>
   );
 };
@@ -239,9 +296,14 @@ const Podium = () => {
 };
 
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
-  const [status, setStatus] = useState('lobby');
+  const [status, setStatus] = useState('quizQuestion');
   const [players, setPlayers] = useState([]);
   const [socket, setSocket] = useAtom(socketAtom);
+
+  const changeStatus = (newStatus: string) => {
+    setStatus(newStatus);
+    //socket.emit('changeStatus', newStatus);
+  };
 
   useEffect(() => {
     socket.on('updatePlayers', players => {
@@ -257,15 +319,23 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const renderComponent = (component: string) => {
     switch (component) {
       case 'lobby':
-        return <Lobby roomCode={params.roomCode} players={players} />;
+        return (
+          <Lobby
+            changeStatus={changeStatus}
+            roomCode={params.roomCode}
+            players={players}
+          />
+        );
       case 'chooseTopics':
-        return <ChooseTopics />;
+        return <ChooseTopics changeStatus={changeStatus} />;
       case 'countdown':
-        return <Countdown />;
+        return <Countdown changeStatus={changeStatus} />;
       case 'revealQuizzer':
         return <RevealQuizzer />;
+      case 'quizQuestion':
+        return <QuizQuestion />;
       case 'leaderboard':
-        return <Leaderboard />;
+        return <Leaderboard changeStatus={changeStatus} />;
       case 'podium':
         return <Podium />;
     }
