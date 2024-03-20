@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -9,6 +9,7 @@ import styles from './page.module.scss';
 import { formatSeconds } from '../util/format';
 import { FaChevronRight } from 'react-icons/fa';
 import Paper from '../components/Paper';
+import { useRouter } from 'next/navigation';
 
 const IdleScreen = () => {
   return (
@@ -151,6 +152,7 @@ const QuestionSpotlight = () => {
 
 const Room = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('idleScreen');
+  const router = useRouter();
 
   const renderComponent = (component: string) => {
     switch (component) {

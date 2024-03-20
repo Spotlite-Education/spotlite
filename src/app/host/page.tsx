@@ -3,31 +3,23 @@
 import Link from 'next/link';
 import Button from '../components/Button';
 import styles from './page.module.scss';
-import { socketAtom } from '../../context/socket';
-import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/app/components/Header';
-
-const NameSelect = () => {
-  return (
-    <div className={styles.nameSelect}>
-      <Header>ENTER YOUR NAME:</Header>
-      <Input placeholder="Name" />
-    </div>
-  );
-};
+import { SOCKET_URL } from '../../context/socket';
 
 const HostRoom = () => {
-  const [socket, setSocket] = useAtom(socketAtom);
   const router = useRouter();
 
   const handleCreateRoom = e => {
     e.preventDefault();
-    console.log('host room clicked');
-    socket.emit('createGame', response => {
-      router.push('/admin/' + response.room.roomCode);
-    });
+    fetch(SOCKET_URL + '/createRoom', { method: 'POST' })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        router.push('/admin/' + data.room.code);
+      });
   };
 
   return (

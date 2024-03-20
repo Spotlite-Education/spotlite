@@ -6,10 +6,10 @@ import Input from './components/Input';
 import styles from './page.module.scss';
 import React from 'react';
 import { useState } from 'react';
-import { socketAtom } from '../context/socket';
-import { useAtom } from 'jotai';
 import Header from '@/app/components/Header';
 import { useRouter } from 'next/navigation';
+
+import { SOCKET_URL, socket } from '../context/socket';
 
 const NameSelect = ({
   handleJoin,
@@ -29,8 +29,8 @@ const NameSelect = ({
 };
 
 const Home = () => {
+  const [playerID, setPlayerID] = useState('');
   const [roomCode, setRoomCode] = useState('');
-  const [socket, setSocket] = useAtom(socketAtom);
 
   const [chooseUser, setChooseUser] = useState(false);
   const [username, setUsername] = React.useState('');
@@ -39,14 +39,18 @@ const Home = () => {
 
   const handleJoin = e => {
     e.preventDefault();
-    socket.emit('joinGame', roomCode, username, response => {
-      if (response.ok) {
-        router.push('/' + response.room.roomCode);
-        console.log('joined game');
-      } else {
-        console.log("didn't join game");
-      }
-    });
+    // set username
+    fetch(SOCKET_URL + '/api/setUsername', {
+      method: 'POST',
+      body: JSON.stringify({ username: username }),
+      headers: { sessionToken: playerID },
+    })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+      });
   };
 
   const handleChangeUsername = e => {
@@ -55,16 +59,18 @@ const Home = () => {
 
   const handleSubmitRoomCode = e => {
     e.preventDefault();
-    console.log('hello');
-    socket.emit('checkRoomExists', roomCode, response => {
-      console.log('hi');
-      if (response.ok) {
-        console.log('room exists');
-        setChooseUser(true);
-      } else {
-        console.log('room does not exist');
-      }
-    });
+    fetch(SOCKET_URL + '/authenticate?roomCode=' + roomCode, {
+      method: 'GET',
+    })
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        if (data.sessionToken != null) {
+          setPlayerID(data.sessionToken);
+          setChooseUser(true);
+        }
+      });
   };
 
   return (

@@ -9,8 +9,6 @@ import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
 import { render } from 'react-dom';
-import { socketAtom } from '../../../context/socket';
-import { useAtom } from 'jotai';
 import Paper from '@/app/components/Paper';
 import Guess from '@/app/components/Guess';
 
@@ -298,25 +296,25 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
-  const [socket, setSocket] = useAtom(socketAtom);
+  const [socket, setSocket] = useState();
 
   const changeStatus = (newStatus: string, socketEvent: string) => {
     setStatus(newStatus);
     if (socketEvent !== 'null') {
-      socket.emit(socketEvent);
+      //socket.emit(socketEvent);
     }
   };
 
-  useEffect(() => {
-    socket.on('updatePlayers', players => {
-      console.log('setting players');
-      setPlayers(players);
-    });
+  // useEffect(() => {
+  //   socket.on('updatePlayers', players => {
+  //     console.log('setting players');
+  //     setPlayers(players);
+  //   });
 
-    return () => {
-      socket.off('updatePlayers', players => {});
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.off('updatePlayers', players => {});
+  //   };
+  // }, [socket]);
 
   const renderComponent = (component: string) => {
     switch (component) {
