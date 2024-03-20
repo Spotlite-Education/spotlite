@@ -9,7 +9,8 @@ import { useState } from 'react';
 import Header from '@/app/components/Header';
 import { useRouter } from 'next/navigation';
 
-import { SOCKET_URL, socket } from '../context/socket';
+import { SOCKET_URL } from '../context/socket';
+import socket from '../context/socket';
 
 const NameSelect = ({
   handleJoin,
@@ -29,7 +30,6 @@ const NameSelect = ({
 };
 
 const Home = () => {
-  const [playerID, setPlayerID] = useState('');
   const [roomCode, setRoomCode] = useState('');
 
   const [chooseUser, setChooseUser] = useState(false);
@@ -39,19 +39,13 @@ const Home = () => {
 
   const handleJoin = e => {
     e.preventDefault();
-    // set username
-    fetch(SOCKET_URL + '/api/setUsername?roomCode=' + roomCode, {
-      method: 'POST',
-      body: JSON.stringify({ username: username }),
-      headers: { sessiontoken: playerID },
-    })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        console.log(data);
-        router.push('/' + roomCode);
-      });
+    socket.emit(
+      'join',
+      username,
+      roomCode,
+      sessionStorage.getItem('sessionToken')
+    );
+    router.push('/' + roomCode);
   };
 
   const handleChangeUsername = e => {
@@ -69,7 +63,7 @@ const Home = () => {
       .then(data => {
         if (data.sessionToken != null) {
           console.log(data.sessionToken);
-          setPlayerID(data.sessionToken);
+          sessionStorage.setItem('sessionToken', data.sessionToken);
           setChooseUser(true);
         }
       });

@@ -6,6 +6,7 @@ import styles from './page.module.scss';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SOCKET_URL } from '../../context/socket';
+import socket from '../../context/socket';
 
 const HostRoom = () => {
   const router = useRouter();
@@ -18,6 +19,8 @@ const HostRoom = () => {
       })
       .then(data => {
         console.log(data);
+        sessionStorage.setItem('sessionID', data.admin.id);
+        socket.emit('join', 'admin', data.room.code, data.admin.id);
         router.push('/admin/' + data.room.code);
       });
   };

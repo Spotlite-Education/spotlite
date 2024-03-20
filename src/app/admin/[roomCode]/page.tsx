@@ -11,6 +11,7 @@ import { formatSeconds } from '@/app/util/format';
 import { render } from 'react-dom';
 import Paper from '@/app/components/Paper';
 import Guess from '@/app/components/Guess';
+import socket from '../../../context/socket';
 
 interface LobbyProps {
   roomCode: string;
@@ -19,6 +20,10 @@ interface LobbyProps {
 }
 
 const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
+  useEffect(() => {
+    socket.emit('refreshLobby', roomCode, sessionStorage.getItem('sessionID'));
+  }, []);
+
   return (
     <div className={styles.lobby}>
       <div className={styles.roomSettings}>
@@ -45,9 +50,9 @@ const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
           </div>
         </div>
         <div className={styles.playerList}>
-          {players.map(name => (
-            <Button key={name} className={styles.item}>
-              {name}
+          {players.map(({ id, username }) => (
+            <Button key={id} className={styles.item}>
+              {username}
             </Button>
           ))}
         </div>
@@ -296,25 +301,24 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
-  const [socket, setSocket] = useState();
 
   const changeStatus = (newStatus: string, socketEvent: string) => {
     setStatus(newStatus);
     if (socketEvent !== 'null') {
-      //socket.emit(socketEvent);
+      socket.emit(socketEvent);
     }
   };
 
-  // useEffect(() => {
-  //   socket.on('updatePlayers', players => {
-  //     console.log('setting players');
-  //     setPlayers(players);
-  //   });
+  useEffect(() => {
+    socket.on('lobbyUpdate', players => {
+      console.log('setting players');
+      setPlayers(players);
+    });
 
-  //   return () => {
-  //     socket.off('updatePlayers', players => {});
-  //   };
-  // }, [socket]);
+    return () => {
+      socket.off('updatePlayers', players => {});
+    };
+  }, [socket]);
 
   const renderComponent = (component: string) => {
     switch (component) {
