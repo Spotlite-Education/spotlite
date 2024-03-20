@@ -40,16 +40,17 @@ const Home = () => {
   const handleJoin = e => {
     e.preventDefault();
     // set username
-    fetch(SOCKET_URL + '/api/setUsername', {
+    fetch(SOCKET_URL + '/api/setUsername?roomCode=' + roomCode, {
       method: 'POST',
       body: JSON.stringify({ username: username }),
-      headers: { sessionToken: playerID },
+      headers: { sessiontoken: playerID },
     })
       .then(response => {
         return response.json();
       })
       .then(data => {
         console.log(data);
+        router.push('/' + roomCode);
       });
   };
 
@@ -67,6 +68,7 @@ const Home = () => {
       })
       .then(data => {
         if (data.sessionToken != null) {
+          console.log(data.sessionToken);
           setPlayerID(data.sessionToken);
           setChooseUser(true);
         }
