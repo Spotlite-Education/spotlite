@@ -10,12 +10,74 @@ import { formatSeconds } from '../util/format';
 import { FaChevronRight } from 'react-icons/fa';
 import Paper from '../components/Paper';
 import { useRouter } from 'next/navigation';
+import socket from '../../context/socket';
 
-const IdleScreen = () => {
+const IdleScreen = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string, socketEvent: string) => void;
+}) => {
+  socket.on('gameStateChange', data => {
+    if ((data.state = 'questionCreation')) {
+      changeStatus('questionCreation', 'null');
+    }
+  });
+
   return (
     <div className={styles.idleScreen}>
       <div className={styles.youreIn}>YOU&#8217;RE IN!</div>
       <Note>Waiting for start...</Note>
+    </div>
+  );
+};
+
+const QuestionCreation = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string, socketEvent: string) => void;
+}) => {
+  const [topic, setTopic] = useState<string>('topic');
+  const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
+
+  socket.on('gameStateChange', game => {
+    setSecondsLeft(game.countdown);
+  });
+
+  return (
+    <div className={styles.questionCreationWrapper}>
+      <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
+      <div className={styles.drawablePaper}>
+        <Paper>
+          Create a quiz question related to{' '}
+          <span
+            style={{
+              color: 'var(--accent-color)',
+              fontSize: 'inherit',
+              fontWeight: 'inherit',
+            }}
+          >
+            {topic}.
+          </span>
+          <div>
+            <LongInput
+              className={styles.input}
+              placeholder="Write your quiz question here..."
+            />
+          </div>
+        </Paper>
+      </div>
+      <div className={styles.gridRight}>
+        <Paper>
+          Answer:
+          <div>
+            <LongInput
+              className={styles.input}
+              placeholder="Write your answer here..."
+            />
+          </div>
+        </Paper>
+        <Button className={styles.submitButton}>Submit Question</Button>
+      </div>
     </div>
   );
 };
@@ -77,48 +139,6 @@ const LeaderboardPosition = () => {
   );
 };
 
-const QuestionCreation = () => {
-  const [topic, setTopic] = useState<string>('topic');
-
-  return (
-    <div className={styles.questionCreationWrapper}>
-      <div className={styles.timer}>{formatSeconds(47)}</div>
-      <div className={styles.drawablePaper}>
-        <Paper>
-          Create a quiz question related to{' '}
-          <span
-            style={{
-              color: 'var(--accent-color)',
-              fontSize: 'inherit',
-              fontWeight: 'inherit',
-            }}
-          >
-            {topic}.
-          </span>
-          <div>
-            <LongInput
-              className={styles.input}
-              placeholder="Write your quiz question here..."
-            />
-          </div>
-        </Paper>
-      </div>
-      <div className={styles.gridRight}>
-        <Paper>
-          Answer:
-          <div>
-            <LongInput
-              className={styles.input}
-              placeholder="Write your answer here..."
-            />
-          </div>
-        </Paper>
-        <Button className={styles.submitButton}>Submit Question</Button>
-      </div>
-    </div>
-  );
-};
-
 const QuestionSpotlight = () => {
   return (
     <div className={styles.questionSpotlightWrapper}>
@@ -154,10 +174,17 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('idleScreen');
   const router = useRouter();
 
+  const changeStatus = (newStatus: string, socketEvent: string) => {
+    setStatus(newStatus);
+    if (socketEvent !== 'null') {
+      socket.emit(socketEvent);
+    }
+  };
+
   const renderComponent = (component: string) => {
     switch (component) {
       case 'idleScreen':
-        return <IdleScreen />;
+        return <IdleScreen changeStatus={changeStatus} />;
       case 'questionSubmitted':
         return <QuestionSubmitted />;
       case 'answerQuestion':
@@ -167,7 +194,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       case 'leaderboardPosition':
         return <LeaderboardPosition />;
       case 'questionCreation':
-        return <QuestionCreation />;
+        return <QuestionCreation changeStatus={changeStatus} />;
       case 'questionSpotlight':
         return <QuestionSpotlight />;
       default:

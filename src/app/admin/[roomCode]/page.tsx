@@ -124,7 +124,10 @@ const ChooseTopics = ({
         +
       </button>
       <Button
-        onClick={e => changeStatus('countdown', 'startGame')}
+        onClick={e => {
+          socket.emit('createGame', 5, 30);
+          changeStatus('countdown', 'null');
+        }}
         className={styles.hostRoom}
         fill="secondary"
       >
@@ -136,23 +139,21 @@ const ChooseTopics = ({
 
 const Countdown = ({
   changeStatus,
+  changeQuizzer,
 }: {
   changeStatus: (newStatus: string, socketEvent: string) => void;
+  changeQuizzer: (newQuizzer: object) => void;
 }) => {
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (secondsLeft > 0) {
-        setSecondsLeft(prev => prev - 1);
-      } else {
-        clearInterval(intervalId);
-        changeStatus('quizQuestion', 'startQuizzing');
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [secondsLeft]);
+  socket.on('gameStateChange', game => {
+    if (game.status === 'countdown') {
+      setSecondsLeft(game.countdown);
+    } else if (game.status == 'answerQuestion') {
+      changeQuizzer(game.quizzer);
+      changeStatus('revealQuizzer', 'null');
+    }
+  });
 
   return (
     <div className={styles.centeredWrapper}>
@@ -162,7 +163,11 @@ const Countdown = ({
   );
 };
 
-const RevealQuizzer = () => {
+const RevealQuizzer = ({
+  changeStatus,
+}: {
+  changeStatus: (newStatus: string, socketEvent: string) => void;
+}) => {
   return (
     <div className={styles.centeredWrapper}>
       <div className={styles.quizzer}>Andrew</div>
@@ -301,12 +306,17 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
+  const [quizzer, setQuizzer] = useState({});
 
   const changeStatus = (newStatus: string, socketEvent: string) => {
     setStatus(newStatus);
     if (socketEvent !== 'null') {
       socket.emit(socketEvent);
     }
+  };
+
+  const changeQuizzer = (newQuizzer: object) => {
+    setQuizzer(newQuizzer);
   };
 
   useEffect(() => {
@@ -333,9 +343,14 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       case 'chooseTopics':
         return <ChooseTopics changeStatus={changeStatus} />;
       case 'countdown':
-        return <Countdown changeStatus={changeStatus} />;
+        return (
+          <Countdown
+            changeStatus={changeStatus}
+            changeQuizzer={changeQuizzer}
+          />
+        );
       case 'revealQuizzer':
-        return <RevealQuizzer />;
+        return <RevealQuizzer changeStatus={changeStatus} />;
       case 'quizQuestion':
         return <QuizQuestion />;
       case 'leaderboard':
