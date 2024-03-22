@@ -19,7 +19,7 @@ const HostRoom = () => {
       })
       .then(data => {
         console.log(data);
-        sessionStorage.setItem('sessionID', data.admin.id);
+        sessionStorage.setItem('sessionToken', data.admin.id);
         socket.emit('join', 'admin', data.room.code, data.admin.id);
         router.push('/admin/' + data.room.code);
       });
@@ -35,7 +35,6 @@ const HostRoom = () => {
           To Student Mode
         </Button>
       </Link>
-      <div className={styles.box} />
     </main>
   );
 };

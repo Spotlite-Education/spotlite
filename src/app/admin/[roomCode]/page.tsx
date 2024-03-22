@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', 5, 30);
+          socket.emit('createGame', 5, 7);
           changeStatus('countdown', 'null');
         }}
         className={styles.hostRoom}
@@ -137,24 +137,7 @@ const ChooseTopics = ({
   );
 };
 
-const Countdown = ({
-  changeStatus,
-  changeQuizzer,
-}: {
-  changeStatus: (newStatus: string, socketEvent: string) => void;
-  changeQuizzer: (newQuizzer: object) => void;
-}) => {
-  const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
-
-  socket.on('gameStateChange', game => {
-    if (game.status === 'countdown') {
-      setSecondsLeft(game.countdown);
-    } else if (game.status == 'answerQuestion') {
-      changeQuizzer(game.quizzer);
-      changeStatus('revealQuizzer', 'null');
-    }
-  });
-
+const Countdown = ({ secondsLeft }: { secondsLeft: number }) => {
   return (
     <div className={styles.centeredWrapper}>
       <div className={styles.header}>Create your quiz questions!</div>
@@ -163,23 +146,27 @@ const Countdown = ({
   );
 };
 
-const RevealQuizzer = ({
-  changeStatus,
-}: {
-  changeStatus: (newStatus: string, socketEvent: string) => void;
-}) => {
+const RevealQuizzer = ({ quizzer }: { quizzer: string }) => {
   return (
     <div className={styles.centeredWrapper}>
-      <div className={styles.quizzer}>Andrew</div>
+      <div className={styles.quizzer}>{quizzer}</div>
       <div className={styles.isTheQuizzer}>is the quizzer...</div>
     </div>
   );
 };
 
-const QuizQuestion = () => {
+const QuizQuestion = ({
+  quizzer,
+  secondsLeft,
+}: {
+  quizzer: string;
+  secondsLeft: number;
+}) => {
   return (
     <div className={styles.quizQuestionWrapper}>
-      <Paper className={styles.quizQuestion}>Andrew is the quizzer...</Paper>
+      <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
+
+      <Paper className={styles.quizQuestion}>{quizzer} is the quizzer...</Paper>
       <div className={styles.gridRight}>
         <Paper>Hint:</Paper>
         <div className={styles.guesses}>
@@ -201,11 +188,7 @@ const QuizQuestion = () => {
   );
 };
 
-const Leaderboard = ({
-  changeStatus,
-}: {
-  changeStatus: (newStatus: string, socketEvent: string) => void;
-}) => {
+const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState<
     {
       player: string;
@@ -251,7 +234,7 @@ const Leaderboard = ({
         </div>
       ))}
       <Button
-        onClick={e => changeStatus('podium', 'showPodium')}
+        //onClick={e => changeStatus('podium', 'showPodium')}
         className={styles.nextButton}
       >
         Next
@@ -306,7 +289,8 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
-  const [quizzer, setQuizzer] = useState({});
+  const [quizzer, setQuizzer] = useState('');
+  const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
   const changeStatus = (newStatus: string, socketEvent: string) => {
     setStatus(newStatus);
@@ -315,14 +299,27 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     }
   };
 
-  const changeQuizzer = (newQuizzer: object) => {
-    setQuizzer(newQuizzer);
-  };
-
   useEffect(() => {
     socket.on('lobbyUpdate', players => {
-      console.log('setting players');
       setPlayers(players);
+    });
+    socket.on('gameStateChange', game => {
+      setSecondsLeft(game.countdown);
+      console.log(game.state);
+      switch (game.state) {
+        case 'choosing quizzer':
+          setQuizzer(game.quizzer);
+          changeStatus('revealQuizzer', 'null');
+          break;
+        case 'answerQuestion':
+          changeStatus('quizQuestion', 'null');
+          break;
+        case 'leaderboardPosition':
+          changeStatus('leaderboard', 'null');
+          break;
+        case 'end':
+          changeStatus('podium', 'null');
+      }
     });
 
     return () => {
@@ -343,18 +340,13 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       case 'chooseTopics':
         return <ChooseTopics changeStatus={changeStatus} />;
       case 'countdown':
-        return (
-          <Countdown
-            changeStatus={changeStatus}
-            changeQuizzer={changeQuizzer}
-          />
-        );
+        return <Countdown secondsLeft={secondsLeft} />;
       case 'revealQuizzer':
-        return <RevealQuizzer changeStatus={changeStatus} />;
+        return <RevealQuizzer quizzer={quizzer} />;
       case 'quizQuestion':
-        return <QuizQuestion />;
+        return <QuizQuestion quizzer={quizzer} secondsLeft={secondsLeft} />;
       case 'leaderboard':
-        return <Leaderboard changeStatus={changeStatus} />;
+        return <Leaderboard />;
       case 'podium':
         return <Podium />;
     }

@@ -89,7 +89,6 @@ const Home = () => {
           <Link href="/host">
             <Button className={styles.toTeacherMode}>To Teacher Mode</Button>
           </Link>
-          <div className={styles.box} />
         </>
       )}
     </main>
