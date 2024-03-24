@@ -28,7 +28,14 @@ const QuestionCreation = ({
   changeStatus: (newStatus: string, socketEvent: string) => void;
   secondsLeft: number;
 }) => {
-  const [topic, setTopic] = useState<string>('topic');
+  const [topic, setTopic] = useState<string>('');
+
+  useEffect(() => {
+    socket.emit('getStudentInfo', info => {
+      setTopic(info.theme);
+      console.log(info);
+    });
+  }, []);
 
   const onClick = () => {
     changeStatus('questionSubmitted', 'null');
@@ -39,7 +46,7 @@ const QuestionCreation = ({
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
       <div className={styles.drawablePaper}>
         <Paper>
-          Create a quiz question related to{' '}
+          Create a quiz question related to&nbsp;
           <span
             style={{
               color: 'var(--accent-color)',
@@ -227,7 +234,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
     });
 
     return () => {
-      socket.off('updatePlayers', players => {});
+      socket.off('gameStateChange', players => {});
     };
   }, [socket]);
 

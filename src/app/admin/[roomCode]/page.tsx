@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', 5, 7);
+          socket.emit('createGame', topics, 5, 7);
           changeStatus('countdown', 'null');
         }}
         className={styles.hostRoom}
@@ -305,7 +305,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     });
     socket.on('gameStateChange', game => {
       setSecondsLeft(game.countdown);
-      console.log(game.state);
+      console.log(game);
       switch (game.state) {
         case 'choosing quizzer':
           setQuizzer(game.quizzer);
@@ -323,7 +323,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     });
 
     return () => {
-      socket.off('updatePlayers', players => {});
+      socket.off('lobbyUpdate', players => {});
+      socket.off('gameStateChange', game => {});
     };
   }, [socket]);
 
