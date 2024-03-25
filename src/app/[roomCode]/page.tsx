@@ -25,24 +25,33 @@ const QuestionCreation = ({
   changeStatus,
   secondsLeft,
 }: {
-  changeStatus: (newStatus: string, socketEvent: string) => void;
+  changeStatus: (newStatus: string) => void;
   secondsLeft: number;
 }) => {
   const [topic, setTopic] = useState<string>('');
 
   useEffect(() => {
-    socket.emit('getStudentInfo', info => {
-      setTopic(info.theme);
-      console.log(info);
-    });
+    socket.emit(
+      'getStudentInfo',
+      sessionStorage.getItem('sessionToken'),
+      info => {
+        setTopic(info.theme);
+      }
+    );
   }, []);
 
-  const onClick = () => {
-    changeStatus('questionSubmitted', 'null');
+  const onSubmit = e => {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const formJson = Object.fromEntries(formData.entries());
+
+    socket.emit('submitQuestion', formJson.question, formJson.answer);
+    changeStatus('questionSubmitted');
   };
 
   return (
-    <div className={styles.questionCreationWrapper}>
+    <form className={styles.questionCreationWrapper} onSubmit={onSubmit}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
       <div className={styles.drawablePaper}>
         <Paper>
@@ -60,6 +69,7 @@ const QuestionCreation = ({
             <LongInput
               className={styles.input}
               placeholder="Write your quiz question here..."
+              name="question"
             />
           </div>
         </Paper>
@@ -71,14 +81,15 @@ const QuestionCreation = ({
             <LongInput
               className={styles.input}
               placeholder="Write your answer here..."
+              name="answer"
             />
           </div>
         </Paper>
-        <Button className={styles.submitButton} onClick={onClick}>
+        <Button className={styles.submitButton} type="submit">
           Submit Question
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
 
@@ -167,6 +178,20 @@ const LeaderboardPosition = () => {
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+
+  useEffect(() => {
+    socket.emit(
+      'getStudentInfo',
+      sessionStorage.getItem('sessionToken'),
+      info => {
+        setAnswer(info.answer);
+        setQuestion(info.question);
+      }
+    );
+  }, []);
+
   return (
     <div
       className={styles.questionSpotlightWrapper}
@@ -176,9 +201,11 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
       <div className={styles.questionDetails}>
         <Paper className={styles.questionDraftWrapper}>
           Your Question Draft:
+          <div>{question}</div>
         </Paper>
         <Paper className={styles.questionAnswerWrapper}>
           Your Question Answer:
+          <div>{answer}</div>
         </Paper>
         {/* <div className={styles.lastResponseWrapper}>
           <div className={styles.name}>No responses yet</div>
@@ -207,28 +234,33 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [isQuizzer, setIsQuizzer] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
+  const changeStatus = (newStatus: string) => {
+    console.log(newStatus);
+    setStatus(newStatus);
+  };
+
   useEffect(() => {
     socket.on('gameStateChange', game => {
+      console.log(status);
+
       setSecondsLeft(game.countdown);
       switch (game.state) {
         case 'questionCreation':
-          if (status == 'idleScreen') {
-            changeStatus('questionCreation', 'null');
-          }
+          changeStatus('questionCreation');
           break;
         case 'choosing quizzer':
           setQuizzer(game.quizzer);
-          changeStatus('showQuizzer', 'null');
+          changeStatus('showQuizzer');
           break;
         case 'answerQuestion':
           if (sessionStorage.getItem('sessionToken') == game.quizzer) {
-            changeStatus('questionSpotlight', 'null');
+            changeStatus('questionSpotlight');
           } else {
-            changeStatus('answerQuestion', 'null');
+            changeStatus('answerQuestion');
           }
           break;
         case 'leaderboardPosition':
-          changeStatus('leaderboardPosition', 'null');
+          changeStatus('leaderboardPosition');
           break;
       }
     });
@@ -237,17 +269,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       socket.off('gameStateChange', players => {});
     };
   }, [socket]);
-
-  const changeStatus = (newStatus: string, socketEvent: string) => {
-    setStatus(newStatus);
-    if (socketEvent !== 'null') {
-      socket.emit(socketEvent);
-    }
-  };
-
-  const changeQuizzer = (newQuizzer: string) => {
-    setQuizzer(newQuizzer);
-  };
 
   const renderComponent = (component: string) => {
     switch (component) {

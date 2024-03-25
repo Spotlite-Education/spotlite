@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 5, 7);
+          socket.emit('createGame', topics, 20, 20);
           changeStatus('countdown', 'null');
         }}
         className={styles.hostRoom}
@@ -162,11 +162,22 @@ const QuizQuestion = ({
   quizzer: string;
   secondsLeft: number;
 }) => {
+  const [question, setQuestion] = useState('');
+
+  useEffect(() => {
+    socket.emit('getStudentInfo', quizzer, info => {
+      setQuestion(info.question);
+    });
+  }, []);
+
   return (
     <div className={styles.quizQuestionWrapper}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
 
-      <Paper className={styles.quizQuestion}>{quizzer} is the quizzer...</Paper>
+      <Paper className={styles.quizQuestion}>
+        {quizzer} is the quizzer...
+        <div>{question}</div>
+      </Paper>
       <div className={styles.gridRight}>
         <Paper>Hint:</Paper>
         <div className={styles.guesses}>
