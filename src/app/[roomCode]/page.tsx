@@ -172,7 +172,17 @@ const AnswerQuestion = ({
 };
 
 const AnswerResult = () => {
-  const [correct, setCorrect] = useState<boolean>(true);
+  const [points, setPoints] = useState(0);
+
+  useEffect(() => {
+    socket.emit(
+      'getStudentInfo',
+      sessionStorage.getItem('sessionToken'),
+      info => {
+        setPoints(info.points);
+      }
+    );
+  }, []);
 
   return (
     <div
@@ -180,7 +190,7 @@ const AnswerResult = () => {
       style={{ backgroundColor: 'var(--accent-color)' }}
     >
       <div className={styles.lessLessBigText}>Correct!</div>
-      <div className={styles.pointsChange}>+657</div>
+      <div className={styles.pointsChange}>+{points}</div>
     </div>
   );
 };
