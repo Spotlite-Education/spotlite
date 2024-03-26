@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 30, 20);
+          socket.emit('createGame', topics, 10, 10);
           changeStatus('countdown');
         }}
         className={styles.hostRoom}
@@ -196,7 +196,7 @@ const QuizQuestion = ({
 };
 
 const Leaderboard = () => {
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboard, setLeaderboard] = useState({});
 
   useEffect(() => {
     socket.emit('getLeaderboard', leaderboard => {
@@ -206,9 +206,9 @@ const Leaderboard = () => {
 
   return (
     <div className={styles.leaderboardWrapper}>
-      {leaderboard.map((position, i) => (
+      {Object.keys(leaderboard).map((playerID, i) => (
         <div
-          key={position.player}
+          // key={}
           className={styles.leaderboardItem}
           style={{
             color: i === 0 ? 'var(--accent-color)' : undefined,
@@ -221,15 +221,15 @@ const Leaderboard = () => {
           }}
         >
           {i === 0 && <GiQueenCrown size="4.5rem" fill="var(--accent-color)" />}
-          <div className={styles.name}>{position.player}</div>
+          <div className={styles.name}>{leaderboard[playerID].username}</div>
           <div className={styles.score}>
-            {position.points}
+            {leaderboard[playerID].points}
             <div className={styles.icon}>
-              {position.status === 'ascended' ? (
+              {leaderboard[playerID].ascended ? (
                 <FaArrowUp size="3rem" />
-              ) : position.status === 'descended' ? (
+              ) : (
                 <FaArrowDown size="3rem" />
-              ) : null}
+              )}
             </div>
           </div>
         </div>
