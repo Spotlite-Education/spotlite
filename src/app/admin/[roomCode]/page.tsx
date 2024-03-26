@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 5, 20);
+          socket.emit('createGame', topics, 30, 20);
           changeStatus('countdown');
         }}
         className={styles.hostRoom}

@@ -137,10 +137,22 @@ const ShowQuizzer = ({
 const AnswerQuestion = ({
   quizzerUsername,
   secondsLeft,
+  changeStatus,
 }: {
   quizzerUsername: string;
   secondsLeft: number;
+  changeStatus: (newStatus: string) => void;
 }) => {
+  const onAnswer = e => {
+    e.preventDefault();
+    // do something with the answer
+    socket.emit('guessAnswer', e.target[0].value, result => {
+      if (result) {
+        changeStatus('answerResult');
+      }
+    });
+  };
+
   return (
     <div className={styles.centeredWrapper}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
@@ -148,10 +160,12 @@ const AnswerQuestion = ({
         Answer {quizzerUsername}&#8217;s Question:
       </div>
       <div className={styles.answerInputWrapper}>
-        <Input className={styles.answerInput} placeholder="Answer here..." />
-        <button className={styles.submitAnswer}>
-          <FaChevronRight size="2.5rem" color="var(--input-text-color)" />
-        </button>
+        <form onSubmit={onAnswer}>
+          <Input className={styles.answerInput} placeholder="Answer here..." />
+          <button className={styles.submitAnswer}>
+            <FaChevronRight size="2.5rem" color="var(--input-text-color)" />
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -165,9 +179,7 @@ const AnswerResult = () => {
       className={styles.centeredWrapper}
       style={{ backgroundColor: 'var(--accent-color)' }}
     >
-      <div className={styles.lessLessBigText}>
-        {correct ? 'Correct!' : 'Incorrect...'}
-      </div>
+      <div className={styles.lessLessBigText}>Correct!</div>
       <div className={styles.pointsChange}>+657</div>
     </div>
   );
@@ -235,7 +247,12 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           Write out your quiz question
         </span>{' '}
         for everyone!
-        <form onChange={onWrite}>
+        <form
+          onChange={onWrite}
+          onSubmit={e => {
+            e.preventDefault();
+          }}
+        >
           <LongInput
             className={styles.input}
             placeholder="Write your quiz question here..."
@@ -276,7 +293,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
         case 'answerQuestion':
           if (sessionStorage.getItem('sessionToken') == game.quizzer.id) {
             changeStatus('questionSpotlight');
-          } else {
+          } else if (status != 'answerResult') {
             changeStatus('answerQuestion');
           }
           break;
@@ -304,6 +321,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           <AnswerQuestion
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
+            changeStatus={changeStatus}
           />
         );
       case 'showQuizzer':
