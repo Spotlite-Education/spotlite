@@ -78,7 +78,7 @@ const Home = () => {
         />
       ) : (
         <>
-          <div className={styles.title}>TOSS-IT!</div>
+          <div className={styles.title}>SPOTLITE!</div>
           <form onSubmit={e => handleSubmitRoomCode(e)}>
             <Input
               onChange={e => setRoomCode(e.target.value)}

@@ -27,7 +27,7 @@ const HostRoom = () => {
 
   return (
     <main className={styles.main}>
-      <div className={styles.title}>TOSS-IT!</div>
+      <div className={styles.title}>SPOTLITE!</div>
       <div className={styles.forTeachers}>FOR TEACHERS</div>
       <Button onClick={e => handleCreateRoom(e)}>Host Room</Button>
       <Link href="/">

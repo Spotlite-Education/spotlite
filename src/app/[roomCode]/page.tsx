@@ -105,8 +105,14 @@ const QuestionSubmitted = () => {
   );
 };
 
-const ShowQuizzer = ({ quizzer }: { quizzer: string }) => {
-  const isQuizzer = sessionStorage.getItem('sessionToken') == quizzer;
+const ShowQuizzer = ({
+  quizzerID,
+  quizzerUsername,
+}: {
+  quizzerID: string;
+  quizzerUsername: string;
+}) => {
+  const isQuizzer = sessionStorage.getItem('sessionToken') == quizzerID;
   return (
     <>
       {isQuizzer ? (
@@ -118,7 +124,9 @@ const ShowQuizzer = ({ quizzer }: { quizzer: string }) => {
         </div>
       ) : (
         <div className={styles.centeredWrapper}>
-          <div className={styles.isTheQuizzer}>{quizzer} is the quizzer...</div>
+          <div className={styles.isTheQuizzer}>
+            {quizzerUsername} is the quizzer...
+          </div>
         </div>
       )}
       ;
@@ -127,17 +135,17 @@ const ShowQuizzer = ({ quizzer }: { quizzer: string }) => {
 };
 
 const AnswerQuestion = ({
-  quizzer,
+  quizzerUsername,
   secondsLeft,
 }: {
-  quizzer: string;
+  quizzerUsername: string;
   secondsLeft: number;
 }) => {
   return (
     <div className={styles.centeredWrapper}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
       <div className={styles.lessBigText}>
-        Answer {quizzer}&#8217;s Question:
+        Answer {quizzerUsername}&#8217;s Question:
       </div>
       <div className={styles.answerInputWrapper}>
         <Input className={styles.answerInput} placeholder="Answer here..." />
@@ -181,6 +189,10 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
 
+  const onWrite = e => {
+    socket.emit('updateSpotlitQuestion', e.target.value);
+  };
+
   useEffect(() => {
     socket.emit(
       'getStudentInfo',
@@ -211,7 +223,8 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           <div className={styles.name}>No responses yet</div>
         </div> */}
       </div>
-      <Paper drawable className={styles.whiteboardWrapper}>
+      {/* <Paper drawable className={styles.whiteboardWrapper}> */}
+      <Paper className={styles.whiteboardWrapper}>
         <span
           style={{
             color: 'var(--accent-color)',
@@ -222,6 +235,13 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           Write out your quiz question
         </span>{' '}
         for everyone!
+        <form onChange={onWrite}>
+          <LongInput
+            className={styles.input}
+            placeholder="Write your quiz question here..."
+            name="question"
+          />
+        </form>
       </Paper>
     </div>
   );
@@ -230,30 +250,31 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
 const Room = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('idleScreen');
   const router = useRouter();
-  const [quizzer, setQuizzer] = useState('');
+  const [quizzerID, setQuizzerID] = useState('');
+  const [quizzerUsername, setQuizzerUsername] = useState('');
   const [isQuizzer, setIsQuizzer] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
 
   const changeStatus = (newStatus: string) => {
-    console.log(newStatus);
     setStatus(newStatus);
   };
 
   useEffect(() => {
-    socket.on('gameStateChange', game => {
-      console.log(status);
-
+    const handleGameStateChange = game => {
       setSecondsLeft(game.countdown);
       switch (game.state) {
         case 'questionCreation':
-          changeStatus('questionCreation');
+          if (status == 'idleScreen') {
+            changeStatus('questionCreation');
+          }
           break;
         case 'choosing quizzer':
-          setQuizzer(game.quizzer);
+          setQuizzerID(game.quizzer.id);
+          setQuizzerUsername(game.quizzer.username);
           changeStatus('showQuizzer');
           break;
         case 'answerQuestion':
-          if (sessionStorage.getItem('sessionToken') == game.quizzer) {
+          if (sessionStorage.getItem('sessionToken') == game.quizzer.id) {
             changeStatus('questionSpotlight');
           } else {
             changeStatus('answerQuestion');
@@ -263,12 +284,14 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           changeStatus('leaderboardPosition');
           break;
       }
-    });
+    };
+
+    socket.on('gameStateChange', handleGameStateChange);
 
     return () => {
-      socket.off('gameStateChange', players => {});
+      socket.off('gameStateChange', handleGameStateChange);
     };
-  }, [socket]);
+  }, [status]);
 
   const renderComponent = (component: string) => {
     switch (component) {
@@ -277,9 +300,19 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       case 'questionSubmitted':
         return <QuestionSubmitted />;
       case 'answerQuestion':
-        return <AnswerQuestion quizzer={quizzer} secondsLeft={secondsLeft} />;
+        return (
+          <AnswerQuestion
+            quizzerUsername={quizzerUsername}
+            secondsLeft={secondsLeft}
+          />
+        );
       case 'showQuizzer':
-        return <ShowQuizzer quizzer={quizzer} />;
+        return (
+          <ShowQuizzer
+            quizzerID={quizzerID}
+            quizzerUsername={quizzerUsername}
+          />
+        );
       case 'answerResult':
         return <AnswerResult />;
       case 'leaderboardPosition':

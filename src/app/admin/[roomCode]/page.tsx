@@ -16,7 +16,7 @@ import socket from '../../../context/socket';
 interface LobbyProps {
   roomCode: string;
   players: string[];
-  changeStatus: (newStatus: string, socketEvent: string) => void;
+  changeStatus: (newStatus: string) => void;
 }
 
 const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
@@ -59,7 +59,7 @@ const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
       </div>
       <Button
         onClick={e => {
-          changeStatus('chooseTopics', 'null');
+          changeStatus('chooseTopics');
         }}
         className={styles.startGame}
       >
@@ -72,7 +72,7 @@ const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
 const ChooseTopics = ({
   changeStatus,
 }: {
-  changeStatus: (newStatus: string, socketEvent: string) => void;
+  changeStatus: (newStatus: string) => void;
 }) => {
   const [topics, setTopics] = useState<string[]>([]);
 
@@ -125,8 +125,8 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 20, 20);
-          changeStatus('countdown', 'null');
+          socket.emit('createGame', topics, 5, 20);
+          changeStatus('countdown');
         }}
         className={styles.hostRoom}
         fill="secondary"
@@ -156,26 +156,22 @@ const RevealQuizzer = ({ quizzer }: { quizzer: string }) => {
 };
 
 const QuizQuestion = ({
-  quizzer,
+  quizzerID,
+  quizzerUsername,
   secondsLeft,
+  question,
 }: {
-  quizzer: string;
+  quizzerID: string;
+  quizzerUsername: string;
   secondsLeft: number;
+  question: string;
 }) => {
-  const [question, setQuestion] = useState('');
-
-  useEffect(() => {
-    socket.emit('getStudentInfo', quizzer, info => {
-      setQuestion(info.question);
-    });
-  }, []);
-
   return (
     <div className={styles.quizQuestionWrapper}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
 
       <Paper className={styles.quizQuestion}>
-        {quizzer} is the quizzer...
+        {quizzerUsername} is the quizzer...
         <div>{question}</div>
       </Paper>
       <div className={styles.gridRight}>
@@ -200,19 +196,13 @@ const QuizQuestion = ({
 };
 
 const Leaderboard = () => {
-  const [leaderboard, setLeaderboard] = useState<
-    {
-      player: string;
-      points: number;
-      status: 'idle' | 'ascended' | 'descended';
-    }[]
-  >([
-    { player: 'Soap', points: 2458, status: 'ascended' },
-    { player: 'Andrew', points: 2104, status: 'ascended' },
-    { player: 'Yuchen', points: 2092, status: 'descended' },
-    { player: 'Sherry', points: 1095, status: 'ascended' },
-    { player: 'Momo', points: 506, status: 'descended' },
-  ]);
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    socket.emit('getLeaderboard', leaderboard => {
+      setLeaderboard(leaderboard);
+    });
+  }, []);
 
   return (
     <div className={styles.leaderboardWrapper}>
@@ -300,44 +290,53 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState([]);
-  const [quizzer, setQuizzer] = useState('');
+  const [quizzerID, setQuizzerID] = useState('');
+  const [quizzerUsername, setQuizzerUsername] = useState('');
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
+  const [question, setQuestion] = useState('');
 
-  const changeStatus = (newStatus: string, socketEvent: string) => {
+  const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
-    if (socketEvent !== 'null') {
-      socket.emit(socketEvent);
-    }
   };
 
   useEffect(() => {
-    socket.on('lobbyUpdate', players => {
-      setPlayers(players);
-    });
-    socket.on('gameStateChange', game => {
+    const handleGameStateChange = game => {
       setSecondsLeft(game.countdown);
-      console.log(game);
       switch (game.state) {
         case 'choosing quizzer':
-          setQuizzer(game.quizzer);
-          changeStatus('revealQuizzer', 'null');
+          setQuizzerID(game.quizzer.id);
+          setQuizzerUsername(game.quizzer.username);
+          changeStatus('revealQuizzer');
           break;
         case 'answerQuestion':
-          changeStatus('quizQuestion', 'null');
+          changeStatus('quizQuestion');
           break;
         case 'leaderboardPosition':
-          changeStatus('leaderboard', 'null');
+          changeStatus('leaderboard');
           break;
         case 'end':
-          changeStatus('podium', 'null');
+          changeStatus('podium');
       }
-    });
+    };
+
+    const handleUpdateSpotlitQuestion = question => {
+      setQuestion(question);
+    };
+
+    const handleLobbyUpdate = players => {
+      setPlayers(players);
+    };
+
+    socket.on('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
+    socket.on('lobbyUpdate', handleLobbyUpdate);
+    socket.on('gameStateChange', handleGameStateChange);
 
     return () => {
-      socket.off('lobbyUpdate', players => {});
-      socket.off('gameStateChange', game => {});
+      socket.off('lobbyUpdate', handleLobbyUpdate);
+      socket.off('gameStateChange', handleGameStateChange);
+      socket.off('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
     };
-  }, [socket]);
+  }, [status]);
 
   const renderComponent = (component: string) => {
     switch (component) {
@@ -354,9 +353,16 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       case 'countdown':
         return <Countdown secondsLeft={secondsLeft} />;
       case 'revealQuizzer':
-        return <RevealQuizzer quizzer={quizzer} />;
+        return <RevealQuizzer quizzer={quizzerUsername} />;
       case 'quizQuestion':
-        return <QuizQuestion quizzer={quizzer} secondsLeft={secondsLeft} />;
+        return (
+          <QuizQuestion
+            quizzerID={quizzerID}
+            quizzerUsername={quizzerUsername}
+            secondsLeft={secondsLeft}
+            question={question}
+          />
+        );
       case 'leaderboard':
         return <Leaderboard />;
       case 'podium':
