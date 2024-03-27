@@ -160,11 +160,18 @@ const QuizQuestion = ({
   quizzerUsername,
   secondsLeft,
   question,
+  guesses,
 }: {
   quizzerID: string;
   quizzerUsername: string;
   secondsLeft: number;
   question: string;
+  guesses: {
+    username: string;
+    guess: string;
+    correct: boolean;
+    points: number;
+  }[];
 }) => {
   return (
     <div className={styles.quizQuestionWrapper}>
@@ -177,18 +184,17 @@ const QuizQuestion = ({
       <div className={styles.gridRight}>
         <Paper>Hint:</Paper>
         <div className={styles.guesses}>
-          <Guess
-            name={'SOAP'}
-            guess={'hello'}
-            correct={true}
-            points={100}
-          ></Guess>
-          <Guess
-            name={'Yuchen'}
-            guess={'poo'}
-            correct={false}
-            points={0}
-          ></Guess>
+          {guesses
+            .slice(0, 3)
+            .reverse()
+            .map(guess => (
+              <Guess
+                name={guess.username}
+                guess={guess.guess}
+                correct={guess.correct}
+                points={guess.points}
+              ></Guess>
+            ))}
         </div>
       </div>
     </div>
@@ -294,6 +300,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
   const [question, setQuestion] = useState('');
+  const [guesses, setGuesses] = useState([]);
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -327,14 +334,21 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       setPlayers(players);
     };
 
+    const handleNewGuess = guesses => {
+      console.log(guesses);
+      setGuesses(guesses);
+    };
+
     socket.on('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
     socket.on('lobbyUpdate', handleLobbyUpdate);
     socket.on('gameStateChange', handleGameStateChange);
+    socket.on('newGuess', handleNewGuess);
 
     return () => {
       socket.off('lobbyUpdate', handleLobbyUpdate);
       socket.off('gameStateChange', handleGameStateChange);
       socket.off('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
+      socket.off('newGuess', handleNewGuess);
     };
   }, [status]);
 
@@ -361,6 +375,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
             question={question}
+            guesses={guesses}
           />
         );
       case 'leaderboard':

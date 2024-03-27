@@ -18,7 +18,7 @@ const Guess = ({ name, guess, correct, points }: GuessProps) => {
           }}
         >
           <div>{name}</div>
-          <div>{points}</div>
+          <div>+{points}</div>
         </div>
       ) : (
         <div

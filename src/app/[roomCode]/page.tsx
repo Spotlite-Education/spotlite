@@ -171,19 +171,7 @@ const AnswerQuestion = ({
   );
 };
 
-const AnswerResult = () => {
-  const [points, setPoints] = useState(0);
-
-  useEffect(() => {
-    socket.emit(
-      'getStudentInfo',
-      sessionStorage.getItem('sessionToken'),
-      info => {
-        setPoints(info.points);
-      }
-    );
-  }, []);
-
+const AnswerResult = ({ points }) => {
   return (
     <div
       className={styles.centeredWrapper}
@@ -195,14 +183,14 @@ const AnswerResult = () => {
   );
 };
 
-const LeaderboardPosition = () => {
+const LeaderboardPosition = ({ rank }) => {
   return (
     <div
       className={styles.centeredWrapper}
       style={{ backgroundColor: 'var(--accent-color)' }}
     >
       <div className={styles.lessLessBigText}>Your Position:</div>
-      <div className={styles.pointsChange}>#N/A</div>
+      <div className={styles.pointsChange}>#{rank}</div>
     </div>
   );
 };
@@ -274,6 +262,15 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   );
 };
 
+interface StudentInfo {
+  username: string;
+  theme: string;
+  points: number;
+  rank: number;
+  ascended: boolean;
+  questions: object;
+}
+
 const Room = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('idleScreen');
   const router = useRouter();
@@ -281,6 +278,9 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [isQuizzer, setIsQuizzer] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
+  const [studentInfo, setStudentInfo] = useState<StudentInfo>(
+    {} as StudentInfo
+  );
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -313,10 +313,17 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       }
     };
 
+    const handleUpdateStudentInfo = (info: StudentInfo) => {
+      console.log(info);
+      setStudentInfo(info);
+    };
+
     socket.on('gameStateChange', handleGameStateChange);
+    socket.on('updateStudentInfo', handleUpdateStudentInfo);
 
     return () => {
       socket.off('gameStateChange', handleGameStateChange);
+      socket.off('updateStudentInfo', handleUpdateStudentInfo);
     };
   }, [status]);
 
@@ -342,9 +349,9 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'answerResult':
-        return <AnswerResult />;
+        return <AnswerResult points={studentInfo.points} />;
       case 'leaderboardPosition':
-        return <LeaderboardPosition />;
+        return <LeaderboardPosition rank={studentInfo.rank} />;
       case 'questionCreation':
         return (
           <QuestionCreation
