@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 10, 10);
+          socket.emit('createGame', topics, 7, 5);
           changeStatus('countdown');
         }}
         className={styles.hostRoom}
@@ -206,15 +206,15 @@ const Leaderboard = () => {
 
   useEffect(() => {
     socket.emit('getLeaderboard', leaderboard => {
+      console.log(leaderboard);
       setLeaderboard(leaderboard);
     });
   }, []);
 
   return (
     <div className={styles.leaderboardWrapper}>
-      {Object.keys(leaderboard).map((playerID, i) => (
+      {Object.entries(leaderboard).map(([key, player], i) => (
         <div
-          // key={}
           className={styles.leaderboardItem}
           style={{
             color: i === 0 ? 'var(--accent-color)' : undefined,
@@ -227,11 +227,11 @@ const Leaderboard = () => {
           }}
         >
           {i === 0 && <GiQueenCrown size="4.5rem" fill="var(--accent-color)" />}
-          <div className={styles.name}>{leaderboard[playerID].username}</div>
+          <div className={styles.name}>{player.username}</div>
           <div className={styles.score}>
-            {leaderboard[playerID].points}
+            {player.points}
             <div className={styles.icon}>
-              {leaderboard[playerID].ascended ? (
+              {player.ascended ? (
                 <FaArrowUp size="3rem" />
               ) : (
                 <FaArrowDown size="3rem" />
@@ -251,6 +251,14 @@ const Leaderboard = () => {
 };
 
 const Podium = () => {
+  const [leaderboard, setLeaderboard] = useState<object>([]);
+
+  useEffect(() => {
+    socket.emit('getLeaderboard', leaderboard => {
+      setLeaderboard(leaderboard);
+    });
+  }, []);
+
   return (
     <div className={styles.podiumWrapper}>
       <Button className={styles.seeQuestionBank}>See Question Bank</Button>
@@ -270,7 +278,7 @@ const Podium = () => {
             }}
           >
             <GiQueenCrown size="7.5rem" style={{ marginRight: '3.5rem' }} />
-            Soap
+            {leaderboard.length > 0 ? leaderboard[0].username : ''}
           </div>
           <div className={styles.pillar} />
         </div>

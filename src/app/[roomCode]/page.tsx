@@ -314,6 +314,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
     };
 
     const handleUpdateStudentInfo = (info: StudentInfo) => {
+      console.log('updating info');
       console.log(info);
       setStudentInfo(info);
     };
