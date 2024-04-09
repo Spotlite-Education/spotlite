@@ -113,6 +113,7 @@ const Home = () => {
             >
               <input
                 className={styles.roomCodeInput}
+                placeholder="Room Code"
                 maxLength={6}
                 autoCorrect="off"
               />

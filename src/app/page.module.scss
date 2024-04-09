@@ -81,7 +81,14 @@
     font-size: 10rem;
     text-align: center;
     border: none;
+    letter-spacing: 5px;
     background: none;
+
+    &::placeholder {
+      opacity: 0.5;
+      font-size: 6.5rem;
+      letter-spacing: normal;
+    }
 
     &:focus {
       outline: none;

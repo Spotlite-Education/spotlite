@@ -7,12 +7,12 @@ import { SOCKET_URL } from '../../context/socket';
 import socket from '../../context/socket';
 import { Logo } from '../components/Logo';
 import { UnstyledLink } from '../components/UnstyledLink';
+import { MouseEvent } from 'react';
 
 const HostRoom = () => {
   const router = useRouter();
 
-  const handleCreateRoom = e => {
-    e.preventDefault();
+  const handleCreateRoom = (e: MouseEvent<HTMLButtonElement>) => {
     fetch(SOCKET_URL + '/createRoom', { method: 'POST' })
       .then(response => {
         return response.json();
@@ -35,7 +35,9 @@ const HostRoom = () => {
 
         <Logo size="xl" />
         <div className={styles.forTeachers}>For Teachers</div>
-        <button className={styles.hostGame}>Create Game!</button>
+        <button className={styles.hostGame} onClick={handleCreateRoom}>
+          Create Game!
+        </button>
       </div>
       <div className={styles.footer}>
         <div className={styles.legal}>
@@ -50,16 +52,6 @@ const HostRoom = () => {
         <div className={styles.copyright}>Copyright © 2024 Spotlite</div>
       </div>
     </main>
-    // <main className={styles.main}>
-    //   <div className={styles.title}>SPOTLITE!</div>
-    //   <div className={styles.forTeachers}>FOR TEACHERS</div>
-    //   <Button onClick={e => handleCreateRoom(e)}>Host Room</Button>
-    //   <Link href="/">
-    //     <Button className={styles.toStudentMode} fill="secondary">
-    //       To Student Mode
-    //     </Button>
-    //   </Link>
-    // </main>
   );
 };
 
