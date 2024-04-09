@@ -1,14 +1,6 @@
-import { Rowdies } from 'next/font/google';
-import { Red_Hat_Display } from 'next/font/google';
+import localFont from 'next/font/local';
 
-export const ROWDIES = Rowdies({
-  subsets: ['latin'],
-  weight: ['300', '400', '700'],
-  variable: '--font-rowdies',
-});
-
-export const REDHAT = Red_Hat_Display({
-  subsets: ['latin'],
-  weight: ['700'],
-  variable: '--font-redhat',
+export const COMICO = localFont({
+  src: '../assets/fonts/Comico-Regular.otf',
+  variable: '--font-comico',
 });

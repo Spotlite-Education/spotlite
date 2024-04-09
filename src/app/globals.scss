@@ -1,19 +1,17 @@
 :root {
-  --note-text-color: #b46f07;
-  --text-color: #fff8dd;
-  --alt-text-color: #70470a;
+  --off-white: rgb(252, 249, 245);
+  --dark-text: #1b1b1b;
 
-  color: var(--text-color);
-
+  color: var(--dark-text);
   font-size: 62.5%;
 
   --brand-color: #ffa800;
-  --accent-color: #9546fb;
+  --accent-color: rgb(128, 0, 255);
 
   --input-fill-primary: rgba(255, 247, 221, 0.51);
   --input-text-color: #da8506;
 
-  --dark-orange: #ed8e00;
+  background-color: var(--off-white);
 }
 
 * {

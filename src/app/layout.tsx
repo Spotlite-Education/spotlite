@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.scss';
-import { REDHAT, ROWDIES } from './util/fonts';
+import { COMICO } from './util/fonts';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -15,9 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${REDHAT.className} ${REDHAT.variable} ${ROWDIES.variable}`}
-      >
+      <body className={`${COMICO.className} ${COMICO.variable}`}>
         {children}
       </body>
     </html>
