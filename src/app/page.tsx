@@ -1,16 +1,13 @@
 'use client';
 
-import Link from 'next/link';
-import Button from './components/Button';
-import Input from './components/Input';
-import styles from './page.module.scss';
-import React from 'react';
-import { useState } from 'react';
 import Header from '@/app/components/Header';
 import { useRouter } from 'next/navigation';
-
-import { SOCKET_URL } from '../context/socket';
-import socket from '../context/socket';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import socket, { SOCKET_URL } from '../context/socket';
+import Input from './components/Input';
+import { Logo } from './components/Logo';
+import { UnstyledLink } from './components/UnstyledLink';
+import styles from './page.module.scss';
 
 const NameSelect = ({
   handleJoin,
@@ -29,6 +26,30 @@ const NameSelect = ({
   );
 };
 
+const Spotlight = () => {
+  const [pos, setPos] = useState<{ x: string; y: string }>();
+
+  useEffect(() => {
+    const changePosition = setInterval(() => {
+      setPos({
+        x: `${Math.random() * 85 + 5}%`,
+        y: `${Math.random() * 85 + 5}%`,
+      });
+    }, (Math.random() * 3 + 1) * 1000);
+
+    return () => {
+      clearInterval(changePosition);
+    };
+  }, []);
+
+  return (
+    <div
+      className={styles.spotlight}
+      style={{ opacity: pos ? 0.65 : 0, top: pos?.y, left: pos?.x }}
+    />
+  );
+};
+
 const Home = () => {
   const [roomCode, setRoomCode] = useState('');
 
@@ -37,7 +58,7 @@ const Home = () => {
 
   const router = useRouter();
 
-  const handleJoin = e => {
+  const handleJoin = (e: FormEvent) => {
     e.preventDefault();
     socket.emit(
       'join',
@@ -48,11 +69,11 @@ const Home = () => {
     router.push('/' + roomCode);
   };
 
-  const handleChangeUsername = e => {
+  const handleChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
-  const handleSubmitRoomCode = e => {
+  const handleSubmitRoomCode = (e: FormEvent) => {
     e.preventDefault();
     fetch(SOCKET_URL + '/authenticate?roomCode=' + roomCode, {
       method: 'GET',
@@ -70,26 +91,48 @@ const Home = () => {
   };
 
   return (
-    <main className={styles.main}>
+    <main className={styles.wrapper}>
       {chooseUser ? (
         <NameSelect
           handleJoin={handleJoin}
           handleChangeUsername={handleChangeUsername}
         />
       ) : (
-        <>
-          <div className={styles.title}>SPOTLITE!</div>
-          <form onSubmit={e => handleSubmitRoomCode(e)}>
-            <Input
-              onChange={e => setRoomCode(e.target.value)}
-              className={styles.roomCodeInput}
-              placeholder="Room Code"
-            />
-          </form>
-          <Link href="/host">
-            <Button className={styles.toTeacherMode}>To Teacher Mode</Button>
-          </Link>
-        </>
+        <div className={styles.home}>
+          <div className={styles.content}>
+            <Spotlight />
+            <div className={styles.corner} />
+            <UnstyledLink href="/host">
+              <div className={styles.teacherMode}>Teacher Mode!</div>
+            </UnstyledLink>
+
+            <Logo size="xl" />
+            <form
+              className={styles.roomCodeInputWrapper}
+              onSubmit={e => handleSubmitRoomCode(e)}
+            >
+              <input
+                className={styles.roomCodeInput}
+                placeholder="Room Code"
+                maxLength={6}
+                autoCorrect="off"
+              />
+            </form>
+            <button className={styles.play}>Play!</button>
+          </div>
+          <div className={styles.footer}>
+            <div className={styles.legal}>
+              <UnstyledLink href="/">Terms & Conditions</UnstyledLink>
+              <UnstyledLink href="/">Privacy Policy</UnstyledLink>
+            </div>
+            <div className={styles.center}>
+              <UnstyledLink href="/">
+                See what other creative minds have made at spotlite.org
+              </UnstyledLink>
+            </div>
+            <div className={styles.copyright}>Copyright © 2024 Spotlite</div>
+          </div>
+        </div>
       )}
     </main>
   );

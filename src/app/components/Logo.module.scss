@@ -1,0 +1,23 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.1em;
+  color: var(--accent-color);
+}
+
+.spotlight {
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: 99rem;
+  font-size: inherit;
+  background-color: var(--brand-color);
+}
+
+.xl {
+  font-size: 15rem;
+}
+
+.bordered {
+  -webkit-text-stroke: 0.01em var(--dark-text);
+}
