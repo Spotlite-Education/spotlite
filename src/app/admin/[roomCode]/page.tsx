@@ -251,11 +251,11 @@ const Leaderboard = () => {
 };
 
 const Podium = () => {
-  const [leaderboard, setLeaderboard] = useState<object>([]);
+  const [leaderboard, setLeaderboard] = useState({});
 
   useEffect(() => {
     socket.emit('getLeaderboard', leaderboard => {
-      setLeaderboard(leaderboard);
+      setLeaderboard(Object.entries(leaderboard).values);
     });
   }, []);
 
@@ -263,39 +263,66 @@ const Podium = () => {
     <div className={styles.podiumWrapper}>
       <Button className={styles.seeQuestionBank}>See Question Bank</Button>
       <div className={styles.backgroundPillars}>
-        <div className={styles.pillarWrapper} style={{ height: '50%' }}>
-          <div className={styles.player}>Yuchen</div>
-          <div className={styles.pillar} />
-        </div>
-        <div className={styles.pillarWrapper} style={{ height: '82.5%' }}>
-          <div
-            className={styles.player}
-            style={{
-              width: '48rem',
-              height: '12rem',
-              boxShadow: '0px 0px 65px var(--brand-color)',
-              fontSize: '5rem',
-            }}
-          >
-            <GiQueenCrown size="7.5rem" style={{ marginRight: '3.5rem' }} />
-            {leaderboard.length > 0 ? leaderboard[0].username : ''}
+        {Object.entries(leaderboard).length > 2 ? (
+          <div className={styles.pillarWrapper} style={{ height: '50%' }}>
+            <div className={styles.player}>{leaderboard[2].username}</div>
+            <div className={styles.pillar} />
           </div>
-          <div className={styles.pillar} />
-        </div>
-        <div className={styles.pillarWrapper} style={{ height: '60%' }}>
-          <div className={styles.player}>Andrew</div>
-          <div className={styles.pillar} />
-        </div>
+        ) : (
+          <div></div>
+        )}
+        {Object.entries(leaderboard).length > 0 ? (
+          <div className={styles.pillarWrapper} style={{ height: '82.5%' }}>
+            <div
+              className={styles.player}
+              style={{
+                width: '48rem',
+                height: '12rem',
+                boxShadow: '0px 0px 65px var(--brand-color)',
+                fontSize: '5rem',
+              }}
+            >
+              <GiQueenCrown size="7.5rem" style={{ marginRight: '3.5rem' }} />
+              {Object.entries(leaderboard)[0].username}
+            </div>
+            <div className={styles.pillar} />
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {Object.entries(leaderboard).length > 1 ? (
+          <div className={styles.pillarWrapper} style={{ height: '60%' }}>
+            <div className={styles.player}>
+              {Object.entries(leaderboard)[1].username}
+            </div>
+            <div className={styles.pillar} />
+          </div>
+        ) : (
+          <div></div>
+        )}
       </div>
       <div className={styles.foregroundPillars}>
-        <div className={styles.pillarWrapper} style={{ height: '25%' }}>
-          <div className={styles.player}>Momo</div>
-          <div className={styles.pillar} />
-        </div>
-        <div className={styles.pillarWrapper} style={{ height: '35%' }}>
-          <div className={styles.player}>Sherry</div>
-          <div className={styles.pillar} />
-        </div>
+        {Object.entries(leaderboard).length > 4 ? (
+          <div className={styles.pillarWrapper} style={{ height: '25%' }}>
+            <div className={styles.player}>
+              {Object.entries(leaderboard)[4].username}
+            </div>
+            <div className={styles.pillar} />
+          </div>
+        ) : (
+          <div></div>
+        )}
+        {Object.entries(leaderboard).length > 3 ? (
+          <div className={styles.pillarWrapper} style={{ height: '35%' }}>
+            <div className={styles.player}>
+              {Object.entries(leaderboard)[3].username}
+            </div>
+            <div className={styles.pillar} />
+          </div>
+        ) : (
+          <div></div>
+        )}
       </div>
     </div>
   );
