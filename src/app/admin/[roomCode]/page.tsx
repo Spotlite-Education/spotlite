@@ -125,7 +125,7 @@ const ChooseTopics = ({
       </button>
       <Button
         onClick={e => {
-          socket.emit('createGame', topics, 7, 5);
+          socket.emit('createGame', topics, 10, 15);
           changeStatus('countdown');
         }}
         className={styles.hostRoom}
@@ -160,12 +160,14 @@ const QuizQuestion = ({
   quizzerUsername,
   secondsLeft,
   question,
+  hint,
   guesses,
 }: {
   quizzerID: string;
   quizzerUsername: string;
   secondsLeft: number;
   question: string;
+  hint: string;
   guesses: {
     username: string;
     guess: string;
@@ -173,6 +175,12 @@ const QuizQuestion = ({
     points: number;
   }[];
 }) => {
+  var splitHint = '';
+  for (let i = 0; i < hint.length; i++) {
+    splitHint += hint[i];
+    splitHint += ' ';
+  }
+
   return (
     <div className={styles.quizQuestionWrapper}>
       <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
@@ -182,7 +190,10 @@ const QuizQuestion = ({
         <div>{question}</div>
       </Paper>
       <div className={styles.gridRight}>
-        <Paper>Hint:</Paper>
+        <Paper>
+          Hint:
+          {splitHint}
+        </Paper>
         <div className={styles.guesses}>
           {guesses
             .slice(0, 3)
@@ -335,6 +346,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
   const [question, setQuestion] = useState('');
+  const [hint, setHint] = useState('');
   const [guesses, setGuesses] = useState([]);
 
   const changeStatus = (newStatus: string) => {
@@ -344,6 +356,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   useEffect(() => {
     const handleGameStateChange = game => {
       setSecondsLeft(game.countdown);
+      setHint(game.hint);
       switch (game.state) {
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
@@ -410,6 +423,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
             question={question}
+            hint={hint}
             guesses={guesses}
           />
         );
