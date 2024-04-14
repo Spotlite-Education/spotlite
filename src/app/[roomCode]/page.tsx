@@ -3,6 +3,7 @@ import {
   KeyboardEvent,
   MutableRefObject,
   forwardRef,
+  use,
   useEffect,
   useRef,
   useState,
@@ -96,7 +97,7 @@ const Canvas = ({
       if (!canvas) return;
 
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 10 * 10 - 12.5 * 10;
+      canvas.height = window.innerHeight - 10 * 10 - 28 * 10;
 
       reconstructCanvas(aggregateLines(actions));
     };
@@ -156,7 +157,7 @@ const Canvas = ({
     };
 
     const stopDrawing = () => {
-      setQuestion({ type: 'draw', content: actions });
+      setQuestion(actions);
       isDrawing = false;
       if (line.points.length >= 2) {
         const lineCopy = line;
@@ -332,7 +333,7 @@ const Canvas = ({
   );
 };
 
-addStyles();
+//addStyles();
 
 const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
   const [text, setText] = useState<string>('');
@@ -340,7 +341,7 @@ const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
 
   return (
     <div className={styles.textEditorWrapper}>
-      <div className={styles.settings}>
+      {/* <div className={styles.settings}>
         <button
           className={styles.setting}
           style={{ opacity: mode === 'text' ? 1 : 0.5 }}
@@ -355,7 +356,7 @@ const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
         >
           <MdFunctions />
         </button>
-      </div>
+      </div> */}
       {/* <EditableMathField
         className={styles.equationEditor}
         latex={text}
@@ -363,7 +364,7 @@ const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
       /> */}
       <textarea
         placeholder="Type your question here!"
-        maxLength={550}
+        maxLength={100}
         value={text}
         onChange={e => {
           setText(e.target.value);
@@ -382,7 +383,6 @@ const QuestionCreation = ({
   secondsLeft: number;
 }) => {
   const [topic, setTopic] = useState<string>('');
-  const [mode, setMode] = useState<'type' | 'draw'>('draw');
 
   const answerInputRef = useRef<HTMLInputElement>(null);
   const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
@@ -397,15 +397,16 @@ const QuestionCreation = ({
     );
   }, []);
 
-  const [question, setQuestion] = useState<Question>({
-    type: 'draw',
-    content: [],
-  });
+  const [canvas, setCanvas] = useState();
+  const [text, setText] = useState('');
+
   const [answer, setAnswer] = useState<string>('');
 
   const handleSubmit = () => {
-    socket.emit('submitQuestion', question, answer);
-    changeStatus('questionSubmitted');
+    console.log(canvas);
+    console.log(text);
+    //socket.emit('submitQuestion', question, answer);
+    //changeStatus('questionSubmitted');
   };
 
   const timeLeft = formatSeconds(secondsLeft);
@@ -423,56 +424,40 @@ const QuestionCreation = ({
           {timeLeft}
         </div>
       </div>
-      <div className={styles.content}>
-        <div className={styles.canvas} tabIndex={0}>
-          <div className={styles.controls}>
-            <div>Question Canvas</div>
-            <div>|</div>
-            <div className={styles.modeSelect}>
-              <div
-                className={styles.mode}
-                style={{ opacity: mode === 'type' ? 1 : 0.35 }}
-                onClick={() => setMode('type')}
-              >
-                Type
-              </div>
-              <div
-                className={styles.mode}
-                style={{ opacity: mode === 'draw' ? 1 : 0.35 }}
-                onClick={() => setMode('draw')}
-              >
-                Draw
-              </div>
+      <form onSubmit={handleSubmit}>
+        <div className={styles.content}>
+          <div className={styles.canvas} tabIndex={0}>
+            <div>
+              <TextEditor setQuestion={setText} />
+              <Canvas setHovered={setCanvasHovered} setQuestion={setCanvas} />
             </div>
           </div>
-          {mode === 'draw' ? (
-            <Canvas setHovered={setCanvasHovered} setQuestion={setQuestion} />
-          ) : (
-            <TextEditor setQuestion={setQuestion} />
-          )}
-        </div>
-        <div className={styles.answerWrapper}>
-          <div className={styles.input}>
-            Answer:
-            <input
-              ref={answerInputRef}
-              disabled={
-                document.activeElement !== answerInputRef.current &&
-                canvasHovered
-              }
-              onChange={e => setAnswer(e.target.value)}
-              placeholder="Type here..."
-            />
+          <div className={styles.answerWrapper}>
+            <div className={styles.input}>
+              Answer:
+              <input
+                ref={answerInputRef}
+                disabled={
+                  document.activeElement !== answerInputRef.current &&
+                  canvasHovered
+                }
+                onChange={e => setAnswer(e.target.value)}
+                placeholder="Type here..."
+              />
+            </div>
+            <button
+              className={styles.submit}
+              disabled={(!text && !canvas) || !answer}
+              type="submit"
+              onClick={e => {
+                e.preventDefault();
+              }}
+            >
+              Submit It!
+            </button>
           </div>
-          <button
-            className={styles.submit}
-            disabled={!question.content || !answer}
-            onClick={handleSubmit}
-          >
-            Submit It!
-          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
