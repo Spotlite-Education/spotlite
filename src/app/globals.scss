@@ -8,6 +8,8 @@
   --brand-color: #ffa800;
   --accent-color: rgb(128, 0, 255);
 
+  --canvas-color: #f4ede8;
+
   --input-fill-primary: rgba(255, 247, 221, 0.51);
   --input-text-color: #da8506;
 
@@ -35,4 +37,11 @@ button {
   border: none;
   border-radius: 99rem;
   padding: 1rem 2.5rem;
+  color: var(--off-white);
+  font-size: 2rem;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }

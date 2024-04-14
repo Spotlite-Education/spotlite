@@ -6,6 +6,13 @@
   color: var(--accent-color);
 }
 
+.sp,
+.tlite {
+  position: relative;
+  z-index: 1;
+  font-size: inherit;
+}
+
 .spotlight {
   width: 0.75em;
   height: 0.75em;
@@ -14,10 +21,39 @@
   background-color: var(--brand-color);
 }
 
+.xs {
+  font-size: 1.2rem;
+}
+
+.sm {
+  font-size: 1.6rem;
+}
+
+.md {
+  font-size: 2.5rem;
+}
+
+.lg {
+  font-size: 4rem;
+}
+
 .xl {
   font-size: 15rem;
 }
 
 .bordered {
-  -webkit-text-stroke: 0.01em var(--dark-text);
+  .sp,
+  .tlite {
+    &::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      z-index: -1;
+      -webkit-text-stroke: 0.15em var(--dark-text);
+    }
+  }
+
+  .spotlight {
+    border: 0.06em solid var(--dark-text);
+  }
 }

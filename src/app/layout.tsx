@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { COMICO, PP_NEUE_MONTREAL } from './util/fonts';
+import { Theme } from '@radix-ui/themes';
+import '@radix-ui/themes/styles.css';
+import './theme-config.css';
 import './globals.scss';
-import { COMICO } from './util/fonts';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -15,8 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${COMICO.className} ${COMICO.variable}`}>
-        {children}
+      <body
+        className={`${COMICO.className} ${COMICO.variable} ${PP_NEUE_MONTREAL.variable}`}
+      >
+        <Theme>{children}</Theme>
       </body>
     </html>
   );

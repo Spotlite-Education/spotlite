@@ -10,18 +10,33 @@ import { UnstyledLink } from './components/UnstyledLink';
 import styles from './page.module.scss';
 
 const NameSelect = ({
+  roomCode,
   handleJoin,
   handleChangeUsername,
 }: {
+  roomCode: string;
   handleJoin: (e: React.FormEvent<HTMLFormElement>) => void;
   handleChangeUsername: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   return (
     <div className={styles.nameSelect}>
-      <Header>ENTER YOUR NAME:</Header>
-      <form onSubmit={e => handleJoin(e)}>
-        <Input placeholder="Name" onChange={e => handleChangeUsername(e)} />
-      </form>
+      <div className={styles.content}>
+        <div className={styles.logo}>
+          <Logo color="black" />
+        </div>
+        <div className={styles.title}>What&apos;s your name?</div>
+        <div className={styles.inputWrapper}>
+          <form style={{ all: 'unset' }} onSubmit={e => handleJoin(e)}>
+            <input
+              maxLength={15}
+              placeholder="Name Here"
+              autoFocus
+              onChange={e => handleChangeUsername(e)}
+            />
+          </form>
+        </div>
+      </div>
+      <div className={styles.footer}>You are joining room {roomCode}</div>
     </div>
   );
 };
@@ -60,6 +75,11 @@ const Home = () => {
 
   const handleJoin = (e: FormEvent) => {
     e.preventDefault();
+
+    if (username.length === 0) {
+      return;
+    }
+
     socket.emit(
       'join',
       username,
@@ -94,6 +114,7 @@ const Home = () => {
     <main className={styles.wrapper}>
       {chooseUser ? (
         <NameSelect
+          roomCode={roomCode}
           handleJoin={handleJoin}
           handleChangeUsername={handleChangeUsername}
         />
@@ -117,9 +138,13 @@ const Home = () => {
                 placeholder="Room Code"
                 maxLength={6}
                 autoCorrect="off"
+                value={roomCode}
+                onChange={e => setRoomCode(e.target.value)}
               />
             </form>
-            <button className={styles.play}>Play!</button>
+            <button className={styles.play} onClick={handleSubmitRoomCode}>
+              Play!
+            </button>
           </div>
           <div className={styles.footer}>
             <div className={styles.legal}>

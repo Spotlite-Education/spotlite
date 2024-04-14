@@ -2,80 +2,202 @@
 import Header from '@/app/components/Header';
 import styles from './page.module.scss';
 import Input, { IconInput } from '@/app/components/Input';
-import { useEffect, useState, useCallback } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  SetStateAction,
+  Dispatch,
+} from 'react';
 import Button from '@/app/components/Button';
 import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
 import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
-import { render } from 'react-dom';
 import Paper from '@/app/components/Paper';
 import Guess from '@/app/components/Guess';
 import socket from '../../../context/socket';
+import { UnstyledLink } from '@/app/components/UnstyledLink';
+import { Logo } from '@/app/components/Logo';
+import { Game } from '@/app/types/Game';
 
 interface LobbyProps {
   roomCode: string;
   players: string[];
+  setCreatingTime: (seconds: number) => any;
+  setAnsweringTime: (seconds: number) => any;
   changeStatus: (newStatus: string) => void;
 }
 
-const Lobby = ({ changeStatus, roomCode, players }: LobbyProps) => {
+const Lobby = ({
+  changeStatus,
+  setCreatingTime,
+  setAnsweringTime,
+  roomCode,
+  players,
+}: LobbyProps) => {
+  const [questionMakingTime, setQuestionMakingTime] = useState<{
+    minutes: string;
+    seconds: string;
+  }>({
+    minutes: '5',
+    seconds: '00',
+  });
+
+  const [questionAnsweringTime, setQuestionAnsweringTime] = useState<{
+    minutes: string;
+    seconds: string;
+  }>({
+    minutes: '1',
+    seconds: '00',
+  });
+
+  const cleanNumber = (numberString: string): string => {
+    numberString = numberString.replace(/([^\d]+)/g, '');
+    return numberString;
+  };
+
+  const setNumber = (setState: Function, value: string) => {
+    value = cleanNumber(value).substring(0, 2);
+    if (value[0] && !value[0].match(/^[012345]$/)) {
+      return;
+    }
+    setState(value);
+  };
+
+  const toSeconds = ({
+    minutes,
+    seconds,
+  }: {
+    minutes: string;
+    seconds: string;
+  }): number => {
+    let m = Number(minutes);
+    let s = Number(seconds);
+
+    if (isNaN(m)) {
+      m = 0;
+    }
+    if (isNaN(s)) {
+      s = 0;
+    }
+
+    return m * 60 + s;
+  };
+
   useEffect(() => {
     socket.emit('refreshLobby', roomCode, sessionStorage.getItem('sessionID'));
   }, []);
 
   return (
     <div className={styles.lobby}>
-      <div className={styles.roomSettings}>
-        <div className={styles.roomCodeDetails}>
-          <div className={styles.subtleText}>Your room code is</div>
-          <div className={styles.roomCode}>{roomCode}</div>
+      <div className={styles.content}>
+        <div className={styles.logo}>
+          <Logo size="md" color="black" />
+        </div>
+        <div className={styles.tag}>
+          Go go go!! Join this game at{' '}
+          <UnstyledLink href="https://spotlite.com" target="_blank">
+            Spotlite.com
+          </UnstyledLink>
+        </div>
+        <div className={styles.roomCode} data-text={roomCode}>
+          {roomCode}
+        </div>
+        <div className={styles.actions}>
+          <button className={styles.lockRoom}>Lock Room</button>
+          <button
+            className={styles.startGame}
+            onClick={e => {
+              setCreatingTime(toSeconds(questionMakingTime));
+              setAnsweringTime(toSeconds(questionAnsweringTime));
+              changeStatus('chooseTopics');
+            }}
+          >
+            Start Game
+          </button>
         </div>
         <div className={styles.settings}>
-          <div>
-            <div className={styles.subtleText}>Question Creation Time</div>
-            <div className={styles.time}>3:00</div>
+          <div className={styles.setting}>
+            <div className={styles.settingName}>Question Making Time</div>
+            <div className={styles.time}>
+              {questionMakingTime.minutes.length === 1 && (
+                <div className={styles.minutePlaceholder}>0</div>
+              )}
+              <input
+                placeholder="00"
+                value={questionMakingTime.minutes}
+                onChange={e =>
+                  setNumber(
+                    (minutes: string) =>
+                      setQuestionMakingTime(prev => ({ ...prev, minutes })),
+                    e.target.value
+                  )
+                }
+              />
+              :
+              <input
+                placeholder="00"
+                value={questionMakingTime.seconds}
+                onChange={e =>
+                  setNumber(
+                    (seconds: string) =>
+                      setQuestionMakingTime(prev => ({ ...prev, seconds })),
+                    e.target.value
+                  )
+                }
+              />
+            </div>
           </div>
-          <div>
-            <div className={styles.subtleText}>Question Answering Timed</div>
-            <div className={styles.time}>1:00</div>
+          <div className={styles.setting}>
+            <div className={styles.settingName}>Question Answer Time</div>
+            <div className={styles.time}>
+              {questionAnsweringTime.minutes.length === 1 && (
+                <div className={styles.minutePlaceholder}>0</div>
+              )}
+              <input
+                placeholder="00"
+                value={questionAnsweringTime.minutes}
+                onChange={e =>
+                  setNumber(
+                    (minutes: string) =>
+                      setQuestionAnsweringTime(prev => ({ ...prev, minutes })),
+                    e.target.value
+                  )
+                }
+              />
+              :
+              <input
+                placeholder="00"
+                value={questionAnsweringTime.seconds}
+                onChange={e =>
+                  setNumber(
+                    (seconds: string) =>
+                      setQuestionAnsweringTime(prev => ({ ...prev, seconds })),
+                    e.target.value
+                  )
+                }
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div className={styles.players}>
-        <div className={styles.playerCount}>
-          <div className={styles.number}>{players.length}</div>
-          <div className={styles.text}>
-            {players.length === 1 ? 'Player' : 'Players'}
-          </div>
-        </div>
-        <div className={styles.playerList}>
-          {players.map(({ id, username }) => (
-            <Button key={id} className={styles.item}>
-              {username}
-            </Button>
-          ))}
-        </div>
+      <div className={styles.footer}>
+        {players.length} {players.length === 1 ? 'Player' : 'Players'} Joined
       </div>
-      <Button
-        onClick={e => {
-          changeStatus('chooseTopics');
-        }}
-        className={styles.startGame}
-      >
-        Start Game
-      </Button>
     </div>
   );
 };
 
 const ChooseTopics = ({
-  changeStatus,
+  topics,
+  setTopics,
+  handleStartGame,
 }: {
-  changeStatus: (newStatus: string) => void;
+  topics: string[];
+  setTopics: Dispatch<SetStateAction<string[]>>;
+  handleStartGame: Function;
 }) => {
-  const [topics, setTopics] = useState<string[]>([]);
-
   const handleAddTopic = () => {
     setTopics(prev => [...prev, '']);
   };
@@ -92,56 +214,72 @@ const ChooseTopics = ({
     setTopics(copy);
   };
 
-  const DeleteTopic = ({ index }: { index: number }) => (
-    <button
-      className={styles.deleteTopic}
-      onClick={() => handleDeleteTopic(index)}
-    >
-      <FaTimes size="2rem" color="var(--input-placeholder-color)" />
-    </button>
-  );
-
   return (
     <div className={styles.chooseTopics}>
-      <Header>WHAT TOPICS SHOULD STUDENTS COVER?</Header>
-      <div className={styles.topics}>
-        {topics.length === 0 ? <Note>There's nothing here...</Note> : null}
-        {topics.map((topic, i) => (
-          <IconInput
-            className={styles.topic}
-            placeholder="Some topic..."
-            value={topic}
-            onChange={e => handleEditTopic(i, e.target.value)}
-            right={<DeleteTopic index={i} />}
-          />
-        ))}
+      <div className={styles.logo}>
+        <Logo color="black" />
       </div>
-      <button
-        className={styles.addTopic}
-        disabled={topics.length >= 4}
-        onClick={handleAddTopic}
-      >
-        +
-      </button>
-      <Button
-        onClick={e => {
-          socket.emit('createGame', topics, 10, 15);
-          changeStatus('countdown');
-        }}
-        className={styles.hostRoom}
-        fill="secondary"
-      >
-        Start Game
-      </Button>
+      <div>
+        <div className={styles.title}>What theme should questions follow?</div>
+        <div className={styles.topics}>
+          {topics.map((topic, i) => (
+            <div className={styles.topic}>
+              <div className={styles.index}>{i + 1}.</div>
+              <div className={styles.inputWrapper}>
+                <input
+                  placeholder="Enter a theme here!!"
+                  value={topic}
+                  onChange={e => handleEditTopic(i, e.target.value)}
+                  maxLength={40}
+                />
+              </div>
+              <div className={styles.delete}>
+                <button onClick={e => handleDeleteTopic(i)}>Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className={styles.actions}>
+        <button
+          className={styles.anothaOne}
+          onClick={handleAddTopic}
+          disabled={topics.length >= 4}
+        >
+          Anotha one.
+        </button>
+        <button className={styles.startGame} onClick={() => handleStartGame()}>
+          Start game!
+        </button>
+      </div>
     </div>
   );
 };
 
-const Countdown = ({ secondsLeft }: { secondsLeft: number }) => {
+const Countdown = ({
+  secondsLeft,
+  totalTime,
+}: {
+  secondsLeft: number;
+  totalTime: number;
+}) => {
+  const timeLeft = formatSeconds(secondsLeft);
+
   return (
-    <div className={styles.centeredWrapper}>
-      <div className={styles.header}>Create your quiz questions!</div>
-      <div className={styles.timeLeft}>{formatSeconds(secondsLeft)}</div>
+    <div className={styles.createQuestions}>
+      <div className={styles.logo}>
+        <Logo size="md" color="white" variant="bordered" />
+      </div>
+      <div className={styles.title}>Create your quiz questions!</div>
+      <div className={styles.time} data-time={timeLeft}>
+        {timeLeft}
+      </div>
+      <div className={styles.progressWrapper}>
+        <div
+          className={styles.inner}
+          style={{ width: `${(secondsLeft / totalTime) * 100}%` }}
+        />
+      </div>
     </div>
   );
 };
@@ -198,8 +336,9 @@ const QuizQuestion = ({
           {guesses
             .slice(0, 3)
             .reverse()
-            .map(guess => (
+            .map((guess, i) => (
               <Guess
+                key={i}
                 name={guess.username}
                 guess={guess.guess}
                 correct={guess.correct}
@@ -226,6 +365,7 @@ const Leaderboard = () => {
     <div className={styles.leaderboardWrapper}>
       {Object.entries(leaderboard).map(([key, player], i) => (
         <div
+          key={key}
           className={styles.leaderboardItem}
           style={{
             color: i === 0 ? 'var(--accent-color)' : undefined,
@@ -344,7 +484,10 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [players, setPlayers] = useState([]);
   const [quizzerID, setQuizzerID] = useState('');
   const [quizzerUsername, setQuizzerUsername] = useState('');
-  const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
+  const [questionCreatingTime, setQuestionCreatingTime] = useState<number>(0);
+  const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(0);
+  const [topics, setTopics] = useState<string[]>(['']);
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const [question, setQuestion] = useState('');
   const [hint, setHint] = useState('');
   const [guesses, setGuesses] = useState([]);
@@ -354,9 +497,11 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   };
 
   useEffect(() => {
-    const handleGameStateChange = game => {
+    const handleGameStateChange = (game: Game) => {
       setSecondsLeft(game.countdown);
       setHint(game.hint);
+      setQuestionCreatingTime(game.questionCreatingTime);
+      setQuestionAnsweringTime(game.questionAnsweringTime);
       switch (game.state) {
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
@@ -400,6 +545,17 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     };
   }, [status]);
 
+  const handleStartGame = () => {
+    console.log({ questionCreatingTime, questionAnsweringTime });
+    socket.emit(
+      'createGame',
+      topics,
+      questionCreatingTime,
+      questionAnsweringTime
+    );
+    changeStatus('countdown');
+  };
+
   const renderComponent = (component: string) => {
     switch (component) {
       case 'lobby':
@@ -408,12 +564,25 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             changeStatus={changeStatus}
             roomCode={params.roomCode}
             players={players}
+            setCreatingTime={setQuestionCreatingTime}
+            setAnsweringTime={setQuestionAnsweringTime}
           />
         );
       case 'chooseTopics':
-        return <ChooseTopics changeStatus={changeStatus} />;
+        return (
+          <ChooseTopics
+            topics={topics}
+            setTopics={setTopics}
+            handleStartGame={handleStartGame}
+          />
+        );
       case 'countdown':
-        return <Countdown secondsLeft={secondsLeft} />;
+        return (
+          <Countdown
+            secondsLeft={secondsLeft}
+            totalTime={questionCreatingTime}
+          />
+        );
       case 'revealQuizzer':
         return <RevealQuizzer quizzer={quizzerUsername} />;
       case 'quizQuestion':

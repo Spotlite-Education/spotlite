@@ -1,7 +1,7 @@
 .main {
   width: 100%;
   height: 100vh;
-  background-color: var(--brand-color);
+  background-color: var(--off-white);
 }
 
 .chooseTopics {
@@ -10,112 +10,249 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  padding: 15rem;
+  justify-content: space-between;
+  padding: 5rem 2.5rem;
+  padding-top: 15rem;
+
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+  }
+
+  .title {
+    margin-bottom: 2.5rem;
+    font-size: 3.5rem;
+  }
 
   .topics {
     display: flex;
     flex-direction: column;
     gap: 3rem;
-    color: var(--input-text-color);
 
     .topic {
       width: 100%;
-      min-height: 6rem;
-      font-size: 1.6rem;
-      text-align: start;
+      height: 9rem;
+      display: grid;
+      grid-template-columns: 2ch 1fr auto;
+      column-gap: 1.5rem;
+      font-size: 5rem;
 
-      &::placeholder {
-        font-size: 1.8rem;
-      }
-
-      .deleteTopic {
-        color: var(--input-text-color);
-
+      .index {
+        width: 100%;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        font-size: inherit;
+      }
+
+      .inputWrapper {
+        max-width: 100%;
+        position: relative;
+        overflow: hidden;
+        padding-left: 2rem;
+
+        &::after {
+          content: '__________________________________________';
+          position: absolute;
+          pointer-events: none;
+          top: 1rem;
+          left: 0;
+          color: var(--accent-color);
+          font-size: 5rem;
+        }
+      }
+
+      input {
+        width: 100%;
+        height: 100%;
         border: none;
-        background-color: transparent;
+        font-size: 3.5rem;
+        background: none;
+
+        &:focus {
+          outline: none;
+        }
+
+        &::placeholder {
+          opacity: 0.5;
+        }
+      }
+
+      .delete {
+        width: 15rem;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 6.5rem;
+
+        button {
+          background-color: var(--accent-color);
+        }
       }
     }
   }
 
-  .addTopic {
-    width: 7rem;
-    height: 7rem;
+  .actions {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    border-radius: 99rem;
-    color: var(--input-text-color);
-    font-size: 5rem;
-    background-color: var(--input-fill-primary);
-    box-shadow: 0.3rem 0.3rem;
-  }
+    gap: 2.5rem;
 
-  .hostRoom {
-    position: absolute;
-    bottom: 10rem;
-    right: 10rem;
-  }
-}
+    .anothaOne {
+      background-color: var(--accent-color);
+    }
 
-@mixin drop-shadow() {
-  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    .startGame {
+      background-color: var(--brand-color);
+    }
+  }
 }
 
 .lobby {
   width: 100%;
   height: 100%;
-  padding: 7rem 15rem 7rem 15rem;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr auto;
 
-  .roomSettings {
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+    width: max-content;
+  }
+
+  .content {
+    position: relative;
     width: 100%;
-    height: 27.5rem;
-    display: grid;
-    grid-template-columns: 60% 1fr;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    column-gap: 2.5rem;
-    padding: 5rem;
-    border-radius: 80px;
-    background-color: var(--accent-color);
+    gap: 5rem;
+    padding-top: 2.5rem;
+    padding-right: 30rem;
 
-    .roomCodeDetails {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1.5rem 0;
-      border-right: 2.5px solid #7d33da;
-      @include drop-shadow();
+    .tag {
+      font-size: 2.5rem;
+    }
 
-      .roomCode {
-        font-family: var(--font-rowdies);
-        font-size: 8rem;
-        text-transform: uppercase;
+    .roomCode {
+      position: relative;
+      z-index: 0;
+      color: var(--off-white);
+      font-size: 12.5rem;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 25rem;
+        height: 25rem;
+        z-index: -99;
+        border-radius: 99rem;
+        background-color: var(--brand-color);
+      }
+
+      &::after {
+        content: attr(data-text);
+        position: absolute;
+        left: 0;
+        color: white;
+        -webkit-text-stroke: 15px var(--accent-color);
+        z-index: -1;
       }
     }
 
-    .subtleText {
-      font-size: 2rem;
-      font-weight: 600;
-      opacity: 0.75;
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 5rem;
+      margin-top: 3.5rem;
+
+      .lockRoom {
+        background-color: var(--accent-color);
+      }
+
+      .startGame {
+        background-color: var(--brand-color);
+      }
     }
 
     .settings {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 30rem;
+      min-height: 40rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      justify-content: space-around;
+      padding: 2.5rem;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      background-color: var(--accent-color);
 
-      .time {
-        font-family: var(--font-rowdies);
-        font-size: 5rem;
-        font-weight: 600;
-        @include drop-shadow();
+      .setting {
+        display: flex;
+        flex-direction: column;
+        color: var(--off-white);
+
+        .settingName {
+          color: var(--off-white);
+          font-size: 1.8rem;
+        }
+
+        .time {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 6rem;
+
+          .minutePlaceholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.5;
+            font-size: inherit;
+          }
+
+          input {
+            width: 2ch;
+            color: var(--off-white);
+            border: none;
+            font-size: inherit;
+            text-align: right;
+            background: none;
+
+            &::placeholder {
+              color: var(--off-white);
+              opacity: 0.5;
+            }
+
+            &:focus {
+              outline: none;
+            }
+          }
+        }
       }
     }
+  }
+
+  .footer {
+    width: 100%;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--off-white);
+    background-color: var(--accent-color);
   }
 }
 
@@ -138,7 +275,6 @@
     font-family: var(--font-rowdies);
     font-size: 5rem;
     font-weight: 600;
-    @include drop-shadow();
   }
 
   .text {
@@ -161,26 +297,65 @@
   }
 }
 
-.centeredWrapper {
+.createQuestions {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 2.5rem;
+  color: var(--off-white);
+  background-color: var(--accent-color);
 
-  .header {
-    opacity: 0.75;
-    font-size: 2.5rem;
-    font-weight: 600;
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
   }
 
-  .timeLeft {
-    font-family: var(--font-rowdies);
-    font-size: 10rem;
-    font-weight: 600;
-    @include drop-shadow();
+  .title {
+    position: relative;
+    z-index: 1;
+    font-size: 3rem;
+
+    &::after {
+      content: 'Create your quiz questions!';
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      -webkit-text-stroke: 5px var(--dark-text);
+    }
+  }
+
+  .time {
+    position: relative;
+    z-index: 1;
+    font-size: 12.5rem;
+
+    &::after {
+      content: attr(data-time);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      -webkit-text-stroke: 10px var(--dark-text);
+    }
+  }
+
+  .progressWrapper {
+    width: 50%;
+    height: 3.5rem;
+    margin-top: 5rem;
+    border: 5px solid var(--dark-text);
+    border-radius: 99rem;
+
+    .inner {
+      height: 100%;
+      border-radius: 99rem;
+      background-color: var(--off-white);
+      transition: width 0.2s;
+    }
   }
 }
 
@@ -330,12 +505,6 @@
   padding: 0 3.5rem;
   font-size: 1.4rem;
   background-color: var(--dark-orange) !important;
-}
-
-.startGame {
-  position: absolute;
-  bottom: 5rem;
-  right: 5rem;
 }
 
 .quizQuestionWrapper {

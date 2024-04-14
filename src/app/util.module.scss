@@ -5,3 +5,18 @@
 @mixin drop-shadow($x: 4px, $y: 4px) {
   box-shadow: $x $y 0px rgba(0, 0, 0, 0.25);
 }
+
+@mixin borderedText($content, $width) {
+  position: relative;
+  z-index: 1;
+
+  &::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: $content;
+    z-index: -1;
+    font-size: inherit;
+    -webkit-text-stroke: $width var(--dark-text);
+  }
+}
