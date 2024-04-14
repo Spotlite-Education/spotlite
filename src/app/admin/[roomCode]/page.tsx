@@ -40,16 +40,16 @@ const Lobby = ({
     minutes: string;
     seconds: string;
   }>({
-    minutes: '5',
-    seconds: '00',
+    minutes: '0',
+    seconds: '20',
   });
 
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<{
     minutes: string;
     seconds: string;
   }>({
-    minutes: '1',
-    seconds: '00',
+    minutes: '0',
+    seconds: '20',
   });
 
   const cleanNumber = (numberString: string): string => {
@@ -317,6 +317,9 @@ const QuizQuestion = ({
   for (let i = 0; i < hint.length; i++) {
     splitHint += hint[i];
     splitHint += ' ';
+    if (hint[i] == ' ') {
+      splitHint += '\xa0\xa0';
+    }
   }
 
   return (
@@ -347,6 +350,15 @@ const QuizQuestion = ({
             ))}
         </div>
       </div>
+    </div>
+  );
+};
+
+const AnswerScreen = ({ answer }: { answer: string }) => {
+  return (
+    <div className={styles.centeredWrapper}>
+      <div className={styles.title}> The answer was: </div>
+      <div className={styles.answer}> {answer} </div>
     </div>
   );
 };
@@ -402,11 +414,11 @@ const Leaderboard = () => {
 };
 
 const Podium = () => {
-  const [leaderboard, setLeaderboard] = useState({});
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     socket.emit('getLeaderboard', leaderboard => {
-      setLeaderboard(Object.entries(leaderboard).values);
+      setLeaderboard(leaderboard);
     });
   }, []);
 
@@ -414,7 +426,7 @@ const Podium = () => {
     <div className={styles.podiumWrapper}>
       <Button className={styles.seeQuestionBank}>See Question Bank</Button>
       <div className={styles.backgroundPillars}>
-        {Object.entries(leaderboard).length > 2 ? (
+        {leaderboard.length > 2 ? (
           <div className={styles.pillarWrapper} style={{ height: '50%' }}>
             <div className={styles.player}>{leaderboard[2].username}</div>
             <div className={styles.pillar} />
@@ -422,7 +434,7 @@ const Podium = () => {
         ) : (
           <div></div>
         )}
-        {Object.entries(leaderboard).length > 0 ? (
+        {leaderboard.length > 0 ? (
           <div className={styles.pillarWrapper} style={{ height: '82.5%' }}>
             <div
               className={styles.player}
@@ -434,7 +446,7 @@ const Podium = () => {
               }}
             >
               <GiQueenCrown size="7.5rem" style={{ marginRight: '3.5rem' }} />
-              {Object.entries(leaderboard)[0].username}
+              {leaderboard[0].username}
             </div>
             <div className={styles.pillar} />
           </div>
@@ -444,9 +456,7 @@ const Podium = () => {
 
         {Object.entries(leaderboard).length > 1 ? (
           <div className={styles.pillarWrapper} style={{ height: '60%' }}>
-            <div className={styles.player}>
-              {Object.entries(leaderboard)[1].username}
-            </div>
+            <div className={styles.player}>{leaderboard[1].username}</div>
             <div className={styles.pillar} />
           </div>
         ) : (
@@ -454,7 +464,7 @@ const Podium = () => {
         )}
       </div>
       <div className={styles.foregroundPillars}>
-        {Object.entries(leaderboard).length > 4 ? (
+        {leaderboard.length > 4 ? (
           <div className={styles.pillarWrapper} style={{ height: '25%' }}>
             <div className={styles.player}>
               {Object.entries(leaderboard)[4].username}
@@ -464,7 +474,7 @@ const Podium = () => {
         ) : (
           <div></div>
         )}
-        {Object.entries(leaderboard).length > 3 ? (
+        {leaderboard.length > 3 ? (
           <div className={styles.pillarWrapper} style={{ height: '35%' }}>
             <div className={styles.player}>
               {Object.entries(leaderboard)[3].username}
@@ -491,6 +501,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [question, setQuestion] = useState('');
   const [hint, setHint] = useState('');
   const [guesses, setGuesses] = useState([]);
+  const [answer, setAnswer] = useState('');
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -510,6 +521,9 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           break;
         case 'answerQuestion':
           changeStatus('quizQuestion');
+          break;
+        case 'showingAnswer':
+          changeStatus('showingAnswer');
           break;
         case 'leaderboardPosition':
           changeStatus('leaderboard');
@@ -532,16 +546,23 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       setGuesses(guesses);
     };
 
+    const handleRevealAnswer = answer => {
+      console.log(answer);
+      setAnswer(answer);
+    };
+
     socket.on('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
     socket.on('lobbyUpdate', handleLobbyUpdate);
     socket.on('gameStateChange', handleGameStateChange);
     socket.on('newGuess', handleNewGuess);
+    socket.on('revealAnswer', handleRevealAnswer);
 
     return () => {
       socket.off('lobbyUpdate', handleLobbyUpdate);
       socket.off('gameStateChange', handleGameStateChange);
       socket.off('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
       socket.off('newGuess', handleNewGuess);
+      socket.off('revealAnswer', handleRevealAnswer);
     };
   }, [status]);
 
@@ -596,6 +617,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             guesses={guesses}
           />
         );
+      case 'showingAnswer':
+        return <AnswerScreen answer={answer} />;
       case 'leaderboard':
         return <Leaderboard />;
       case 'podium':
