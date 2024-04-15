@@ -8,6 +8,7 @@ import Input from './components/Input';
 import { Logo } from './components/Logo';
 import { UnstyledLink } from './components/UnstyledLink';
 import styles from './page.module.scss';
+import { FaChevronRight } from 'react-icons/fa';
 
 const NameSelect = ({
   roomCode,
@@ -18,22 +19,45 @@ const NameSelect = ({
   handleJoin: (e: React.FormEvent<HTMLFormElement>) => void;
   handleChangeUsername: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
+  const icons = [
+    'catscaled.png',
+    'dogscaled.png',
+    'frogscaled.png',
+    'bunnyscaled.png',
+    'horsescaled.png',
+  ];
+  const [currentIconIndex, setCurrentIconIndex] = useState(1);
+  const [currentIcon, setCurrentIcon] = useState('/catscaled.png');
+
+  const changeIcon = () => {
+    setCurrentIcon('/' + icons[currentIconIndex % icons.length]);
+    setCurrentIconIndex(currentIconIndex + 1);
+  };
+
   return (
     <div className={styles.nameSelect}>
       <div className={styles.content}>
         <div className={styles.logo}>
           <Logo color="black" />
         </div>
-        <div className={styles.title}>What&apos;s your name?</div>
-        <div className={styles.inputWrapper}>
-          <form style={{ all: 'unset' }} onSubmit={e => handleJoin(e)}>
-            <input
-              maxLength={15}
-              placeholder="Name Here"
-              autoFocus
-              onChange={e => handleChangeUsername(e)}
-            />
-          </form>
+        <div className={styles.iconNameWrapper}>
+          <button onClick={changeIcon} className={styles.icon}>
+            <img className={styles.iconImg} src={currentIcon}></img>
+          </button>
+          <div>
+            <div className={styles.title}>What&apos;s your name?</div>
+            <div className={styles.inputWrapper}>
+              <form style={{ all: 'unset' }} onSubmit={e => handleJoin(e)}>
+                <input
+                  maxLength={15}
+                  placeholder="Name Here"
+                  autoFocus
+                  onChange={e => handleChangeUsername(e)}
+                />
+                <FaChevronRight></FaChevronRight>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
       <div className={styles.footer}>You are joining room {roomCode}</div>

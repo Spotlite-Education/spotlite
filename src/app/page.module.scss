@@ -154,37 +154,55 @@
       left: 2.5rem;
     }
 
-    .title {
-      font-size: 3.5rem;
-    }
+    .iconNameWrapper {
+      display: flex;
+      gap: 10rem;
 
-    .inputWrapper {
-      position: relative;
-
-      &::after {
-        pointer-events: none;
-        content: '______________';
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        color: var(--brand-color);
-        font-size: 7.5rem;
+      .title {
+        font-size: 3.5rem;
+        text-align: center;
+        margin: 2rem;
       }
 
-      input {
-        width: 14ch;
-        border: none;
-        font-size: 5rem;
-        text-align: center;
-        background: none;
+      .icon {
+        background-color: transparent;
 
-        &:focus {
-          outline: none;
+        .iconImg {
+          width: 25rem;
+          height: 25rem;
+        }
+        :hover {
+          transform: scale(1.1);
+        }
+      }
+      .inputWrapper {
+        position: relative;
+
+        &::after {
+          pointer-events: none;
+          content: '______________';
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          color: var(--brand-color);
+          font-size: 7.5rem;
         }
 
-        &::placeholder {
-          opacity: 0.5;
-          color: var(--brand-color);
+        input {
+          width: 14ch;
+          border: none;
+          font-size: 5rem;
+          text-align: center;
+          background: none;
+
+          &:focus {
+            outline: none;
+          }
+
+          &::placeholder {
+            opacity: 0.5;
+            color: var(--brand-color);
+          }
         }
       }
     }
