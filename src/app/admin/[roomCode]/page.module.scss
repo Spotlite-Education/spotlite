@@ -520,6 +520,15 @@
     left: 50%;
     transform: translate(-50%);
   }
+
+  .forceSkip {
+    position: absolute;
+    font-size: 3rem;
+    bottom: 5rem;
+    right: 0px;
+    background-color: var(--accent-color);
+    transform: translate(-50%);
+  }
 }
 
 .answerReveal {

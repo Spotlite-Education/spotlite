@@ -270,10 +270,12 @@ const Countdown = ({
   secondsLeft,
   totalTime,
   addTime,
+  forceSkip,
 }: {
   secondsLeft: number;
   totalTime: number;
   addTime: () => void;
+  forceSkip: () => void;
 }) => {
   const timeLeft = formatSeconds(secondsLeft);
 
@@ -294,6 +296,9 @@ const Countdown = ({
       </div>
       <button className={styles.addTime} onClick={addTime}>
         Add 30 seconds
+      </button>
+      <button className={styles.addTime} onClick={forceSkip}>
+        Force skip
       </button>
     </div>
   );
@@ -317,6 +322,7 @@ const QuizQuestion = ({
   question,
   hint,
   guesses,
+  forceSkip,
 }: {
   quizzerID: string;
   quizzerUsername: string;
@@ -329,6 +335,7 @@ const QuizQuestion = ({
     correct: boolean;
     points: number;
   }[];
+  forceSkip: () => void;
 }) => {
   var splitHint = '';
   for (let i = 0; i < hint.length; i++) {
@@ -365,7 +372,10 @@ const QuizQuestion = ({
       </div>
       <div className={styles.questionPrompt}>{question}</div>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
-      <div className={styles.questionHint}>Answer: {hint}</div>
+      <div className={styles.questionHint}>Hint: {hint}</div>
+      <button className={styles.forceSkip} onClick={forceSkip}>
+        Force skip
+      </button>
     </div>
   );
 };
@@ -550,6 +560,10 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     changeStatus('countdown');
   };
 
+  const handleForceSkip = () => {
+    socket.emit('forceSkip');
+  };
+
   const handleAddTime = () => {
     setQuestionCreatingTime(questionCreatingTime + 30);
     socket.emit('addTime', 30);
@@ -581,6 +595,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             secondsLeft={secondsLeft}
             totalTime={questionCreatingTime}
             addTime={handleAddTime}
+            forceSkip={handleForceSkip}
           />
         );
       case 'revealQuizzer':
@@ -594,6 +609,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             question={question}
             hint={hint}
             guesses={guesses}
+            forceSkip={handleForceSkip}
           />
         );
       case 'showingAnswer':
