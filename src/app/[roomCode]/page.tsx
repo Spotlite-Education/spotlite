@@ -703,12 +703,14 @@ const AnswerQuestion = ({
         <div className={styles.chatWrapper}>
           <div className={styles.title}>Chat</div>
           <div className={styles.messages}>
-            {guesses.map((guess: Guess, i) => (
-              <div key={i} className={styles.guess}>
-                <div className={styles.guesser}>{guess.player.username}:</div>
-                <div className={styles.guess}>{guess.guess}</div>
-              </div>
-            ))}
+            {guesses.map((guess: Guess, i) =>
+              guess.correct ? null : (
+                <div key={i} className={styles.guess}>
+                  <div className={styles.guesser}>{guess.player.username}:</div>
+                  <div className={styles.guess}>{guess.guess}</div>
+                </div>
+              )
+            )}
           </div>
         </div>
         <div className={styles.answerSpace}>
