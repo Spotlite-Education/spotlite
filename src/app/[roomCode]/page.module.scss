@@ -668,6 +668,13 @@
         gap: 1rem;
         padding: 0 2.5rem;
 
+        .correctGuess {
+          display: flex;
+          padding: 0.25rem 1rem;
+          border-radius: 5px;
+          background-color: #37d200;
+        }
+
         .guess {
           display: flex;
           gap: 1rem;
