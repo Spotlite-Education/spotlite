@@ -653,11 +653,13 @@ const AnswerQuestion = ({
   secondsLeft,
   points,
   changeStatus,
+  setPointIncrement,
 }: {
   quizzerUsername: string;
   secondsLeft: number;
   points: number;
   changeStatus: (newStatus: string) => void;
+  setPointIncrement: Function;
 }) => {
   const [answer, setAnswer] = useState<string>('');
   const [guesses, setGuesses] = useState<Guess[]>([]);
@@ -668,9 +670,10 @@ const AnswerQuestion = ({
     if (!answer) return;
 
     // do something with the answer
-    socket.emit('guessAnswer', answer, (correct: boolean) => {
+    socket.emit('guessAnswer', answer, (correct: boolean, points: number) => {
       if (correct) {
         changeStatus('answerResult');
+        setPointIncrement(points);
       }
     });
 
@@ -736,8 +739,8 @@ const AnswerResult = ({ points }: { points: number }) => {
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.title} data-text={'+' + (points || 0)}>
-        +{points || 0}
+      <div className={styles.title} data-text={'+' + points}>
+        +{points}
       </div>
       <div className={styles.correct}>Correct!</div>
     </div>
@@ -764,8 +767,8 @@ const LeaderboardPosition = ({
         <div className={styles.rank} data-text={rankText + '!'}>
           {rankText}!
         </div>
-        <div className={styles.points} data-text={(points || 0) + ' Pts'}>
-          {points || 0} Pts
+        <div className={styles.points} data-text={points + ' Pts'}>
+          {points} Pts
         </div>
       </div>
     </div>
@@ -867,6 +870,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(
     {} as StudentInfo
   );
+  const [pointIncrement, setPointIncrement] = useState(0);
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -930,6 +934,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             secondsLeft={secondsLeft}
             changeStatus={changeStatus}
             points={studentInfo.points}
+            setPointIncrement={setPointIncrement}
           />
         );
       case 'showQuizzer':
@@ -940,7 +945,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'answerResult':
-        return <AnswerResult points={studentInfo.points} />;
+        return <AnswerResult points={pointIncrement} />;
       case 'leaderboardPosition':
         return (
           <LeaderboardPosition
