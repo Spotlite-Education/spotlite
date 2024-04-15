@@ -259,9 +259,11 @@ const ChooseTopics = ({
 const Countdown = ({
   secondsLeft,
   totalTime,
+  addTime,
 }: {
   secondsLeft: number;
   totalTime: number;
+  addTime: () => void;
 }) => {
   const timeLeft = formatSeconds(secondsLeft);
 
@@ -280,6 +282,9 @@ const Countdown = ({
           style={{ width: `${(secondsLeft / totalTime) * 100}%` }}
         />
       </div>
+      <button className={styles.addTime} onClick={addTime}>
+        Add 30 seconds
+      </button>
     </div>
   );
 };
@@ -511,8 +516,6 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     const handleGameStateChange = (game: Game) => {
       setSecondsLeft(game.countdown);
       setHint(game.hint);
-      setQuestionCreatingTime(game.questionCreatingTime);
-      setQuestionAnsweringTime(game.questionAnsweringTime);
       switch (game.state) {
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
@@ -577,6 +580,11 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     changeStatus('countdown');
   };
 
+  const handleAddTime = () => {
+    setQuestionCreatingTime(questionCreatingTime + 30);
+    socket.emit('addTime', 30);
+  };
+
   const renderComponent = (component: string) => {
     switch (component) {
       case 'lobby':
@@ -602,6 +610,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           <Countdown
             secondsLeft={secondsLeft}
             totalTime={questionCreatingTime}
+            addTime={handleAddTime}
           />
         );
       case 'revealQuizzer':
