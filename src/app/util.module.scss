@@ -6,7 +6,7 @@
   box-shadow: $x $y 0px rgba(0, 0, 0, 0.25);
 }
 
-@mixin borderedText($content, $width) {
+@mixin borderedText($content, $width, $color: var(--dark-text)) {
   position: relative;
   z-index: 1;
 
@@ -17,6 +17,6 @@
     content: $content;
     z-index: -1;
     font-size: inherit;
-    -webkit-text-stroke: $width var(--dark-text);
+    -webkit-text-stroke: $width $color;
   }
 }

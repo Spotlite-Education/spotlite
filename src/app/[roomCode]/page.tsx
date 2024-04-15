@@ -1,9 +1,12 @@
 'use client';
 import {
+  FormEvent,
   KeyboardEvent,
   MutableRefObject,
   forwardRef,
+  memo,
   use,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -14,7 +17,7 @@ import Input from '../components/Input';
 import LongInput from '../components/Input';
 import Note from '../components/Note';
 import styles from './page.module.scss';
-import { formatSeconds } from '../util/format';
+import { formatRank, formatSeconds } from '../util/format';
 import { FaChevronRight } from 'react-icons/fa';
 import Paper from '../components/Paper';
 import { useRouter } from 'next/navigation';
@@ -30,6 +33,7 @@ import { addStyles, EditableMathField } from 'react-mathquill';
 import { Question } from '../types/Question';
 import { GamePlayerState } from '../types/GamePlayerState';
 import { Game } from '../types/Game';
+import { Guess } from '../types/Guess';
 
 const IdleScreen = () => {
   return (
@@ -52,11 +56,19 @@ type Line = {
 };
 
 const Canvas = ({
-  setHovered,
-  setQuestion,
+  width,
+  height,
+  onHoverStart,
+  onHoverEnd,
+  onDraw,
+  onDrawEnd,
 }: {
-  setHovered: Function;
-  setQuestion: Function;
+  width: number;
+  height: number;
+  onHoverStart?: Function;
+  onHoverEnd?: Function;
+  onDraw?: (imageData: string) => any;
+  onDrawEnd?: (imageData: string) => any;
 }) => {
   const SCALE_FACTOR = 1;
 
@@ -89,6 +101,10 @@ const Canvas = ({
     if (actions[actions.length - 1].type !== 'clear') {
       setActions(prev => [...prev, { type: 'clear', data: null }]);
     }
+
+    if (onDraw) {
+      onDraw(canvas.toDataURL());
+    }
   };
 
   useEffect(() => {
@@ -96,8 +112,8 @@ const Canvas = ({
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 10 * 10 - 28 * 10;
+      canvas.width = width;
+      canvas.height = height;
 
       reconstructCanvas(aggregateLines(actions));
     };
@@ -108,7 +124,7 @@ const Canvas = ({
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, [actions]);
+  }, []);
 
   useEffect(() => {
     let isDrawing = false;
@@ -154,12 +170,18 @@ const Canvas = ({
 
       lastX = xTo;
       lastY = yTo;
+
+      if (onDraw) {
+        onDraw(canvas.toDataURL());
+      }
     };
 
     const stopDrawing = () => {
       if (!canvasRef.current) return;
 
-      setQuestion(canvasRef.current.toDataURL('image/png'));
+      if (onDrawEnd) {
+        onDrawEnd(canvasRef.current.toDataURL());
+      }
 
       isDrawing = false;
       if (line.points.length >= 2) {
@@ -190,7 +212,16 @@ const Canvas = ({
       canvas.removeEventListener('mouseup', stopDrawing);
       canvas.removeEventListener('mouseout', stopDrawing);
     };
-  }, [color, lineWidth, erasing, setActions, setUndos, actions, setQuestion]);
+  }, [
+    color,
+    lineWidth,
+    erasing,
+    setActions,
+    setUndos,
+    actions,
+    onDraw,
+    onDrawEnd,
+  ]);
 
   const aggregateLines = (actions: CanvasAction[]) => {
     let lines: Line[] = [];
@@ -276,8 +307,8 @@ const Canvas = ({
       className={styles.whiteboardWrapper}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => onHoverStart && onHoverStart()}
+      onMouseLeave={() => onHoverEnd && onHoverEnd()}
     >
       <div className={styles.drawSettings}>
         <div className={styles.strokeWidth}>
@@ -367,7 +398,7 @@ const CanvasDisplay = ({
 
 //addStyles();
 
-const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
+const TextEditor = ({ setValue }: { setValue: Function }) => {
   const [text, setText] = useState<string>('');
   const [mode, setMode] = useState<'text' | 'math'>('text');
 
@@ -400,9 +431,70 @@ const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
         value={text}
         onChange={e => {
           setText(e.target.value);
-          setQuestion(e.target.value);
+          setValue(e.target.value);
         }}
       />
+    </div>
+  );
+};
+
+const Editor = ({
+  width,
+  height,
+  only,
+  onTextEditorChange,
+  onDraw,
+  onDrawEnd,
+  onCanvasHoverStart,
+  onCanvasHoverEnd,
+}: {
+  width: number;
+  height: number;
+  only?: 'text' | 'draw';
+  onTextEditorChange?: Function;
+  onDraw?: (imageData: string) => any;
+  onDrawEnd?: (imageData: string) => any;
+  onCanvasHoverStart?: Function;
+  onCanvasHoverEnd?: Function;
+}) => {
+  const [mode, setMode] = useState<'text' | 'draw'>(only || 'draw');
+
+  return (
+    <div className={styles.editor} tabIndex={0} style={{ width, height }}>
+      <div className={styles.modeSelect}>
+        {!only && (
+          <>
+            <div
+              className={styles.mode}
+              style={{ opacity: mode === 'text' ? 1 : 0.5 }}
+              onClick={() => setMode('text')}
+            >
+              Text
+            </div>
+            <div
+              className={styles.mode}
+              style={{ opacity: mode === 'draw' ? 1 : 0.5 }}
+              onClick={() => setMode('draw')}
+            >
+              Draw
+            </div>
+          </>
+        )}
+      </div>
+      {mode === 'text' ? (
+        <TextEditor
+          setValue={onTextEditorChange ? onTextEditorChange : () => {}}
+        />
+      ) : (
+        <Canvas
+          width={width}
+          height={height}
+          onHoverStart={onCanvasHoverStart ? onCanvasHoverStart : () => {}}
+          onHoverEnd={onCanvasHoverEnd ? onCanvasHoverEnd : () => {}}
+          onDraw={onDraw ? onDraw : undefined}
+          onDrawEnd={onDrawEnd ? onDrawEnd : undefined}
+        />
+      )}
     </div>
   );
 };
@@ -416,6 +508,7 @@ const QuestionCreation = ({
 }) => {
   const [topic, setTopic] = useState<string>('');
 
+  const promptInputRef = useRef<HTMLInputElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
   const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
 
@@ -430,16 +523,14 @@ const QuestionCreation = ({
   }, []);
 
   const [imageURL, setImageURL] = useState('');
-  const [text, setText] = useState('');
+  const [prompt, setPrompt] = useState('');
 
   const [answer, setAnswer] = useState<string>('');
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log(imageURL);
-    console.log(text);
 
-    socket.emit('submitQuestion', text, imageURL, answer);
+    socket.emit('submitQuestion', prompt, imageURL, answer);
     changeStatus('questionSubmitted');
   };
 
@@ -460,12 +551,25 @@ const QuestionCreation = ({
       </div>
       <form onSubmit={handleSubmit}>
         <div className={styles.content}>
-          <div className={styles.canvas} tabIndex={0}>
-            <div>
-              <TextEditor setQuestion={setText} />
-              <Canvas setHovered={setCanvasHovered} setQuestion={setImageURL} />
-            </div>
+          <div className={styles.promptInput}>
+            <input
+              ref={promptInputRef}
+              disabled={
+                document.activeElement !== promptInputRef.current &&
+                canvasHovered
+              }
+              placeholder="Type a prompt here..."
+              onChange={e => setPrompt(e.target.value)}
+            />
           </div>
+          <Editor
+            width={window.innerWidth || 0}
+            height={window.innerHeight - 5 * 10 - 28 * 10 || 0}
+            only="draw"
+            onDrawEnd={setImageURL}
+            onCanvasHoverStart={() => setCanvasHovered(true)}
+            onCanvasHoverEnd={() => setCanvasHovered(false)}
+          />
           <div className={styles.answerWrapper}>
             <div className={styles.input}>
               Answer:
@@ -481,7 +585,7 @@ const QuestionCreation = ({
             </div>
             <button
               className={styles.submit}
-              disabled={(!text && !imageURL) || !answer}
+              disabled={(!prompt && !imageURL) || !answer}
               type="submit"
             >
               Submit It!
@@ -492,46 +596,6 @@ const QuestionCreation = ({
     </div>
   );
 };
-
-// <form className={styles.questionCreationWrapper} onSubmit={onSubmit}>
-//   <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
-//   <div className={styles.drawablePaper}>
-//     <Paper>
-//       Create a quiz question related to&nbsp;
-//       <span
-//         style={{
-//           color: 'var(--accent-color)',
-//           fontSize: 'inherit',
-//           fontWeight: 'inherit',
-//         }}
-//       >
-//         {topic}.
-//       </span>
-//       <div>
-//         <LongInput
-//           className={styles.input}
-//           placeholder="Write your quiz question here..."
-//           name="question"
-//         />
-//       </div>
-//     </Paper>
-//   </div>
-//   <div className={styles.gridRight}>
-//     <Paper>
-//       Answer:
-//       <div>
-//         <LongInput
-//           className={styles.input}
-//           placeholder="Write your answer here..."
-//           name="answer"
-//         />
-//       </div>
-//     </Paper>
-//     <Button className={styles.submitButton} type="submit">
-//       Submit Question
-//     </Button>
-//   </div>
-// </form>
 
 const QuestionSubmitted = ({
   secondsLeft,
@@ -572,162 +636,220 @@ const ShowQuizzer = ({
 }) => {
   const isQuizzer = sessionStorage.getItem('sessionToken') == quizzerID;
   return (
-    <>
+    <div className={styles.showQuizzer}>
       {isQuizzer ? (
-        <div
-          style={{ backgroundColor: 'var(--accent-color)' }}
-          className={styles.centeredWrapper}
-        >
-          <div className={styles.isTheQuizzer}>You are the quizzer!</div>
-        </div>
+        <div className={styles.youAre}>You&apos;re in the spotlite!</div>
       ) : (
-        <div className={styles.centeredWrapper}>
-          <div className={styles.isTheQuizzer}>
-            {quizzerUsername} is the quizzer...
+        <>
+          <div
+            className={styles.quizzerName}
+            data-text={quizzerUsername || 'Andrew'}
+          >
+            {quizzerUsername || 'Andrew'}
           </div>
-        </div>
+          <div className={styles.subtext}>...Is in the spotlite!</div>
+        </>
       )}
-      ;
-    </>
+    </div>
   );
 };
 
 const AnswerQuestion = ({
   quizzerUsername,
   secondsLeft,
+  points,
   changeStatus,
 }: {
   quizzerUsername: string;
   secondsLeft: number;
+  points: number;
   changeStatus: (newStatus: string) => void;
 }) => {
-  const onAnswer = e => {
+  const [answer, setAnswer] = useState<string>('');
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+
+  const onAnswer = (e: FormEvent) => {
     e.preventDefault();
+
+    if (!answer) return;
+
     // do something with the answer
-    socket.emit('guessAnswer', e.target[0].value, result => {
-      if (result) {
+    socket.emit('guessAnswer', answer, (correct: boolean) => {
+      if (correct) {
         changeStatus('answerResult');
       }
     });
+
+    setAnswer('');
   };
 
+  useEffect(() => {
+    const handleChatUpdate = (guesses: Guess[]) => {
+      setGuesses(guesses);
+    };
+
+    socket.on('newGuess', handleChatUpdate);
+
+    return () => {
+      socket.off('newGuess', handleChatUpdate);
+    };
+  }, []);
+
+  const timeLeft = formatSeconds(secondsLeft);
+
   return (
-    <div className={styles.centeredWrapper}>
-      <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
-      <div className={styles.lessBigText}>
-        Answer {quizzerUsername}&#8217;s Question:
+    <div className={styles.questionAnswerWrapper}>
+      <div className={styles.content}>
+        <div className={styles.logo}>
+          <Logo color="white" variant="bordered" />
+        </div>
+        <div className={styles.timer} data-text={timeLeft}>
+          {timeLeft}
+        </div>
+        <div className={styles.chatWrapper}>
+          <div className={styles.title}>Chat</div>
+          <div className={styles.messages}>
+            {guesses.map((guess: Guess, i) => (
+              <div key={i} className={styles.guess}>
+                <div className={styles.guesser}>{guess.player.username}:</div>
+                <div className={styles.guess}>{guess.guess}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className={styles.answerSpace}>
+          <div>Answer {quizzerUsername}&apos;s question!</div>
+          <form onSubmit={onAnswer}>
+            <div className={styles.inputWrapper}>
+              <input
+                placeholder="Type here..."
+                value={answer}
+                onChange={e => setAnswer(e.target.value)}
+              />
+            </div>
+            <button>Submit!</button>
+          </form>
+        </div>
       </div>
-      <div className={styles.answerInputWrapper}>
-        <form onSubmit={onAnswer}>
-          <Input className={styles.answerInput} placeholder="Answer here..." />
-          <button className={styles.submitAnswer}>
-            <FaChevronRight size="2.5rem" color="var(--input-text-color)" />
-          </button>
-        </form>
-      </div>
+      <div className={styles.footer}>{points || 0} PTS</div>
     </div>
   );
 };
 
-const AnswerResult = ({ points }) => {
+const AnswerResult = ({ points }: { points: number }) => {
   return (
-    <div
-      className={styles.centeredWrapper}
-      style={{ backgroundColor: 'var(--accent-color)' }}
-    >
-      <div className={styles.lessLessBigText}>Correct!</div>
-      <div className={styles.pointsChange}>+{points}</div>
+    <div className={styles.answerResult}>
+      <div className={styles.logo}>
+        <Logo color="white" variant="bordered" />
+      </div>
+      <div className={styles.title} data-text={'+' + points}>
+        +{points}
+      </div>
+      <div className={styles.correct}>Correct!</div>
     </div>
   );
 };
 
-const LeaderboardPosition = ({ rank }) => {
+const LeaderboardPosition = ({
+  rank,
+  points,
+}: {
+  rank: number;
+  points: number;
+}) => {
+  const rankText = formatRank(rank) + ' Place';
+
   return (
-    <div
-      className={styles.centeredWrapper}
-      style={{ backgroundColor: 'var(--accent-color)' }}
-    >
-      <div className={styles.lessLessBigText}>Your Position:</div>
-      <div className={styles.pointsChange}>#{rank}</div>
+    <div className={styles.leaderboard}>
+      <div className={styles.spotlight} />
+      <div className={styles.content}>
+        <div className={styles.logo}>
+          <Logo color="white" variant="bordered" />
+        </div>
+        <div className={styles.subtitle}>You are...</div>
+        <div className={styles.rank} data-text={rankText}>
+          {rankText}
+        </div>
+        <div className={styles.points} data-text={points + ' Pts'}>
+          {points} Pts
+        </div>
+      </div>
     </div>
   );
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
-  const [questionText, setQuestionText] = useState('');
+  const [prompt, setPrompt] = useState<string>('');
   const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
-
-  const onWrite = e => {
-    socket.emit('updateSpotlitQuestion', e.target.value);
-  };
 
   useEffect(() => {
     socket.emit(
       'getStudentInfo',
       sessionStorage.getItem('sessionToken'),
-      info => {
+      (info: GamePlayerState) => {
+        setPrompt(info.question.text);
         setAnswer(info.question.answer);
-        setQuestionText(info.question.text);
         setQuestionImageURL(info.question.imageURL);
+
+        syncPrompt(info.question.text);
       }
     );
   }, []);
 
+  const syncPrompt = useCallback((prompt: string) => {
+    socket.emit('updateSpotlitQuestion', prompt);
+  }, []);
+
+  const syncDrawing = useCallback((imageData: string) => {
+    socket.emit('quizzerDraw', imageData);
+  }, []);
+
+  const timeLeft = formatSeconds(secondsLeft);
+
   return (
-    <div
-      className={styles.questionSpotlightWrapper}
-      style={{ backgroundColor: 'var(--accent-color)' }}
-    >
-      <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
-      <div className={styles.questionDetails}>
-        <Paper className={styles.questionDraftWrapper}>
-          Your Question Draft:
-          <div>
-            {questionText}
-            <img className="questionDraftImage" src={questionImageURL}></img>
-            {/* <div>
-              <CanvasDisplay
-                imageURL={questionImageURL}
-                width={300}
-                height={300}
-              ></CanvasDisplay>
-            </div> */}
-          </div>
-        </Paper>
-        <Paper className={styles.questionAnswerWrapper}>
-          Your Question Answer:
-          <div>{answer}</div>
-        </Paper>
-        {/* <div className={styles.lastResponseWrapper}>
-          <div className={styles.name}>No responses yet</div>
-        </div> */}
+    <div className={styles.questionSpotlightWrapper}>
+      <div className={styles.header}>
+        <div className={styles.logo}>
+          <Logo color="white" variant="bordered" />
+        </div>
+        <div className={styles.prompt}>Write your question out!</div>
+        <div className={styles.timer} data-text={timeLeft}>
+          {timeLeft}
+        </div>
       </div>
-      {/* <Paper drawable className={styles.whiteboardWrapper}> */}
-      <Paper className={styles.whiteboardWrapper}>
-        <span
-          style={{
-            color: 'var(--accent-color)',
-            fontSize: 'inherit',
-            fontWeight: 'inherit',
-          }}
-        >
-          Write out your quiz question
-        </span>{' '}
-        for everyone!
-        <form
-          onChange={onWrite}
-          onSubmit={e => {
-            e.preventDefault();
-          }}
-        >
-          <LongInput
-            className={styles.input}
-            placeholder="Write your quiz question here..."
-            name="question"
+      <div className={styles.content}>
+        <div>
+          <div className={styles.promptInput}>
+            <input
+              placeholder="Type a prompt..."
+              value={prompt}
+              onChange={e => {
+                setPrompt(e.target.value);
+                syncPrompt(e.target.value);
+              }}
+            />
+          </div>
+          <Editor
+            width={window.innerWidth * 0.7 || 0}
+            height={window.innerHeight - 10 * 10 - 7.5 * 10}
+            only="draw"
+            onDraw={syncDrawing}
           />
-        </form>
-      </Paper>
+        </div>
+        <div className={styles.guide}>
+          <div className={styles.questionDraft}>
+            <div className={styles.subtitle}>Your question</div>
+            <div className={styles.preview}>
+              {questionImageURL && <img src={questionImageURL} />}
+            </div>
+          </div>
+          <div className={styles.answer}>
+            <div className={styles.subtitle}>Your Answer</div>
+            <div>{answer}</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -784,8 +906,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
     };
 
     const handleUpdateStudentInfo = (info: StudentInfo) => {
-      console.log('updating info');
-      console.log(info);
       setStudentInfo(info);
     };
 
@@ -815,6 +935,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
             changeStatus={changeStatus}
+            points={studentInfo.points}
           />
         );
       case 'showQuizzer':
@@ -827,7 +948,12 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       case 'answerResult':
         return <AnswerResult points={studentInfo.points} />;
       case 'leaderboardPosition':
-        return <LeaderboardPosition rank={studentInfo.rank} />;
+        return (
+          <LeaderboardPosition
+            rank={studentInfo.rank}
+            points={studentInfo.points}
+          />
+        );
       case 'questionCreation':
         return (
           <QuestionCreation

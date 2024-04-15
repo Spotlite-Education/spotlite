@@ -61,11 +61,223 @@
   }
 }
 
+.editor {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--canvas-color);
+
+  .modeSelect {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+    z-index: 99;
+    display: flex;
+    gap: 1rem;
+
+    .mode {
+      transition: opacity 0.15s;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .whiteboardWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    .drawSettings {
+      position: absolute;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .strokeWidth {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .label {
+          margin-right: 1rem;
+        }
+
+        button {
+          width: 3.5rem;
+          height: 3.5rem;
+        }
+      }
+
+      .colorWheelIcon {
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 1.5px solid var(--dark-text);
+        border-radius: 99rem;
+        background: conic-gradient(
+          hsl(0deg 100% 50%),
+          hsl(10deg 100% 50%),
+          hsl(20deg 100% 50%),
+          hsl(30deg 100% 50%),
+          hsl(40deg 100% 50%),
+          hsl(50deg 100% 50%),
+          hsl(60deg 100% 50%),
+          hsl(70deg 100% 50%),
+          hsl(80deg 100% 50%),
+          hsl(90deg 100% 50%),
+          hsl(100deg 100% 50%),
+          hsl(110deg 100% 50%),
+          hsl(120deg 100% 50%),
+          hsl(130deg 100% 50%),
+          hsl(140deg 100% 50%),
+          hsl(150deg 100% 50%),
+          hsl(160deg 100% 50%),
+          hsl(170deg 100% 50%),
+          hsl(180deg 100% 50%),
+          hsl(190deg 100% 50%),
+          hsl(200deg 100% 50%),
+          hsl(210deg 100% 50%),
+          hsl(220deg 100% 50%),
+          hsl(230deg 100% 50%),
+          hsl(240deg 100% 50%),
+          hsl(250deg 100% 50%),
+          hsl(260deg 100% 50%),
+          hsl(270deg 100% 50%),
+          hsl(280deg 100% 50%),
+          hsl(290deg 100% 50%),
+          hsl(300deg 100% 50%),
+          hsl(310deg 100% 50%),
+          hsl(320deg 100% 50%),
+          hsl(330deg 100% 50%),
+          hsl(340deg 100% 50%),
+          hsl(350deg 100% 50%)
+        );
+      }
+
+      .colorPickerWrapper {
+        width: 100%;
+        height: min-content;
+        padding: 2rem;
+        border-radius: 2.5px;
+        background-color: var(--off-white);
+      }
+
+      button {
+        padding: unset;
+        background-color: unset;
+        color: unset;
+
+        cursor: pointer;
+        width: 4rem;
+        height: 4rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 99rem;
+
+        * {
+          font-size: 2.5rem;
+        }
+
+        &:hover {
+          outline: 1px solid var(--dark-text);
+        }
+      }
+    }
+
+    .whiteboard {
+      cursor: crosshair;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  }
+
+  .textEditorWrapper {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    padding: 0 2.5rem;
+    padding-top: 7.5rem;
+    font-size: 3.5rem;
+
+    * {
+      font-weight: 400;
+    }
+
+    .settings {
+      position: absolute;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .equationEditor {
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      height: 100%;
+      text-wrap: wrap;
+      border: none;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      font-family: var(--font-comico);
+      font-size: 3.5rem;
+      font-weight: 500;
+      background: none;
+      resize: none;
+
+      &:focus {
+        outline: none;
+      }
+
+      &::placeholder {
+        opacity: 0.5;
+        color: var(--dark-text);
+        font-weight: 600;
+        font-family: var(--font-comico);
+      }
+    }
+
+    button {
+      padding: unset;
+      background-color: unset;
+      color: unset;
+
+      cursor: pointer;
+      width: 4rem;
+      height: 4rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 99rem;
+      transition: opacity 0.2s;
+
+      * {
+        font-size: 2.5rem;
+      }
+
+      &:hover {
+        outline: 1px solid var(--dark-text);
+      }
+    }
+  }
+}
+
 .questionCreation {
   width: 100%;
   height: 100%;
   display: flex-column;
-  // grid-template-rows: auto calc(100% - 10rem);
 
   .header {
     width: 100%;
@@ -114,221 +326,20 @@
   .content {
     display: flex-row;
 
-    .canvas {
-      position: relative;
+    .promptInput {
       width: 100%;
-      height: 100%;
-      background-color: var(--canvas-color);
+      height: 10rem;
+      padding: 0 2.5rem;
 
-      .controls {
-        position: absolute;
-        top: 2.5rem;
-        left: 2.5rem;
-        z-index: 99;
-        width: calc(100% - 5rem);
-        display: flex;
-        gap: 1.5rem;
-
-        .modeSelect {
-          display: flex;
-          gap: 1rem;
-
-          .mode {
-            transition: opacity 0.15s;
-
-            &:hover {
-              cursor: pointer;
-            }
-          }
-        }
-      }
-
-      .textEditorWrapper {
+      input {
         width: 100%;
-        max-width: 100%;
         height: 100%;
-        padding: 2.5rem 2.5rem;
-        padding-bottom: 0rem;
+        border: none;
         font-size: 3.5rem;
+        background: none;
 
-        * {
-          font-weight: 400;
-        }
-
-        .settings {
-          position: absolute;
-          bottom: 2.5rem;
-          right: 2.5rem;
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-        }
-
-        .equationEditor {
-          width: 100%;
-          max-width: 100%;
-          overflow: hidden;
-          height: 100%;
-          text-wrap: wrap;
-          border: none;
-        }
-
-        textarea {
-          width: 100%;
-          height: 100%;
-          border: none;
-          font-family: var(--font-comico);
-          font-size: 3.5rem;
-          font-weight: 500;
-          background: none;
-          resize: none;
-
-          &:focus {
-            outline: none;
-          }
-
-          &::placeholder {
-            opacity: 0.5;
-            color: var(--dark-text);
-            font-weight: 600;
-            font-family: var(--font-comico);
-          }
-        }
-
-        button {
-          padding: unset;
-          background-color: unset;
-          color: unset;
-
-          cursor: pointer;
-          width: 4rem;
-          height: 4rem;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          border-radius: 99rem;
-          transition: opacity 0.2s;
-
-          * {
-            font-size: 2.5rem;
-          }
-
-          &:hover {
-            outline: 1px solid var(--dark-text);
-          }
-        }
-      }
-
-      .whiteboardWrapper {
-        position: relative;
-        width: 100%;
-        height: 100%;
-
-        .drawSettings {
-          position: absolute;
-          bottom: 2.5rem;
-          right: 2.5rem;
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-
-          .strokeWidth {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-
-            .label {
-              margin-right: 1rem;
-            }
-
-            button {
-              width: 3.5rem;
-              height: 3.5rem;
-            }
-          }
-
-          .colorWheelIcon {
-            width: 2.5rem;
-            height: 2.5rem;
-            border: 1.5px solid var(--dark-text);
-            border-radius: 99rem;
-            background: conic-gradient(
-              hsl(0deg 100% 50%),
-              hsl(10deg 100% 50%),
-              hsl(20deg 100% 50%),
-              hsl(30deg 100% 50%),
-              hsl(40deg 100% 50%),
-              hsl(50deg 100% 50%),
-              hsl(60deg 100% 50%),
-              hsl(70deg 100% 50%),
-              hsl(80deg 100% 50%),
-              hsl(90deg 100% 50%),
-              hsl(100deg 100% 50%),
-              hsl(110deg 100% 50%),
-              hsl(120deg 100% 50%),
-              hsl(130deg 100% 50%),
-              hsl(140deg 100% 50%),
-              hsl(150deg 100% 50%),
-              hsl(160deg 100% 50%),
-              hsl(170deg 100% 50%),
-              hsl(180deg 100% 50%),
-              hsl(190deg 100% 50%),
-              hsl(200deg 100% 50%),
-              hsl(210deg 100% 50%),
-              hsl(220deg 100% 50%),
-              hsl(230deg 100% 50%),
-              hsl(240deg 100% 50%),
-              hsl(250deg 100% 50%),
-              hsl(260deg 100% 50%),
-              hsl(270deg 100% 50%),
-              hsl(280deg 100% 50%),
-              hsl(290deg 100% 50%),
-              hsl(300deg 100% 50%),
-              hsl(310deg 100% 50%),
-              hsl(320deg 100% 50%),
-              hsl(330deg 100% 50%),
-              hsl(340deg 100% 50%),
-              hsl(350deg 100% 50%)
-            );
-          }
-
-          .colorPickerWrapper {
-            width: 100%;
-            height: min-content;
-            padding: 2rem;
-            border-radius: 2.5px;
-            background-color: var(--off-white);
-          }
-
-          button {
-            padding: unset;
-            background-color: unset;
-            color: unset;
-
-            cursor: pointer;
-            width: 4rem;
-            height: 4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 99rem;
-
-            * {
-              font-size: 2.5rem;
-            }
-
-            &:hover {
-              outline: 1px solid var(--dark-text);
-            }
-          }
-        }
-
-        .whiteboard {
-          cursor: crosshair;
-          image-rendering: -moz-crisp-edges;
-          image-rendering: -webkit-crisp-edges;
-          image-rendering: pixelated;
-          image-rendering: crisp-edges;
+        &:focus {
+          outline: none;
         }
       }
     }
@@ -369,55 +380,11 @@
       }
 
       .submit {
-        height: 60%;
-        width: 20%;
         font-size: 3rem;
         background-color: var(--brand-color);
       }
     }
   }
-}
-
-.centeredWrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 2.5rem;
-}
-
-.bigText {
-  font-family: var(--font-rowdies);
-  font-size: 6rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.lessBigText {
-  @extend .bigText;
-  font-size: 3.5rem;
-}
-
-.lessLessBigText {
-  @extend .bigText;
-  font-size: 2.5rem;
-}
-
-.subText {
-  opacity: 75%;
-  font-size: 2rem;
-  font-weight: 600;
-}
-
-.timer {
-  position: absolute;
-  top: 5rem;
-  right: 5rem;
-  font-family: var(--font-rowdies);
-  font-size: 4rem;
-  font-weight: 600;
 }
 
 .answerInputWrapper {
@@ -484,63 +451,6 @@
   }
 }
 
-.questionSpotlightWrapper {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 35% 1fr;
-  column-gap: 5rem;
-  padding: 13rem 15rem;
-
-  .questionDetails {
-    display: flex;
-    flex-direction: column;
-    row-gap: 5rem;
-
-    .questionDraftWrapper {
-      flex: 3;
-      .questionDraftImage {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-      }
-    }
-
-    .questionAnswerWrapper {
-      flex: 2;
-    }
-
-    .lastResponseWrapper {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0 3.5rem;
-      border-radius: 99rem;
-      background-color: var(--dark-orange);
-
-      .name {
-        font-family: var(--font-rowdies);
-        font-size: 2.5rem;
-        text-transform: uppercase;
-      }
-    }
-  }
-
-  .whiteboardWrapper {
-    border: 2px;
-    border-color: black;
-    height: 100%;
-  }
-
-  .timer {
-    @extend .timer;
-    font-size: 3.5rem;
-    top: 2.5rem;
-    right: 2.5rem;
-  }
-}
-
 .questionSubmitted {
   width: 100%;
   height: 100%;
@@ -576,5 +486,347 @@
   .editQuestion {
     margin-top: 3.5rem;
     background-color: var(--brand-color);
+  }
+}
+
+.questionSpotlightWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    width: 100%;
+    height: 10rem;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    align-items: center;
+    padding: 0 5rem;
+
+    .logo {
+      display: flex;
+    }
+
+    .prompt {
+      width: 100%;
+      height: 5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 99rem;
+      color: var(--off-white);
+      font-size: 2rem;
+      background-color: var(--accent-color);
+    }
+
+    .timer {
+      @include util.borderedText(attr(data-text), 5px);
+      justify-self: end;
+      color: var(--off-white);
+      font-size: 3.5rem;
+    }
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 70% 30%;
+
+    .promptInput {
+      width: 100%;
+      height: 7.5rem;
+      padding: 0 2.5rem;
+
+      input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        font-size: 2.5rem;
+        background: none;
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+
+    .canvas {
+      width: 100%;
+      height: 100%;
+      background-color: var(--canvas-color);
+    }
+
+    .guide {
+      display: flex;
+      flex-direction: column;
+
+      .questionDraft {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+
+        .preview {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          img {
+            width: 100%;
+            object-fit: contain;
+          }
+        }
+      }
+
+      .answer {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+      }
+    }
+  }
+}
+
+.showQuizzer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--accent-color);
+
+  .youAre {
+    @include util.borderedText("You're in the spotlite!", 5px);
+    color: var(--off-white);
+    font-size: 5rem;
+  }
+
+  .quizzerName {
+    @include util.borderedText(attr(data-text), 7.5px);
+    color: var(--off-white);
+    font-size: 7.5rem;
+  }
+
+  .subtext {
+    @include util.borderedText('...is in the spotlite!', 4px);
+    color: var(--off-white);
+    font-size: 3rem;
+  }
+}
+
+.questionAnswerWrapper {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: calc(100vh - 5rem) 5rem;
+
+  .content {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+
+    .logo {
+      position: absolute;
+      top: 2.5rem;
+      left: 2.5rem;
+    }
+
+    .timer {
+      @include util.borderedText(attr(data-text), 5px);
+      position: absolute;
+      top: 2.5rem;
+      right: 2.5rem;
+      color: var(--off-white);
+      font-size: 4rem;
+    }
+
+    .chatWrapper {
+      width: 35rem;
+      height: 100%;
+      max-height: 100%;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      background-color: var(--canvas-color);
+
+      .title {
+        padding: 0 2.5rem;
+        padding-top: 10rem;
+        margin-bottom: 2.5rem;
+        font-size: 2.5rem;
+      }
+
+      .messages {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0 2.5rem;
+
+        .guess {
+          display: flex;
+          gap: 1rem;
+
+          .guess {
+            flex: 1;
+            text-overflow: wrap;
+            word-break: break-word;
+          }
+        }
+      }
+    }
+
+    .answerSpace {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5rem;
+
+      form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5rem;
+
+        .inputWrapper {
+          position: relative;
+          width: 40rem;
+          display: flex;
+          justify-content: center;
+
+          &::after {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            content: '___________________';
+            color: var(--brand-color);
+            font-size: 5rem;
+          }
+
+          input {
+            width: 100%;
+            border: none;
+            font-size: 3.5rem;
+            background: none;
+
+            &:focus {
+              outline: none;
+            }
+
+            &::placeholder {
+              opacity: 0.5;
+            }
+          }
+        }
+      }
+
+      button {
+        background-color: var(--brand-color);
+      }
+    }
+  }
+
+  .footer {
+    width: 100%;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--off-white);
+    background-color: var(--brand-color);
+  }
+}
+
+.answerResult {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3.5rem;
+  background-color: var(--accent-color);
+
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+  }
+
+  .title {
+    @include util.borderedText(attr(data-text), 7.5px);
+
+    color: var(--off-white);
+    font-size: 12.5rem;
+  }
+
+  .correct {
+    @include util.borderedText('Correct!', 5px);
+    color: var(--off-white);
+    font-size: 4rem;
+  }
+}
+
+.leaderboard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--off-white);
+
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+  }
+
+  .spotlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50rem;
+    height: 50rem;
+    border-radius: 99rem;
+    background-color: var(--brand-color);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .subtitle {
+      @include util.borderedText('You are...', 5px);
+      font-size: 3.5rem;
+      color: var(--off-white);
+    }
+
+    .rank {
+      @include util.borderedText(attr(data-text), 7.5px, var(--accent-color));
+      color: var(--off-white);
+      font-size: 7.5rem;
+    }
+
+    .points {
+      @include util.borderedText(attr(data-text), 5px);
+      z-index: 1;
+      margin-top: 3.5rem;
+      color: var(--off-white);
+      font-size: 4rem;
+    }
   }
 }

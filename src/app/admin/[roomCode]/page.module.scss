@@ -1,6 +1,9 @@
+@use '../../util.module.scss' as util;
+
 .main {
   width: 100%;
   height: 100vh;
+  overflow: hidden;
   background-color: var(--off-white);
 }
 
@@ -364,17 +367,27 @@
   }
 }
 
-.quizzer {
-  font-family: var(--font-rowdies);
-  font-size: 5rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
+.revealQuizzer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: var(--accent-color);
 
-.isTheQuizzer {
-  opacity: 0.75;
-  font-size: 1.8rem;
-  font-weight: 600;
+  .quizzer {
+    @include util.borderedText(attr(data-text), 7.5px);
+    color: var(--off-white);
+    font-size: 7.5rem;
+  }
+
+  .subtext {
+    @include util.borderedText('...is in the spotlite!', 3.5px);
+    color: var(--off-white);
+    font-size: 2.5rem;
+  }
 }
 
 .leaderboardWrapper {
@@ -513,47 +526,62 @@
 }
 
 .quizQuestionWrapper {
-  overflow-y: scroll;
+  position: relative;
   width: 100%;
   height: 100%;
-  padding: 15rem 15rem 15rem 15rem;
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  justify-items: stretch;
-  align-items: stretch;
-  gap: 5rem;
 
-  .quizQuestion {
+  .logo {
+    position: absolute;
+    top: 2.5rem;
+    left: 2.5rem;
+  }
+
+  .quizzer {
+    position: absolute;
+    top: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50rem;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 99rem;
+    color: var(--off-white);
+    font-size: 2rem;
+    background-color: var(--accent-color);
+  }
+
+  .timerWrapper {
+    position: absolute;
+    top: 2.5rem;
+    right: 2.5rem;
+
+    .timer {
+      @include util.borderedText(attr(data-text), 3.5px);
+      color: var(--off-white);
+      font-size: 3.5rem;
+    }
+  }
+
+  .questionPrompt {
+    position: absolute;
+    top: 10rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50ch;
+    overflow: hidden;
+    white-space: nowrap;
+    text-wrap: wrap;
+    text-align: center;
+    font-size: 2.5rem;
+  }
+
+  .questionDisplay {
     width: 100%;
     height: 100%;
-    text-align: left;
-    color: var(--accent-color);
-
-    &::placeholder {
-      opacity: 50%;
-      color: var(--accent-color);
-    }
+    object-fit: contain;
+    padding-top: 20rem;
+    padding-bottom: 5rem;
   }
-
-  .gridRight {
-    display: flex;
-    flex-direction: column;
-    gap: 4rem;
-
-    .guesses {
-      display: flex;
-      flex-direction: column;
-      gap: 4rem;
-      font-size: 2rem;
-      width: 100%;
-    }
-  }
-}
-
-.timer {
-  @extend .timer;
-  position: absolute;
-  font-size: 3.5rem;
-  top: 2.5rem;
-  right: 2.5rem;
 }

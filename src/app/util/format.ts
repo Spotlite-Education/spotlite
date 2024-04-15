@@ -13,3 +13,9 @@ export const formatSeconds = (time: number): string => {
 
   return formatted;
 };
+
+const endings = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th'];
+export const formatRank = (rank: number): string => {
+  const lastDigit = rank % 10;
+  return `${rank}${endings[lastDigit]}`;
+};

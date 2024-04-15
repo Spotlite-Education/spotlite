@@ -1,4 +1,4 @@
-import { Question } from './Question';
+import { Answer, Question } from './Question';
 
 export type GamePlayerState = {
   id: string;

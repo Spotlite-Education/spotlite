@@ -1,8 +1,9 @@
 import { CanvasAction } from '../[roomCode]/page';
 
 export type Question = {
-  type: 'draw' | 'text';
-  content: CanvasAction[] | string;
+  text: string;
+  imageURL: string;
+  answer: Answer;
 };
 
 export type Answer = string;
