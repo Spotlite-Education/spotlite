@@ -617,12 +617,6 @@ const QuestionSubmitted = ({
       <div className={styles.time} data-text={timeText}>
         {timeText}
       </div>
-      <button
-        className={styles.editQuestion}
-        onClick={() => changeStatus('questionCreation')}
-      >
-        Edit Question
-      </button>
     </div>
   );
 };
