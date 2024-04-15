@@ -226,7 +226,7 @@ const ChooseTopics = ({
         <div className={styles.title}>What theme should questions follow?</div>
         <div className={styles.topics}>
           {topics.map((topic, i) => (
-            <div className={styles.topic}>
+            <div key={i} className={styles.topic}>
               <div className={styles.index}>{i + 1}.</div>
               <div className={styles.inputWrapper}>
                 <input
@@ -443,7 +443,7 @@ const Podium = () => {
               3rd
             </div>
             <div className={styles.name} data-text={leaderboard[2]?.username}>
-              {leaderboard[2].username}
+              {leaderboard[2]?.username}
             </div>
           </div>
         ) : (
@@ -455,7 +455,7 @@ const Podium = () => {
             1st
           </div>
           <div className={styles.name} data-text={leaderboard[0]?.username}>
-            {leaderboard[0].username}
+            {leaderboard[0]?.username}
           </div>
         </div>
         <div className={styles.second}>
@@ -464,7 +464,7 @@ const Podium = () => {
             2nd
           </div>
           <div className={styles.name} data-text={leaderboard[1]?.username}>
-            {leaderboard[1].username}
+            {leaderboard[1]?.username}
           </div>
         </div>
       </div>

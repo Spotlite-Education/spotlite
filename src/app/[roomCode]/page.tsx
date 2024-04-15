@@ -770,8 +770,8 @@ const LeaderboardPosition = ({
         <div className={styles.rank} data-text={rankText + '!'}>
           {rankText}!
         </div>
-        <div className={styles.points} data-text={points + ' Pts'}>
-          {points} Pts
+        <div className={styles.points} data-text={(points || 0) + ' Pts'}>
+          {points || 0} Pts
         </div>
       </div>
     </div>

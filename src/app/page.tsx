@@ -154,7 +154,6 @@ const Home = () => {
             <Logo size="xl" />
             <form
               className={styles.roomCodeInputWrapper}
-              onChange={e => setRoomCode(e.target.value)}
               onSubmit={e => handleSubmitRoomCode(e)}
             >
               <input
