@@ -499,6 +499,11 @@
 
     .questionDraftWrapper {
       flex: 3;
+      .questionDraftImage {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
     }
 
     .questionAnswerWrapper {

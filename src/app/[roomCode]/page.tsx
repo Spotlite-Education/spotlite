@@ -157,7 +157,10 @@ const Canvas = ({
     };
 
     const stopDrawing = () => {
-      setQuestion(actions);
+      if (!canvasRef.current) return;
+
+      setQuestion(canvasRef.current.toDataURL('image/png'));
+
       isDrawing = false;
       if (line.points.length >= 2) {
         const lineCopy = line;
@@ -333,6 +336,35 @@ const Canvas = ({
   );
 };
 
+const CanvasDisplay = ({
+  imageURL,
+  width,
+  height,
+}: {
+  imageURL: string;
+  width: number;
+  height: number;
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    var img = new Image();
+
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0, width, height); // Or at whatever offset you like
+    };
+    img.src = imageURL;
+  });
+
+  return <canvas ref={canvasRef} width={width} height={height} />;
+};
+
 //addStyles();
 
 const TextEditor = ({ setQuestion }: { setQuestion: Function }) => {
@@ -397,16 +429,18 @@ const QuestionCreation = ({
     );
   }, []);
 
-  const [canvas, setCanvas] = useState();
+  const [imageURL, setImageURL] = useState('');
   const [text, setText] = useState('');
 
   const [answer, setAnswer] = useState<string>('');
 
-  const handleSubmit = () => {
-    console.log(canvas);
+  const handleSubmit = e => {
+    e.preventDefault();
+    console.log(imageURL);
     console.log(text);
-    //socket.emit('submitQuestion', question, answer);
-    //changeStatus('questionSubmitted');
+
+    socket.emit('submitQuestion', text, imageURL, answer);
+    changeStatus('questionSubmitted');
   };
 
   const timeLeft = formatSeconds(secondsLeft);
@@ -429,7 +463,7 @@ const QuestionCreation = ({
           <div className={styles.canvas} tabIndex={0}>
             <div>
               <TextEditor setQuestion={setText} />
-              <Canvas setHovered={setCanvasHovered} setQuestion={setCanvas} />
+              <Canvas setHovered={setCanvasHovered} setQuestion={setImageURL} />
             </div>
           </div>
           <div className={styles.answerWrapper}>
@@ -447,11 +481,8 @@ const QuestionCreation = ({
             </div>
             <button
               className={styles.submit}
-              disabled={(!text && !canvas) || !answer}
+              disabled={(!text && !imageURL) || !answer}
               type="submit"
-              onClick={e => {
-                e.preventDefault();
-              }}
             >
               Submit It!
             </button>
@@ -623,7 +654,8 @@ const LeaderboardPosition = ({ rank }) => {
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
-  const [question, setQuestion] = useState('');
+  const [questionText, setQuestionText] = useState('');
+  const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
 
   const onWrite = e => {
@@ -635,8 +667,9 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
       'getStudentInfo',
       sessionStorage.getItem('sessionToken'),
       info => {
-        setAnswer(info.answer);
-        setQuestion(info.question);
+        setAnswer(info.question.answer);
+        setQuestionText(info.question.text);
+        setQuestionImageURL(info.question.imageURL);
       }
     );
   }, []);
@@ -650,7 +683,17 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
       <div className={styles.questionDetails}>
         <Paper className={styles.questionDraftWrapper}>
           Your Question Draft:
-          <div>{question}</div>
+          <div>
+            {questionText}
+            <img className="questionDraftImage" src={questionImageURL}></img>
+            {/* <div>
+              <CanvasDisplay
+                imageURL={questionImageURL}
+                width={300}
+                height={300}
+              ></CanvasDisplay>
+            </div> */}
+          </div>
         </Paper>
         <Paper className={styles.questionAnswerWrapper}>
           Your Question Answer:
