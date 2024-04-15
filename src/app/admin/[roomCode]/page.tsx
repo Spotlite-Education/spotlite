@@ -422,7 +422,7 @@ const Podium = () => {
 
   const winnerText =
     leaderboard.length > 0
-      ? `${leaderboard[0].username} is the winner!`
+      ? `${leaderboard[0]?.username} is the winner!`
       : 'Winner winner chicken dinner!';
 
   return (
