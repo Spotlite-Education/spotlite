@@ -742,8 +742,8 @@ const AnswerResult = ({ points }: { points: number }) => {
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.title} data-text={'+' + points}>
-        +{points}
+      <div className={styles.title} data-text={'+' + (points || 0)}>
+        +{points || 0}
       </div>
       <div className={styles.correct}>Correct!</div>
     </div>
