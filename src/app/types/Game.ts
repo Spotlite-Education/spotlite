@@ -7,4 +7,5 @@ export type Game = {
   questionAnsweringTime: number;
   countdown: number;
   quizzer: Player;
+  hint: string;
 };

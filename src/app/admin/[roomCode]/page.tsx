@@ -25,7 +25,7 @@ import { Player } from '@/app/types/Player';
 
 interface LobbyProps {
   roomCode: string;
-  players: string[];
+  players: Player[];
   setCreatingTime: (seconds: number) => any;
   setAnsweringTime: (seconds: number) => any;
   changeStatus: (newStatus: string) => void;
@@ -42,15 +42,15 @@ const Lobby = ({
     minutes: string;
     seconds: string;
   }>({
-    minutes: '0',
-    seconds: '20',
+    minutes: '5',
+    seconds: '00',
   });
 
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<{
     minutes: string;
     seconds: string;
   }>({
-    minutes: '59',
+    minutes: '1',
     seconds: '00',
   });
 
@@ -365,96 +365,48 @@ const QuizQuestion = ({
       </div>
       <div className={styles.questionPrompt}>{question}</div>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
-
-      {/* <div className={styles.timer}>{formatSeconds(secondsLeft)}</div>
-      <Paper className={styles.quizQuestion}>
-        {quizzerUsername} is the quizzer...
-        <div>{question}</div>
-      </Paper>
-      <div className={styles.gridRight}>
-        <Paper>
-          Hint:
-          {splitHint}
-        </Paper>
-        <div className={styles.guesses}>
-          {guesses
-            .slice(0, 3)
-            .reverse()
-            .map((guess, i) => (
-              <Guess
-                key={i}
-                name={guess.username}
-                guess={guess.guess}
-                correct={guess.correct}
-                points={guess.points}
-              ></Guess>
-            ))}
-        </div>
-      </div> */}
+      <div className={styles.questionHint}>Answer: {hint}</div>
     </div>
   );
 };
 
 const AnswerScreen = ({ answer }: { answer: string }) => {
   return (
-    <div className={styles.centeredWrapper}>
-      <div className={styles.title}> The answer was: </div>
-      <div className={styles.answer}> {answer} </div>
+    <div className={styles.answerReveal}>
+      <div className={styles.logo}>
+        <Logo color="white" variant="bordered" />
+      </div>
+      <div className={styles.title}> The answer was:</div>
+      <div className={styles.answer}>{answer}</div>
     </div>
   );
 };
 
 const Leaderboard = () => {
-  const [leaderboard, setLeaderboard] = useState({});
+  const [leaderboard, setLeaderboard] = useState<Player[]>([]);
 
   useEffect(() => {
     socket.emit('getLeaderboard', (leaderboard: Leaderboard) => {
-      console.log(leaderboard);
       setLeaderboard(leaderboard);
     });
   }, []);
 
   return (
     <div className={styles.leaderboardWrapper}>
-      {Object.keys(leaderboard).map((key, i) => {
-        const player: Player = leaderboard[key as keyof typeof leaderboard];
-        return (
-          <div
-            key={key}
-            className={styles.leaderboardItem}
-            style={{
-              color: i === 0 ? 'var(--accent-color)' : undefined,
-              backgroundColor:
-                i === 0
-                  ? 'var(--text-color)'
-                  : i >= 3
-                  ? 'var(--dark-orange)'
-                  : 'var(--accent-color)',
-            }}
-          >
-            {i === 0 && (
-              <GiQueenCrown size="4.5rem" fill="var(--accent-color)" />
-            )}
-            <div className={styles.name}>{player.username}</div>
-            <div className={styles.score}>
-              {player.points}
-              <div className={styles.icon}>
-                {player.ascended ? (
-                  <FaArrowUp size="3rem" />
-                ) : (
-                  <FaArrowDown size="3rem" />
-                )}
-              </div>
-            </div>
+      <div className={styles.logo}>
+        <Logo color="white" variant="bordered" />
+      </div>
+      <div className={styles.title}>Leaderboard</div>
+      <div className={styles.list}>
+        {leaderboard.map(player => (
+          <div key={player.id} className={styles.item}>
+            <div className={styles.meta}>{player.username}</div>
+            <div className={styles.points}>{player.points} Pts</div>
+            <div className={styles.status}>{player.ascended ? '«' : '•'}</div>
           </div>
-        );
-      })}
-      <Button
-        //onClick={e => changeStatus('podium', 'showPodium')}
-        className={styles.nextButton}
-      >
-        Next
-      </Button>
+        ))}
+      </div>
+      {/* <button className={styles.next}>Next</button> */}
     </div>
   );
 };
@@ -468,46 +420,53 @@ const Podium = () => {
     });
   }, []);
 
+  const winnerText =
+    leaderboard.length > 0
+      ? `${leaderboard[0].username} is the winner!`
+      : 'Winner winner chicken dinner!';
+
   return (
     <div className={styles.podiumWrapper}>
-      <Button className={styles.seeQuestionBank}>See Question Bank</Button>
-      <div className={styles.backgroundPillars}>
-        {leaderboard.length > 2 ? (
-          <div className={styles.pillarWrapper} style={{ height: '50%' }}>
-            <div className={styles.player}>{leaderboard[2].username}</div>
-            <div className={styles.pillar} />
-          </div>
-        ) : (
-          <div></div>
-        )}
-        {leaderboard.length > 0 ? (
-          <div className={styles.pillarWrapper} style={{ height: '82.5%' }}>
-            <div
-              className={styles.player}
-              style={{
-                width: '48rem',
-                height: '12rem',
-                boxShadow: '0px 0px 65px var(--brand-color)',
-                fontSize: '5rem',
-              }}
-            >
-              <GiQueenCrown size="7.5rem" style={{ marginRight: '3.5rem' }} />
-              {leaderboard[0].username}
+      <div className={styles.logo}>
+        <Logo color="white" variant="bordered" />
+      </div>
+      <div className={styles.titleWrapper}>
+        <div className={styles.title} data-text={winnerText}>
+          {winnerText}
+        </div>
+      </div>
+      <div className={styles.topThree}>
+        {leaderboard.length >= 3 ? (
+          <div className={styles.third}>
+            <div className={styles.spotlight} />
+            <div className={styles.rank} data-text="3rd">
+              3rd
             </div>
-            <div className={styles.pillar} />
+            <div className={styles.name} data-text={leaderboard[2]?.username}>
+              {leaderboard[2].username}
+            </div>
           </div>
         ) : (
-          <div></div>
+          <div />
         )}
-
-        {Object.entries(leaderboard).length > 1 ? (
-          <div className={styles.pillarWrapper} style={{ height: '60%' }}>
-            <div className={styles.player}>{leaderboard[1].username}</div>
-            <div className={styles.pillar} />
+        <div className={styles.first}>
+          <div className={styles.spotlight} />
+          <div className={styles.rank} data-text="1st">
+            1st
           </div>
-        ) : (
-          <div></div>
-        )}
+          <div className={styles.name} data-text={leaderboard[0]?.username}>
+            {leaderboard[0].username}
+          </div>
+        </div>
+        <div className={styles.second}>
+          <div className={styles.spotlight} />
+          <div className={styles.rank} data-text="2nd">
+            2nd
+          </div>
+          <div className={styles.name} data-text={leaderboard[1]?.username}>
+            {leaderboard[1].username}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -515,7 +474,7 @@ const Podium = () => {
 
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [quizzerID, setQuizzerID] = useState('');
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [questionCreatingTime, setQuestionCreatingTime] = useState<number>(0);
@@ -559,16 +518,11 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       setQuestion(question);
     };
 
-    const handleLobbyUpdate = players => {
+    const handleLobbyUpdate = (players: Player[]) => {
       setPlayers(players);
     };
 
-    const handleNewGuess = guesses => {
-      console.log(guesses);
-      setGuesses(guesses);
-    };
-
-    const handleRevealAnswer = answer => {
+    const handleRevealAnswer = (answer: string) => {
       console.log(answer);
       setAnswer(answer);
     };
@@ -576,14 +530,12 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     socket.on('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
     socket.on('lobbyUpdate', handleLobbyUpdate);
     socket.on('gameStateChange', handleGameStateChange);
-    socket.on('newGuess', handleNewGuess);
     socket.on('revealAnswer', handleRevealAnswer);
 
     return () => {
       socket.off('lobbyUpdate', handleLobbyUpdate);
       socket.off('gameStateChange', handleGameStateChange);
       socket.off('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
-      socket.off('newGuess', handleNewGuess);
       socket.off('revealAnswer', handleRevealAnswer);
     };
   }, [status]);

@@ -767,8 +767,8 @@ const LeaderboardPosition = ({
           <Logo color="white" variant="bordered" />
         </div>
         <div className={styles.subtitle}>You are...</div>
-        <div className={styles.rank} data-text={rankText}>
-          {rankText}
+        <div className={styles.rank} data-text={rankText + '!'}>
+          {rankText}!
         </div>
         <div className={styles.points} data-text={points + ' Pts'}>
           {points} Pts
