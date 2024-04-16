@@ -919,7 +919,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       }
     };
 
-    const handleUpdateStudentInfo = (info: Player) => {
+    const handleUpdateStudentInfo = (info: StudentInfo) => {
       setStudentInfo(info);
     };
 
@@ -952,7 +952,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             secondsLeft={secondsLeft}
             changeStatus={changeStatus}
             points={studentInfo.points}
-            setPointIncrement={setPointIncrement}
           />
         );
       case 'showQuizzer':
