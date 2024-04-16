@@ -753,13 +753,14 @@ const LeaderboardPosition = ({
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
+  const [ogPrompt, setOgPrompt] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
-      setPrompt(info.question.text);
+      setOgPrompt(info.question.text);
       setAnswer(info.question.answer);
       setQuestionImageURL(info.question.imageURL);
 
@@ -783,16 +784,31 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         <div className={styles.logo}>
           <Logo color="white" variant="bordered" />
         </div>
-        <div className={styles.prompt}>Write your question out!</div>
+        <div className={styles.prompt}>
+          Write your question out for everyone!
+        </div>
         <div className={styles.timer} data-text={timeLeft}>
           {timeLeft}
         </div>
       </div>
       <div className={styles.content}>
+        <div className={styles.guide}>
+          <div className={styles.questionDraft}>
+            <div className={styles.subtitle}>Your question draft</div>
+            <div> {ogPrompt}</div>
+            <div className={styles.preview}>
+              {questionImageURL && <img src={questionImageURL} />}
+            </div>
+          </div>
+          <div className={styles.answer}>
+            <div className={styles.subtitle}>Your Answer</div>
+            <div>{answer}</div>
+          </div>
+        </div>
         <div>
           <div className={styles.promptInput}>
             <input
-              placeholder="Type a prompt..."
+              placeholder="Type out your question..."
               value={prompt}
               onChange={e => {
                 setPrompt(e.target.value);
@@ -806,18 +822,6 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
             only="draw"
             onDraw={syncDrawing}
           />
-        </div>
-        <div className={styles.guide}>
-          <div className={styles.questionDraft}>
-            <div className={styles.subtitle}>Your question</div>
-            <div className={styles.preview}>
-              {questionImageURL && <img src={questionImageURL} />}
-            </div>
-          </div>
-          <div className={styles.answer}>
-            <div className={styles.subtitle}>Your Answer</div>
-            <div>{answer}</div>
-          </div>
         </div>
       </div>
     </div>
