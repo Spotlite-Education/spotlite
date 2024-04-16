@@ -116,7 +116,7 @@ const Home = () => {
 
   const handleSubmitRoomCode = (e: FormEvent) => {
     e.preventDefault();
-    fetch(SOCKET_URL + '/authenticate?roomCode=' + roomCode, {
+    fetch(SOCKET_URL + '/authenticate?roomCode=' + roomCode.toUpperCase(), {
       method: 'GET',
     })
       .then(response => {
