@@ -802,7 +802,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           </div>
           <div className={styles.answer}>
             <div className={styles.subtitle}>Your Answer</div>
-            <div>{answer}</div>
+            <div className={styles.answerText}>{answer}</div>
           </div>
         </div>
         <div>
@@ -848,7 +848,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(
     {} as StudentInfo
   );
-  const [pointIncrement, setPointIncrement] = useState(0);
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -870,6 +869,9 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
           setQuizzerUsername(game.quizzer.username);
+          socket.emit('getStudentInfo', (info: StudentInfo) => {
+            setStudentInfo(info);
+          });
           setIsQuizzer(
             sessionStorage.getItem('sessionToken') == game.quizzer.id
           );
