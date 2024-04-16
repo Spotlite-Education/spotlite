@@ -324,8 +324,8 @@ const Countdown = ({
   }, []);
 
   const submissionsText = submissions.numPlayers
-    ? `${submissions.submitted}/${submissions.numPlayers} Questions Submitted`
-    : `${submissions.submitted} Questions Submitted`;
+    ? `${submissions.submitted}/${submissions.numPlayers} Players Submitted`
+    : `${submissions.submitted} Players Submitted`;
 
   return (
     <div className={styles.createQuestions}>
@@ -438,7 +438,7 @@ const QuizQuestion = ({
         </div>
       </div>
       <button className={styles.forceSkip} onClick={forceSkip}>
-        Force skip
+        Skip Question
       </button>
     </div>
   );

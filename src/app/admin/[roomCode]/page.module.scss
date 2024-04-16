@@ -543,10 +543,9 @@
 
   .forceSkip {
     position: absolute;
-    transform: translate(-30%);
     bottom: 5rem;
-    right: 0px;
-    font-size: 3rem;
+    right: 5rem;
+    font-size: 2rem;
     background-color: var(--accent-color);
   }
 }
