@@ -328,11 +328,6 @@
     }
   }
 
-  .addTime {
-    margin: 3rem;
-    background-color: var(--brand-color);
-  }
-
   .time {
     position: relative;
     z-index: 1;
@@ -360,6 +355,23 @@
       border-radius: 99rem;
       background-color: var(--off-white);
       transition: width 0.2s;
+    }
+  }
+
+  .submissions {
+    @include util.borderedText(attr(data-text), 5px);
+    margin-top: 3.5rem;
+    font-size: 2.5rem;
+  }
+
+  .actionRow {
+    display: flex;
+    align-items: center;
+    margin-top: 5rem;
+    gap: 3.5rem;
+
+    .addTime {
+      background-color: var(--brand-color);
     }
   }
 }

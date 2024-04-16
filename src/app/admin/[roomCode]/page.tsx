@@ -6,6 +6,7 @@ import {
   useCallback,
   SetStateAction,
   Dispatch,
+  MouseEvent,
 } from 'react';
 import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
 import { GiQueenCrown } from 'react-icons/gi';
@@ -297,7 +298,34 @@ const Countdown = ({
   addTime: () => void;
   forceSkip: () => void;
 }) => {
+  const [submissions, setSubmissions] = useState<{
+    submitted: number;
+    numPlayers?: number;
+  }>({
+    submitted: 0,
+    numPlayers: undefined,
+  });
   const timeLeft = formatSeconds(secondsLeft);
+
+  useEffect(() => {
+    const handleUpdateSubmissions = (submissions: {
+      submitted: number;
+      numPlayers?: number;
+    }) => {
+      console.log(submissions);
+      setSubmissions(submissions);
+    };
+
+    socket.on('questionSubmitted', handleUpdateSubmissions);
+
+    return () => {
+      socket.off('questionSubmitted', handleUpdateSubmissions);
+    };
+  }, []);
+
+  const submissionsText = submissions.numPlayers
+    ? `${submissions.submitted}/${submissions.numPlayers} Questions Submitted`
+    : `${submissions.submitted} Questions Submitted`;
 
   return (
     <div className={styles.createQuestions}>
@@ -314,12 +342,17 @@ const Countdown = ({
           style={{ width: `${(secondsLeft / totalTime) * 100}%` }}
         />
       </div>
-      <button className={styles.addTime} onClick={addTime}>
-        Add 30 seconds
-      </button>
-      <button className={styles.addTime} onClick={forceSkip}>
-        Force skip
-      </button>
+      <div className={styles.submissions} data-text={submissionsText}>
+        {submissionsText}
+      </div>
+      <div className={styles.actionRow}>
+        <button className={styles.addTime} onClick={addTime}>
+          Add 30 seconds
+        </button>
+        <button className={styles.addTime} onClick={forceSkip}>
+          Force Submit
+        </button>
+      </div>
     </div>
   );
 };
@@ -463,10 +496,10 @@ const Podium = () => {
 
   const router = useRouter();
 
-  const handleEndGame = () => {
-    socket.emit('endGame', () => {
-      router.push('/host');
-    });
+  const handleEndGame = (e: MouseEvent) => {
+    e.preventDefault();
+    router.push('/host');
+    socket.emit('endGame');
   };
 
   const winnerText =
@@ -517,7 +550,7 @@ const Podium = () => {
           </div>
         </div>
       </div>
-      <button className={styles.endGame} onClick={() => handleEndGame()}>
+      <button className={styles.endGame} onClick={handleEndGame}>
         End game!
       </button>
     </div>

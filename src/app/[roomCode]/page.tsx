@@ -80,7 +80,7 @@ const Canvas = ({
   const [undos, setUndos] = useState<CanvasAction[]>([]);
 
   const determineStrokeStyle = () => {
-    if (erasing) return '#f4ede8';
+    if (erasing) return 'var(--off-white)';
     return `rgb(${color.r} ${color.g} ${color.b})`;
   };
 
@@ -362,37 +362,6 @@ const Canvas = ({
     </div>
   );
 };
-
-const CanvasDisplay = ({
-  imageURL,
-  width,
-  height,
-}: {
-  imageURL: string;
-  width: number;
-  height: number;
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    var img = new Image();
-
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, width, height); // Or at whatever offset you like
-    };
-    img.src = imageURL;
-  });
-
-  return <canvas ref={canvasRef} width={width} height={height} />;
-};
-
-//addStyles();
 
 const TextEditor = ({ setValue }: { setValue: Function }) => {
   const [text, setText] = useState<string>('');
