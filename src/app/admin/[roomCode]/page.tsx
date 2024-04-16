@@ -320,6 +320,8 @@ const QuizQuestion = ({
   quizzerUsername,
   secondsLeft,
   question,
+  correct,
+  playerCount,
   hint,
   guesses,
   forceSkip,
@@ -328,6 +330,8 @@ const QuizQuestion = ({
   quizzerUsername: string;
   secondsLeft: number;
   question: string;
+  correct: number;
+  playerCount: number;
   hint: string;
   guesses: {
     username: string;
@@ -340,9 +344,9 @@ const QuizQuestion = ({
   var splitHint = '';
   for (let i = 0; i < hint.length; i++) {
     splitHint += hint[i];
-    splitHint += ' ';
+    splitHint += '\xa0';
     if (hint[i] == ' ') {
-      splitHint += '\xa0\xa0';
+      splitHint += '\xa0\xa0\xa0';
     }
   }
 
@@ -364,7 +368,9 @@ const QuizQuestion = ({
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
+
       <div className={styles.quizzer}>{quizzerUsername} is quizzing!</div>
+
       <div className={styles.timerWrapper}>
         <div className={styles.timer} data-text={timeLeft}>
           {timeLeft}
@@ -372,7 +378,12 @@ const QuizQuestion = ({
       </div>
       <div className={styles.questionPrompt}>{question}</div>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
-      <div className={styles.questionHint}>Hint: {hint}</div>
+      <div className={styles.hintWrapper}>
+        <div className={styles.questionHint}>Hint: {hint}</div>
+        <div className={styles.correctAnswers}>
+          {correct}/{playerCount - 1} correct
+        </div>
+      </div>
       <button className={styles.forceSkip} onClick={forceSkip}>
         Force skip
       </button>
@@ -494,6 +505,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [question, setQuestion] = useState('');
   const [hint, setHint] = useState('');
   const [guesses, setGuesses] = useState([]);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
   const [answer, setAnswer] = useState('');
 
   const changeStatus = (newStatus: string) => {
@@ -506,6 +518,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       setHint(game.hint);
       switch (game.state) {
         case 'choosing quizzer':
+          setCorrectAnswers(0);
           setQuizzerID(game.quizzer.id);
           setQuizzerUsername(game.quizzer.username);
           changeStatus('revealQuizzer');
@@ -537,16 +550,22 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       setAnswer(answer);
     };
 
+    const handleUpdateCorrectAnswers = (count: number) => {
+      setCorrectAnswers(count);
+    };
+
     socket.on('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
     socket.on('lobbyUpdate', handleLobbyUpdate);
     socket.on('gameStateChange', handleGameStateChange);
     socket.on('revealAnswer', handleRevealAnswer);
+    socket.on('updateCorrectAnswers', handleUpdateCorrectAnswers);
 
     return () => {
       socket.off('lobbyUpdate', handleLobbyUpdate);
       socket.off('gameStateChange', handleGameStateChange);
       socket.off('updateSpotlitQuestion', handleUpdateSpotlitQuestion);
       socket.off('revealAnswer', handleRevealAnswer);
+      socket.off('updateCorrectAnswers', handleUpdateCorrectAnswers);
     };
   }, [status]);
 
@@ -607,6 +626,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
             question={question}
+            correct={correctAnswers}
+            playerCount={players.length}
             hint={hint}
             guesses={guesses}
             forceSkip={handleForceSkip}

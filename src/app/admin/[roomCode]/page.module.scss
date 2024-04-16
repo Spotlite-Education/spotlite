@@ -466,7 +466,7 @@
 
   .quizzer {
     position: absolute;
-    top: 2.5rem;
+    top: 3%;
     left: 50%;
     transform: translateX(-50%);
     width: 50rem;
@@ -502,7 +502,7 @@
     white-space: nowrap;
     text-wrap: wrap;
     text-align: center;
-    font-size: 2.5rem;
+    font-size: 4rem;
   }
 
   .questionDisplay {
@@ -513,21 +513,32 @@
     padding-bottom: 5rem;
   }
 
-  .questionHint {
+  .hintWrapper {
     position: absolute;
-    font-size: 5rem;
-    bottom: 5rem;
+    bottom: 5%;
     left: 50%;
     transform: translate(-50%);
+
+    .questionHint {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .correctAnswers {
+      font-size: 3rem;
+      color: var(--accent-color);
+      text-align: center;
+    }
   }
 
   .forceSkip {
     position: absolute;
-    font-size: 3rem;
+    transform: translate(-30%);
     bottom: 5rem;
     right: 0px;
+    font-size: 3rem;
     background-color: var(--accent-color);
-    transform: translate(-50%);
   }
 }
 

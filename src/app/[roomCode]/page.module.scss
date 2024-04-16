@@ -782,6 +782,12 @@
     color: var(--off-white);
     font-size: 4rem;
   }
+
+  .goodJob {
+    @include util.borderedText('Nice job quizzing!', 5px);
+    color: var(--off-white);
+    font-size: 4rem;
+  }
 }
 
 .leaderboard {

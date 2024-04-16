@@ -653,13 +653,11 @@ const AnswerQuestion = ({
   secondsLeft,
   points,
   changeStatus,
-  setPointIncrement,
 }: {
   quizzerUsername: string;
   secondsLeft: number;
   points: number;
   changeStatus: (newStatus: string) => void;
-  setPointIncrement: Function;
 }) => {
   const [answer, setAnswer] = useState<string>('');
   const [guesses, setGuesses] = useState<Guess[]>([]);
@@ -670,10 +668,9 @@ const AnswerQuestion = ({
     if (!answer) return;
 
     // do something with the answer
-    socket.emit('guessAnswer', answer, (correct: boolean, points: number) => {
+    socket.emit('guessAnswer', answer, (correct: boolean) => {
       if (correct) {
         changeStatus('answerResult');
-        setPointIncrement(points);
       }
     });
 
@@ -739,16 +736,26 @@ const AnswerQuestion = ({
   );
 };
 
-const AnswerResult = ({ points }: { points: number }) => {
+const AnswerResult = ({
+  isQuizzer,
+  increment,
+}: {
+  isQuizzer: boolean;
+  increment: number;
+}) => {
   return (
     <div className={styles.answerResult}>
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.title} data-text={'+' + points}>
-        +{points}
+      <div className={styles.title} data-text={'+' + increment}>
+        +{increment}
       </div>
-      <div className={styles.correct}>Correct!</div>
+      {isQuizzer ? (
+        <div className={styles.goodJob}>Nice job quizzing!</div>
+      ) : (
+        <div className={styles.correct}>Correct!</div>
+      )}
     </div>
   );
 };
@@ -861,6 +868,7 @@ interface StudentInfo {
   username: string;
   theme: string;
   points: number;
+  increment: number;
   rank: number;
   ascended: boolean;
   questions: object;
@@ -876,7 +884,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(
     {} as StudentInfo
   );
-  const [pointIncrement, setPointIncrement] = useState(0);
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -894,16 +901,23 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
           setQuizzerUsername(game.quizzer.username);
+          setIsQuizzer(
+            sessionStorage.getItem('sessionToken') == game.quizzer.id
+          );
           changeStatus('showQuizzer');
           break;
         case 'answerQuestion':
-          if (sessionStorage.getItem('sessionToken') == game.quizzer.id) {
+          if (isQuizzer) {
             changeStatus('questionSpotlight');
           } else if (status != 'answerResult') {
             changeStatus('answerQuestion');
           }
           break;
+        case 'showingAnswer':
+          changeStatus('answerResult');
+          break;
         case 'leaderboardPosition':
+          console.log('showing leaderboard');
           changeStatus('leaderboardPosition');
           break;
       }
@@ -940,7 +954,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             secondsLeft={secondsLeft}
             changeStatus={changeStatus}
             points={studentInfo.points}
-            setPointIncrement={setPointIncrement}
           />
         );
       case 'showQuizzer':
@@ -951,7 +964,13 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'answerResult':
-        return <AnswerResult points={pointIncrement} />;
+        return (
+          <AnswerResult
+            isQuizzer={isQuizzer}
+            increment={studentInfo.increment}
+          />
+        );
+
       case 'leaderboardPosition':
         return (
           <LeaderboardPosition
