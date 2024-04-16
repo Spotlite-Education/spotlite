@@ -1,10 +1,7 @@
 'use client';
-
-import Header from '@/app/components/Header';
 import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import socket, { SOCKET_URL } from '../context/socket';
-import Input from './components/Input';
 import { Logo } from './components/Logo';
 import { UnstyledLink } from './components/UnstyledLink';
 import styles from './page.module.scss';
@@ -127,7 +124,6 @@ const Home = () => {
       })
       .then(data => {
         if (data.sessionToken != null) {
-          console.log(data.sessionToken);
           sessionStorage.setItem('sessionToken', data.sessionToken);
           setChooseUser(true);
         }
@@ -162,7 +158,7 @@ const Home = () => {
                 maxLength={6}
                 autoCorrect="off"
                 value={roomCode}
-                onChange={e => setRoomCode(e.target.value)}
+                onChange={e => setRoomCode(e.target.value.toUpperCase())}
               />
             </form>
             <button className={styles.play} onClick={handleSubmitRoomCode}>
