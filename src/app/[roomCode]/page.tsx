@@ -11,15 +11,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import Header from '../components/Header';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import LongInput from '../components/Input';
-import Note from '../components/Note';
 import styles from './page.module.scss';
 import { formatRank, formatSeconds } from '../util/format';
-import { FaChevronRight } from 'react-icons/fa';
-import Paper from '../components/Paper';
 import { useRouter } from 'next/navigation';
 import socket from '../../context/socket';
 import { Logo } from '../components/Logo';
@@ -34,6 +27,7 @@ import { Question } from '../types/Question';
 import { GamePlayerState } from '../types/GamePlayerState';
 import { Game } from '../types/Game';
 import { Guess } from '../types/Guess';
+import { Player } from '../types/Player';
 
 const IdleScreen = () => {
   return (
@@ -314,12 +308,13 @@ const Canvas = ({
         <div className={styles.strokeWidth}>
           <span className={styles.label}>Stroke — {lineWidth}</span>
           <button
+            type="button"
             disabled={lineWidth === 10}
             onClick={() => setLineWidth(prev => Math.min(10, prev + 1))}
           >
             <RiAddFill />
           </button>
-          <button disabled={lineWidth === 1}>
+          <button type="button" disabled={lineWidth === 1}>
             <RiSubtractFill
               onClick={() => setLineWidth(prev => Math.max(1, prev - 1))}
             />
@@ -327,7 +322,7 @@ const Canvas = ({
         </div>
         <Popover.Root>
           <Popover.Trigger>
-            <button>
+            <button type="button">
               <div className={styles.colorWheelIcon} />
             </button>
           </Popover.Trigger>
@@ -340,6 +335,7 @@ const Canvas = ({
           </Popover.Content>
         </Popover.Root>
         <button
+          type="button"
           style={{
             outline: erasing ? '1.5px solid var(--dark-text)' : undefined,
           }}
@@ -347,13 +343,13 @@ const Canvas = ({
         >
           <RiEraserFill />
         </button>
-        <button disabled={actions.length === 0} onClick={undo}>
+        <button type="button" disabled={actions.length === 0} onClick={undo}>
           <IoIosUndo />
         </button>
-        <button disabled={undos.length === 0} onClick={redo}>
+        <button type="button" disabled={undos.length === 0} onClick={redo}>
           <IoIosRedo />
         </button>
-        <button onClick={clearCanvas}>
+        <button type="button" onClick={clearCanvas}>
           <MdDelete />
         </button>
       </div>
@@ -513,13 +509,12 @@ const QuestionCreation = ({
   const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.emit(
-      'getStudentInfo',
-      sessionStorage.getItem('sessionToken'),
-      (info: GamePlayerState) => {
-        setTopic(info.theme);
+    socket.emit('getStudentInfo', (info: GamePlayerState) => {
+      if (info.question) {
+        changeStatus('questionSubmitted');
       }
-    );
+      setTopic(info.theme);
+    });
   }, []);
 
   const [imageURL, setImageURL] = useState('');
@@ -787,17 +782,13 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   const [answer, setAnswer] = useState('');
 
   useEffect(() => {
-    socket.emit(
-      'getStudentInfo',
-      sessionStorage.getItem('sessionToken'),
-      (info: GamePlayerState) => {
-        setPrompt(info.question.text);
-        setAnswer(info.question.answer);
-        setQuestionImageURL(info.question.imageURL);
+    socket.emit('getStudentInfo', (info: GamePlayerState) => {
+      setPrompt(info.question.text);
+      setAnswer(info.question.answer);
+      setQuestionImageURL(info.question.imageURL);
 
-        syncPrompt(info.question.text);
-      }
-    );
+      syncPrompt(info.question.text);
+    });
   }, []);
 
   const syncPrompt = useCallback((prompt: string) => {
@@ -857,15 +848,6 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   );
 };
 
-interface StudentInfo {
-  username: string;
-  theme: string;
-  points: number;
-  rank: number;
-  ascended: boolean;
-  questions: object;
-}
-
 const Room = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('idleScreen');
   const router = useRouter();
@@ -873,9 +855,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [isQuizzer, setIsQuizzer] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
-  const [studentInfo, setStudentInfo] = useState<StudentInfo>(
-    {} as StudentInfo
-  );
+  const [studentInfo, setStudentInfo] = useState<Player>();
   const [pointIncrement, setPointIncrement] = useState(0);
 
   const changeStatus = (newStatus: string) => {
@@ -883,11 +863,15 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   };
 
   useEffect(() => {
-    const handleGameStateChange = (game: Game) => {
+    const handleGameStateChange = (game?: Game) => {
+      if (!game) {
+        return;
+      }
+
       setSecondsLeft(game.countdown);
       switch (game.state) {
         case 'questionCreation':
-          if (status == 'idleScreen') {
+          if (status === 'idleScreen') {
             changeStatus('questionCreation');
           }
           break;
@@ -909,9 +893,11 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       }
     };
 
-    const handleUpdateStudentInfo = (info: StudentInfo) => {
+    const handleUpdateStudentInfo = (info: Player) => {
       setStudentInfo(info);
     };
+
+    socket.emit('gameStateRefresh', handleGameStateChange);
 
     socket.on('gameStateChange', handleGameStateChange);
     socket.on('updateStudentInfo', handleUpdateStudentInfo);
@@ -939,7 +925,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
             changeStatus={changeStatus}
-            points={studentInfo.points}
+            points={studentInfo?.points || 0}
             setPointIncrement={setPointIncrement}
           />
         );
@@ -955,8 +941,8 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       case 'leaderboardPosition':
         return (
           <LeaderboardPosition
-            rank={studentInfo.rank}
-            points={studentInfo.points}
+            rank={studentInfo?.rank || 1000}
+            points={studentInfo?.points || 0}
           />
         );
       case 'questionCreation':

@@ -5,6 +5,7 @@ import { Theme } from '@radix-ui/themes';
 import '@radix-ui/themes/styles.css';
 import './theme-config.css';
 import './globals.scss';
+import { Providers } from './components/Providers';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -21,7 +22,7 @@ export default function RootLayout({
       <body
         className={`${COMICO.className} ${COMICO.variable} ${PP_NEUE_MONTREAL.variable}`}
       >
-        <Theme>{children}</Theme>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

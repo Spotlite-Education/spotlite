@@ -1,7 +1,5 @@
 'use client';
-import Header from '@/app/components/Header';
 import styles from './page.module.scss';
-import Input, { IconInput } from '@/app/components/Input';
 import {
   useEffect,
   useState,
@@ -9,19 +7,16 @@ import {
   SetStateAction,
   Dispatch,
 } from 'react';
-import Button from '@/app/components/Button';
 import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
-import Note from '@/app/components/Note';
 import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
-import Paper from '@/app/components/Paper';
-import Guess from '@/app/components/Guess';
 import socket from '../../../context/socket';
 import { UnstyledLink } from '@/app/components/UnstyledLink';
 import { Logo } from '@/app/components/Logo';
 import { Game } from '@/app/types/Game';
 import { FinalLeaderboard, type Leaderboard } from '@/app/types/Leaderboard';
 import { Player } from '@/app/types/Player';
+import { useRouter } from 'next/navigation';
 
 interface LobbyProps {
   roomCode: string;
@@ -38,54 +33,21 @@ const Lobby = ({
   roomCode,
   players,
 }: LobbyProps) => {
-  const [questionMakingTime, setQuestionMakingTime] = useState<{
-    minutes: string;
-    seconds: string;
-  }>({
-    minutes: '5',
-    seconds: '00',
-  });
+  const [questionMakingTime, setQuestionMakingTime] = useState<number>(3 * 60);
 
-  const [questionAnsweringTime, setQuestionAnsweringTime] = useState<{
-    minutes: string;
-    seconds: string;
-  }>({
-    minutes: '1',
-    seconds: '00',
-  });
+  const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(
+    1 * 60 + 30
+  );
 
-  const cleanNumber = (numberString: string): string => {
-    numberString = numberString.replace(/([^\d]+)/g, '');
-    return numberString;
-  };
+  // 10 minutes
+  const QUESTION_MAKING_TIME_MAX = 10 * 60;
+  // 15 seconds
+  const QUESTION_MAKING_TIME_MIN = 15;
 
-  const setNumber = (setState: Function, value: string) => {
-    value = cleanNumber(value).substring(0, 2);
-    if (value[0] && !value[0].match(/^[012345]$/)) {
-      return;
-    }
-    setState(value);
-  };
-
-  const toSeconds = ({
-    minutes,
-    seconds,
-  }: {
-    minutes: string;
-    seconds: string;
-  }): number => {
-    let m = Number(minutes);
-    let s = Number(seconds);
-
-    if (isNaN(m)) {
-      m = 0;
-    }
-    if (isNaN(s)) {
-      s = 0;
-    }
-
-    return m * 60 + s;
-  };
+  // 10 minutes
+  const QUESTION_ANSWERING_TIME_MAX = 10 * 60;
+  // 15 seconds
+  const QUESTION_ANSWERING_TIME_MIN = 15;
 
   useEffect(() => {
     socket.emit('refreshLobby', roomCode, sessionStorage.getItem('sessionID'));
@@ -112,8 +74,8 @@ const Lobby = ({
             className={styles.startGame}
             disabled={players.length < 2}
             onClick={e => {
-              setCreatingTime(toSeconds(questionMakingTime));
-              setAnsweringTime(toSeconds(questionAnsweringTime));
+              setCreatingTime(questionMakingTime);
+              setAnsweringTime(questionAnsweringTime);
               changeStatus('chooseTopics');
             }}
           >
@@ -124,63 +86,113 @@ const Lobby = ({
           <div className={styles.setting}>
             <div className={styles.settingName}>Question Making Time</div>
             <div className={styles.time}>
-              {questionMakingTime.minutes.length === 1 && (
-                <div className={styles.minutePlaceholder}>0</div>
-              )}
-              <input
-                placeholder="00"
-                value={questionMakingTime.minutes}
-                onChange={e =>
-                  setNumber(
-                    (minutes: string) =>
-                      setQuestionMakingTime(prev => ({ ...prev, minutes })),
-                    e.target.value
-                  )
-                }
-              />
-              :
-              <input
-                placeholder="00"
-                value={questionMakingTime.seconds}
-                onChange={e =>
-                  setNumber(
-                    (seconds: string) =>
-                      setQuestionMakingTime(prev => ({ ...prev, seconds })),
-                    e.target.value
-                  )
-                }
-              />
+              <div className={styles.timeRepresentation}>
+                {formatSeconds(questionMakingTime)}
+              </div>
+              <div className={styles.tickers}>
+                <button
+                  disabled={questionMakingTime > QUESTION_MAKING_TIME_MAX - 60}
+                  onClick={() =>
+                    setQuestionMakingTime(prev =>
+                      Math.min(prev + 60, QUESTION_MAKING_TIME_MAX)
+                    )
+                  }
+                >
+                  +1 min
+                </button>
+                <button
+                  disabled={questionMakingTime > QUESTION_MAKING_TIME_MAX - 15}
+                  onClick={() =>
+                    setQuestionMakingTime(prev =>
+                      Math.min(prev + 15, QUESTION_MAKING_TIME_MAX)
+                    )
+                  }
+                >
+                  +15 sec
+                </button>
+              </div>
+              <div className={styles.tickers}>
+                <button
+                  disabled={questionMakingTime < QUESTION_MAKING_TIME_MIN + 60}
+                  onClick={() =>
+                    setQuestionMakingTime(prev =>
+                      Math.max(QUESTION_MAKING_TIME_MIN, prev - 60)
+                    )
+                  }
+                >
+                  -1 min
+                </button>
+                <button
+                  disabled={questionMakingTime < QUESTION_MAKING_TIME_MIN + 15}
+                  onClick={() =>
+                    setQuestionMakingTime(prev =>
+                      Math.max(QUESTION_MAKING_TIME_MIN, prev - 15)
+                    )
+                  }
+                >
+                  -15 sec
+                </button>
+              </div>
             </div>
           </div>
           <div className={styles.setting}>
-            <div className={styles.settingName}>Question Answer Time</div>
+            <div className={styles.settingName}>Answering Time</div>
             <div className={styles.time}>
-              {questionAnsweringTime.minutes.length === 1 && (
-                <div className={styles.minutePlaceholder}>0</div>
-              )}
-              <input
-                placeholder="00"
-                value={questionAnsweringTime.minutes}
-                onChange={e =>
-                  setNumber(
-                    (minutes: string) =>
-                      setQuestionAnsweringTime(prev => ({ ...prev, minutes })),
-                    e.target.value
-                  )
-                }
-              />
-              :
-              <input
-                placeholder="00"
-                value={questionAnsweringTime.seconds}
-                onChange={e =>
-                  setNumber(
-                    (seconds: string) =>
-                      setQuestionAnsweringTime(prev => ({ ...prev, seconds })),
-                    e.target.value
-                  )
-                }
-              />
+              <div className={styles.timeRepresentation}>
+                {formatSeconds(questionAnsweringTime)}
+              </div>
+              <div className={styles.tickers}>
+                <button
+                  disabled={
+                    questionAnsweringTime > QUESTION_ANSWERING_TIME_MAX - 60
+                  }
+                  onClick={() =>
+                    setQuestionAnsweringTime(prev =>
+                      Math.min(prev + 60, QUESTION_ANSWERING_TIME_MAX)
+                    )
+                  }
+                >
+                  +1 min
+                </button>
+                <button
+                  disabled={
+                    questionAnsweringTime > QUESTION_ANSWERING_TIME_MAX - 15
+                  }
+                  onClick={() =>
+                    setQuestionAnsweringTime(prev =>
+                      Math.min(prev + 15, QUESTION_ANSWERING_TIME_MAX)
+                    )
+                  }
+                >
+                  +15 sec
+                </button>
+              </div>
+              <div className={styles.tickers}>
+                <button
+                  disabled={
+                    questionAnsweringTime < QUESTION_ANSWERING_TIME_MIN + 60
+                  }
+                  onClick={() =>
+                    setQuestionAnsweringTime(prev =>
+                      Math.max(QUESTION_ANSWERING_TIME_MIN, prev - 60)
+                    )
+                  }
+                >
+                  -1 min
+                </button>
+                <button
+                  disabled={
+                    questionAnsweringTime < QUESTION_ANSWERING_TIME_MIN + 15
+                  }
+                  onClick={() =>
+                    setQuestionAnsweringTime(prev =>
+                      Math.max(QUESTION_ANSWERING_TIME_MIN, prev - 15)
+                    )
+                  }
+                >
+                  -15 sec
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -193,10 +205,12 @@ const Lobby = ({
 };
 
 const ChooseTopics = ({
+  changeStatus,
   topics,
   setTopics,
   handleStartGame,
 }: {
+  changeStatus: (newStatus: string) => any;
   topics: string[];
   setTopics: Dispatch<SetStateAction<string[]>>;
   handleStartGame: Function;
@@ -260,6 +274,12 @@ const ChooseTopics = ({
           onClick={() => handleStartGame()}
         >
           Start game!
+        </button>
+        <button
+          className={styles.backToLobby}
+          onClick={() => changeStatus('lobby')}
+        >
+          Back to lobby
         </button>
       </div>
     </div>
@@ -430,6 +450,14 @@ const Podium = () => {
     });
   }, []);
 
+  const router = useRouter();
+
+  const handleEndGame = () => {
+    socket.emit('endGame', () => {
+      router.push('/host');
+    });
+  };
+
   const winnerText =
     leaderboard.length > 0
       ? `${leaderboard[0]?.username} is the winner!`
@@ -478,6 +506,9 @@ const Podium = () => {
           </div>
         </div>
       </div>
+      <button className={styles.endGame} onClick={() => handleEndGame()}>
+        End game!
+      </button>
     </div>
   );
 };
@@ -501,10 +532,17 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   };
 
   useEffect(() => {
-    const handleGameStateChange = (game: Game) => {
+    const handleGameStateChange = (game?: Game) => {
+      if (!game) {
+        return;
+      }
+
       setSecondsLeft(game.countdown);
       setHint(game.hint);
       switch (game.state) {
+        case 'questionCreation':
+          changeStatus('countdown');
+          break;
         case 'choosing quizzer':
           setQuizzerID(game.quizzer.id);
           setQuizzerUsername(game.quizzer.username);
@@ -541,6 +579,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     socket.on('lobbyUpdate', handleLobbyUpdate);
     socket.on('gameStateChange', handleGameStateChange);
     socket.on('revealAnswer', handleRevealAnswer);
+
+    socket.emit('gameStateRefresh', handleGameStateChange);
 
     return () => {
       socket.off('lobbyUpdate', handleLobbyUpdate);
@@ -584,6 +624,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       case 'chooseTopics':
         return (
           <ChooseTopics
+            changeStatus={changeStatus}
             topics={topics}
             setTopics={setTopics}
             handleStartGame={handleStartGame}

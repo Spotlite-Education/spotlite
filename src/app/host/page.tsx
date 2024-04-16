@@ -1,6 +1,4 @@
 'use client';
-import Link from 'next/link';
-import Button from '../components/Button';
 import styles from './page.module.scss';
 import { useRouter } from 'next/navigation';
 import { SOCKET_URL } from '../../context/socket';
@@ -18,7 +16,6 @@ const HostRoom = () => {
         return response.json();
       })
       .then(data => {
-        console.log(data);
         sessionStorage.setItem('sessionToken', data.admin.id);
         socket.emit('join', 'admin', data.room.code, data.admin.id);
         router.push('/admin/' + data.room.code);
