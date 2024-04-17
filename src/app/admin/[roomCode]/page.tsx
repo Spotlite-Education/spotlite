@@ -483,7 +483,7 @@ const Leaderboard = () => {
 
   useEffect(() => {
     socket.emit('getLeaderboard', (leaderboard: Leaderboard) => {
-      setLeaderboard(leaderboard);
+      setLeaderboard(leaderboard.slice(0, 5) || []);
     });
   }, []);
 
