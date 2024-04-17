@@ -826,7 +826,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         <div className={styles.guide}>
           <div className={styles.questionDraft}>
             <div className={styles.subtitle}>Your question draft</div>
-            <div>{prompt}</div>
+            <textarea readOnly value={prompt}></textarea>
             {/* <div className={styles.preview}>
               {questionImageURL && <img src={questionImageURL} />}
             </div> */}

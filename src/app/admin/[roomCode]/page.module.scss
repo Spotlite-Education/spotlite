@@ -511,12 +511,19 @@
     top: 10rem;
     left: 50%;
     transform: translateX(-50%);
-    width: 50ch;
+    width: 80%;
+    height: 65%;
     overflow: hidden;
-    white-space: nowrap;
-    text-wrap: wrap;
-    text-align: center;
+    // white-space: pre-line;
+    // text-wrap: wrap;
+    // text-align: center;
+    border: none;
     font-size: 4rem;
+    background: none;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   .questionDisplay {

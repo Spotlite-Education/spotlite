@@ -445,7 +445,11 @@ const QuizQuestion = ({
           {timeLeft}
         </div>
       </div>
-      <div className={styles.questionPrompt}>{question}</div>
+      <textarea
+        readOnly
+        className={styles.questionPrompt}
+        value={question}
+      ></textarea>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
       <div className={styles.correctReel}>
         {correctGuesses.map((guess, i) => (
