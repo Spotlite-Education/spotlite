@@ -388,7 +388,7 @@ const TextEditor = ({ setValue }: { setValue: Function }) => {
       /> */}
       <textarea
         placeholder="Type your question here!"
-        maxLength={100}
+        maxLength={300}
         value={text}
         onChange={e => {
           setText(e.target.value);
@@ -469,7 +469,7 @@ const QuestionCreation = ({
 }) => {
   const [topic, setTopic] = useState<string>('');
 
-  const promptInputRef = useRef<HTMLInputElement>(null);
+  const promptInputRef = useRef<HTMLTextAreaElement>(null);
   const answerInputRef = useRef<HTMLInputElement>(null);
   const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
 
@@ -512,24 +512,25 @@ const QuestionCreation = ({
       <form onSubmit={handleSubmit}>
         <div className={styles.content}>
           <div className={styles.promptInput}>
-            <input
+            <textarea
               ref={promptInputRef}
               disabled={
                 document.activeElement !== promptInputRef.current &&
                 canvasHovered
               }
+              maxLength={300}
               placeholder="Type a prompt here..."
               onChange={e => setPrompt(e.target.value)}
             />
           </div>
-          <Editor
+          {/* <Editor
             width={window.innerWidth || 0}
             height={window.innerHeight - 5 * 10 - 28 * 10 || 0}
             only="draw"
             onDrawEnd={setImageURL}
             onCanvasHoverStart={() => setCanvasHovered(true)}
             onCanvasHoverEnd={() => setCanvasHovered(false)}
-          />
+          /> */}
           <div className={styles.answerWrapper}>
             <div className={styles.input}>
               Answer:
@@ -826,9 +827,9 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           <div className={styles.questionDraft}>
             <div className={styles.subtitle}>Your question draft</div>
             <div>{prompt}</div>
-            <div className={styles.preview}>
+            {/* <div className={styles.preview}>
               {questionImageURL && <img src={questionImageURL} />}
-            </div>
+            </div> */}
           </div>
           <div className={styles.answer}>
             <div className={styles.blur}>Hover to see your answer</div>
@@ -838,21 +839,22 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         </div>
         <div>
           <div className={styles.promptInput}>
-            <input
+            <textarea
               placeholder="Type out your question..."
               value={prompt}
+              maxLength={300}
               onChange={e => {
                 setPrompt(e.target.value);
                 syncPrompt(e.target.value);
               }}
             />
           </div>
-          <Editor
+          {/* <Editor
             width={window.innerWidth * 0.7 || 0}
             height={window.innerHeight - 10 * 10 - 7.5 * 10}
             only="draw"
             onDraw={syncDrawing}
-          />
+          /> */}
         </div>
       </div>
     </div>
