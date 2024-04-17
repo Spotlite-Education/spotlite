@@ -522,6 +522,29 @@
     padding-bottom: 5rem;
   }
 
+  .correctReel {
+    position: absolute;
+    bottom: 5rem;
+    left: 2.5rem;
+    width: 35rem;
+    height: 30rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .guess {
+      width: 100%;
+      height: 5rem;
+      display: flex;
+      align-items: center;
+      padding: 1.5rem;
+      border-radius: 5px;
+      background-color: var(--correct-color);
+    }
+  }
+
   .hintWrapper {
     position: absolute;
     bottom: 5%;
@@ -617,7 +640,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 2rem;
+      gap: 0.5rem;
 
       .rank {
         z-index: 99;
@@ -631,6 +654,13 @@
         @include util.borderedText(attr(data-text), 3.5px);
         color: var(--off-white);
         font-size: 2.5rem;
+      }
+
+      .points {
+        z-index: 99;
+        @include util.borderedText(attr(data-text), 3px);
+        color: var(--off-white);
+        font-size: 2rem;
       }
     }
 
@@ -679,8 +709,8 @@
 
   .endGame {
     position: absolute;
-    bottom: 2.5rem;
-    right: 2.5rem;
+    bottom: 5rem;
+    right: 5rem;
     background-color: var(--brand-color);
   }
 }

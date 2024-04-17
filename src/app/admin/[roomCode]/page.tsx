@@ -18,6 +18,7 @@ import { Game } from '@/app/types/Game';
 import { FinalLeaderboard, type Leaderboard } from '@/app/types/Leaderboard';
 import { Player } from '@/app/types/Player';
 import { useRouter } from 'next/navigation';
+import { Guess } from '@/app/types/Guess';
 
 interface LobbyProps {
   roomCode: string;
@@ -376,7 +377,6 @@ const QuizQuestion = ({
   correct,
   playerCount,
   hint,
-  guesses,
   forceSkip,
 }: {
   quizzerID: string;
@@ -386,22 +386,15 @@ const QuizQuestion = ({
   correct: number;
   playerCount: number;
   hint: string;
-  guesses: {
-    username: string;
-    guess: string;
-    correct: boolean;
-    points: number;
-  }[];
   forceSkip: () => void;
 }) => {
-  var splitHint = '';
-  for (let i = 0; i < hint.length; i++) {
-    splitHint += hint[i];
-    splitHint += '\xa0';
-    if (hint[i] == ' ') {
-      splitHint += '\xa0\xa0\xa0';
-    }
-  }
+  const [correctGuesses, setCorrectGuesses] = useState<Guess[]>([]);
+
+  useEffect(() => {
+    socket.on('newGuess', (guesses: Guess[]) => {
+      setCorrectGuesses(guesses.filter(guess => guess.correct));
+    });
+  }, []);
 
   const [drawing, setDrawing] = useState<string>('');
 
@@ -416,14 +409,21 @@ const QuizQuestion = ({
 
   const timeLeft = formatSeconds(secondsLeft);
 
+  let splitHint = '';
+  for (let i = 0; i < hint.length; i++) {
+    splitHint += hint[i];
+    splitHint += '\xa0';
+    if (hint[i] === ' ') {
+      splitHint += '\xa0\xa0\xa0';
+    }
+  }
+
   return (
     <div className={styles.quizQuestionWrapper}>
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-
       <div className={styles.quizzer}>{quizzerUsername} is quizzing!</div>
-
       <div className={styles.timerWrapper}>
         <div className={styles.timer} data-text={timeLeft}>
           {timeLeft}
@@ -431,6 +431,13 @@ const QuizQuestion = ({
       </div>
       <div className={styles.questionPrompt}>{question}</div>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
+      <div className={styles.correctReel}>
+        {correctGuesses.map((guess, i) => (
+          <div key={i} className={styles.guess}>
+            {guess.player.username} got it!
+          </div>
+        ))}
+      </div>
       <div className={styles.hintWrapper}>
         <div className={styles.questionHint}>Hint: {hint}</div>
         <div className={styles.correctAnswers}>
@@ -527,6 +534,12 @@ const Podium = () => {
             <div className={styles.name} data-text={leaderboard[2]?.username}>
               {leaderboard[2]?.username}
             </div>
+            <div
+              className={styles.points}
+              data-text={leaderboard[2]?.points + ' Pts'}
+            >
+              {leaderboard[2]?.points} Pts
+            </div>
           </div>
         ) : (
           <div />
@@ -539,6 +552,12 @@ const Podium = () => {
           <div className={styles.name} data-text={leaderboard[0]?.username}>
             {leaderboard[0]?.username}
           </div>
+          <div
+            className={styles.points}
+            data-text={leaderboard[0]?.points + ' Pts'}
+          >
+            {leaderboard[0]?.points} Pts
+          </div>
         </div>
         <div className={styles.second}>
           <div className={styles.spotlight} />
@@ -547,6 +566,12 @@ const Podium = () => {
           </div>
           <div className={styles.name} data-text={leaderboard[1]?.username}>
             {leaderboard[1]?.username}
+          </div>
+          <div
+            className={styles.points}
+            data-text={leaderboard[1]?.points + ' Pts'}
+          >
+            {leaderboard[1]?.points} Pts
           </div>
         </div>
       </div>
@@ -568,7 +593,6 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const [question, setQuestion] = useState('');
   const [hint, setHint] = useState('');
-  const [guesses, setGuesses] = useState([]);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [answer, setAnswer] = useState('');
 
@@ -703,7 +727,6 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             correct={correctAnswers}
             playerCount={players.length}
             hint={hint}
-            guesses={guesses}
             forceSkip={handleForceSkip}
           />
         );

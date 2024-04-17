@@ -584,13 +584,30 @@
       }
 
       .answer {
+        position: relative;
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 1rem;
         padding: 1.5rem;
 
-        .answerText {
+        .blur {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: calc(100% - 5rem);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          backdrop-filter: blur(2.5px);
+          font-size: 1.4rem;
+          transition: backdrop-filter 0.15s, color 0.15s;
+
+          &:hover {
+            color: transparent;
+            backdrop-filter: none;
+          }
         }
       }
     }
@@ -652,7 +669,7 @@
     }
 
     .chatWrapper {
-      width: 35rem;
+      width: 50rem;
       height: 100%;
       max-height: 100%;
       overflow-x: hidden;
@@ -676,7 +693,7 @@
           display: flex;
           padding: 0.25rem 1rem;
           border-radius: 5px;
-          background-color: #37d200;
+          background-color: var(--correct-color);
         }
 
         .guess {
@@ -781,8 +798,8 @@
     font-size: 12.5rem;
   }
 
-  .correct {
-    @include util.borderedText('Correct!', 5px);
+  .result {
+    @include util.borderedText(attr(data-text), 5px);
     color: var(--off-white);
     font-size: 4rem;
   }

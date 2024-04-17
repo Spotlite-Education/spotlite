@@ -2,10 +2,6 @@
 import {
   FormEvent,
   KeyboardEvent,
-  MutableRefObject,
-  forwardRef,
-  memo,
-  use,
   useCallback,
   useEffect,
   useRef,
@@ -707,18 +703,22 @@ const AnswerResult = ({
   isQuizzer: boolean;
   increment: number;
 }) => {
+  const resultText = increment ? 'Correct!' : 'Better luck next time!';
+
   return (
     <div className={styles.answerResult}>
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.title} data-text={'+' + increment}>
-        +{increment}
+      <div className={styles.title} data-text={'+' + (increment || 0)}>
+        +{increment || 0}
       </div>
       {isQuizzer ? (
         <div className={styles.goodJob}>Nice job quizzing!</div>
       ) : (
-        <div className={styles.correct}>Correct!</div>
+        <div className={styles.result} data-text={resultText}>
+          {resultText}
+        </div>
       )}
     </div>
   );
@@ -753,14 +753,14 @@ const LeaderboardPosition = ({
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
-  const [ogPrompt, setOgPrompt] = useState<string>('');
+  const [originalPrompt, setOriginalPrompt] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
-      setOgPrompt(info.question.text);
+      setOriginalPrompt(info.question.text);
       setAnswer(info.question.answer);
       setQuestionImageURL(info.question.imageURL);
 
@@ -795,14 +795,16 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         <div className={styles.guide}>
           <div className={styles.questionDraft}>
             <div className={styles.subtitle}>Your question draft</div>
-            <div> {ogPrompt}</div>
+            <div>{originalPrompt}</div>
             <div className={styles.preview}>
               {questionImageURL && <img src={questionImageURL} />}
             </div>
           </div>
           <div className={styles.answer}>
+            <div className={styles.blur}>Hover to see your answer</div>
             <div className={styles.subtitle}>Your Answer</div>
             <div className={styles.answerText}>{answer}</div>
+            <div>{answer}</div>
           </div>
         </div>
         <div>
