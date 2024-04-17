@@ -410,9 +410,9 @@ const QuizQuestion = ({
     socket.on('newGuess', (guesses: Guess[]) => {
       setCorrectGuesses(
         guesses
+          .filter(guess => guess.correct)
           .slice(-5)
           .toReversed()
-          .filter(guess => guess.correct)
       );
     });
   }, []);
