@@ -724,22 +724,26 @@ const AnswerResult = ({
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.chat}>
-        <div className={styles.title}>Chat</div>
-        <div className={styles.messageList}>
-          {guesses.map((guess: Guess, i) =>
-            guess.correct ? (
-              <div key={i} className={styles.correctGuess}>
-                {guess.player.username} got it!
-              </div>
-            ) : (
-              <div key={i} className={styles.guess}>
-                {guess.player.username}: {guess.guess}
-              </div>
-            )
-          )}
+      {isQuizzer ? (
+        <div></div>
+      ) : (
+        <div className={styles.chat}>
+          <div className={styles.title}>Chat</div>
+          <div className={styles.messageList}>
+            {guesses.map((guess: Guess, i) =>
+              guess.correct ? (
+                <div key={i} className={styles.correctGuess}>
+                  {guess.player.username} got it!
+                </div>
+              ) : (
+                <div key={i} className={styles.guess}>
+                  {guess.player.username}: {guess.guess}
+                </div>
+              )
+            )}
+          </div>
         </div>
-      </div>
+      )}
       <div className={styles.resultWrapper}>
         <div className={styles.title} data-text={'+' + (increment || 0)}>
           +{increment || 0}
