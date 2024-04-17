@@ -429,7 +429,7 @@ const QuizQuestion = ({
     splitHint += hint[i];
     splitHint += '\xa0';
     if (hint[i] === ' ') {
-      splitHint += '\xa0\xa0';
+      splitHint += '\xa0';
     }
   }
   hint = splitHint;
