@@ -539,6 +539,7 @@ const QuestionCreation = ({
                   document.activeElement !== answerInputRef.current &&
                   canvasHovered
                 }
+                maxLength={20}
                 onChange={e => setAnswer(e.target.value)}
                 placeholder="Type here..."
               />
@@ -557,13 +558,7 @@ const QuestionCreation = ({
   );
 };
 
-const QuestionSubmitted = ({
-  secondsLeft,
-  changeStatus,
-}: {
-  secondsLeft: number;
-  changeStatus: (newStatus: string) => void;
-}) => {
+const QuestionSubmitted = ({ secondsLeft }: { secondsLeft: number }) => {
   const timeLeft = formatSeconds(secondsLeft);
   const timeText = `Game starts in ${timeLeft}`;
 
@@ -950,12 +945,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
       case 'idleScreen':
         return <IdleScreen />;
       case 'questionSubmitted':
-        return (
-          <QuestionSubmitted
-            secondsLeft={secondsLeft}
-            changeStatus={changeStatus}
-          />
-        );
+        return <QuestionSubmitted secondsLeft={secondsLeft} />;
       case 'answerQuestion':
         return (
           <AnswerQuestion
