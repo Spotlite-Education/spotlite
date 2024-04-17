@@ -703,6 +703,20 @@ const AnswerResult = ({
   isQuizzer: boolean;
   increment: number;
 }) => {
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+
+  useEffect(() => {
+    const handleNewGuess = (guesses: Guess[]) => {
+      setGuesses(guesses);
+    };
+
+    socket.on('newGuess', handleNewGuess);
+
+    return () => {
+      socket.off('newGuess', handleNewGuess);
+    };
+  }, []);
+
   const resultText = increment ? 'Correct!' : 'Better luck next time!';
 
   return (
@@ -710,16 +724,34 @@ const AnswerResult = ({
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.title} data-text={'+' + (increment || 0)}>
-        +{increment || 0}
-      </div>
-      {isQuizzer ? (
-        <div className={styles.goodJob}>Nice job quizzing!</div>
-      ) : (
-        <div className={styles.result} data-text={resultText}>
-          {resultText}
+      <div className={styles.chat}>
+        <div className={styles.title}>Chat</div>
+        <div className={styles.messageList}>
+          {guesses.map((guess: Guess) =>
+            guess.correct ? (
+              <div className={styles.correctGuess}>
+                {guess.player.username} got it!
+              </div>
+            ) : (
+              <div className={styles.guess}>
+                {guess.player.username}: {guess.guess}
+              </div>
+            )
+          )}
         </div>
-      )}
+      </div>
+      <div className={styles.resultWrapper}>
+        <div className={styles.title} data-text={'+' + (increment || 0)}>
+          +{increment || 0}
+        </div>
+        {isQuizzer ? (
+          <div className={styles.goodJob}>Nice job quizzing!</div>
+        ) : (
+          <div className={styles.result} data-text={resultText}>
+            {resultText}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -803,7 +835,6 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
             <div className={styles.blur}>Hover to see your answer</div>
             <div className={styles.subtitle}>Your Answer</div>
             <div className={styles.answerText}>{answer}</div>
-            <div>{answer}</div>
           </div>
         </div>
         <div>
