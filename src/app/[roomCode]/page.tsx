@@ -753,14 +753,13 @@ const LeaderboardPosition = ({
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
-  const [originalPrompt, setOriginalPrompt] = useState<string>('');
   const [prompt, setPrompt] = useState<string>('');
   const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
-      setOriginalPrompt(info.question.text);
+      setPrompt(info.question.text);
       setAnswer(info.question.answer);
       setQuestionImageURL(info.question.imageURL);
 
@@ -795,7 +794,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         <div className={styles.guide}>
           <div className={styles.questionDraft}>
             <div className={styles.subtitle}>Your question draft</div>
-            <div>{originalPrompt}</div>
+            <div>{prompt}</div>
             <div className={styles.preview}>
               {questionImageURL && <img src={questionImageURL} />}
             </div>

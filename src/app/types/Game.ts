@@ -8,4 +8,5 @@ export type Game = {
   countdown: number;
   quizzer: Player;
   hint: string;
+  prevQuizzerCount: number;
 };

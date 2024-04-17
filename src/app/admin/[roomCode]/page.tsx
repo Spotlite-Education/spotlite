@@ -358,13 +358,24 @@ const Countdown = ({
   );
 };
 
-const RevealQuizzer = ({ quizzer }: { quizzer: string }) => {
+const RevealQuizzer = ({
+  quizzer,
+  previousQuizzerAmount,
+  playerCount,
+}: {
+  quizzer: string;
+  previousQuizzerAmount: number;
+  playerCount: number;
+}) => {
   return (
     <div className={styles.revealQuizzer}>
       <div className={styles.quizzer} data-text={quizzer}>
         {quizzer}
       </div>
       <div className={styles.subtext}>...is in the spotlite!</div>
+      <div className={styles.subsubtext}>
+        {playerCount - previousQuizzerAmount - 1} people left to spotlite
+      </div>
     </div>
   );
 };
@@ -585,6 +596,7 @@ const Podium = () => {
 const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [status, setStatus] = useState('lobby');
   const [players, setPlayers] = useState<Player[]>([]);
+  const [prevQuizzerCount, setPrevQuizzerCount] = useState<number>(0);
   const [quizzerID, setQuizzerID] = useState('');
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [questionCreatingTime, setQuestionCreatingTime] = useState<number>(0);
@@ -616,6 +628,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           setCorrectAnswers(0);
           setQuizzerID(game.quizzer.id);
           setQuizzerUsername(game.quizzer.username);
+          setPrevQuizzerCount(game.prevQuizzerCount);
           changeStatus('revealQuizzer');
           break;
         case 'answerQuestion':
@@ -716,7 +729,13 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'revealQuizzer':
-        return <RevealQuizzer quizzer={quizzerUsername} />;
+        return (
+          <RevealQuizzer
+            quizzer={quizzerUsername}
+            previousQuizzerAmount={prevQuizzerCount}
+            playerCount={players.length}
+          />
+        );
       case 'quizQuestion':
         return (
           <QuizQuestion
