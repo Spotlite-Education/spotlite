@@ -316,6 +316,7 @@
   .title {
     position: relative;
     z-index: 1;
+    margin-bottom: 1.5rem;
     font-size: 3rem;
 
     &::after {
@@ -326,6 +327,12 @@
       z-index: -1;
       -webkit-text-stroke: 5px var(--dark-text);
     }
+  }
+
+  .subtitle {
+    position: relative;
+    z-index: 1;
+    font-size: 2rem;
   }
 
   .time {

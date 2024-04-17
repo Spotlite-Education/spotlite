@@ -338,6 +338,7 @@ const Countdown = ({
         <Logo size="md" color="white" variant="bordered" />
       </div>
       <div className={styles.title}>Create your quiz questions!</div>
+      <div className={styles.subtitle}>Try to be creative!</div>
       <div className={styles.time} data-time={timeLeft}>
         {timeLeft}
       </div>
