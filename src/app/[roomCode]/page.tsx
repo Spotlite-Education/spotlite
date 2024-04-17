@@ -727,13 +727,13 @@ const AnswerResult = ({
       <div className={styles.chat}>
         <div className={styles.title}>Chat</div>
         <div className={styles.messageList}>
-          {guesses.map((guess: Guess) =>
+          {guesses.map((guess: Guess, i) =>
             guess.correct ? (
-              <div className={styles.correctGuess}>
+              <div key={i} className={styles.correctGuess}>
                 {guess.player.username} got it!
               </div>
             ) : (
-              <div className={styles.guess}>
+              <div key={i} className={styles.guess}>
                 {guess.player.username}: {guess.guess}
               </div>
             )
