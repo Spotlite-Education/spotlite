@@ -3,13 +3,10 @@ import styles from './page.module.scss';
 import {
   useEffect,
   useState,
-  useCallback,
   SetStateAction,
   Dispatch,
   MouseEvent,
 } from 'react';
-import { FaArrowDown, FaArrowUp, FaTimes } from 'react-icons/fa';
-import { GiQueenCrown } from 'react-icons/gi';
 import { formatSeconds } from '@/app/util/format';
 import socket from '../../../context/socket';
 import { UnstyledLink } from '@/app/components/UnstyledLink';
@@ -35,8 +32,9 @@ const Lobby = ({
   roomCode,
   players,
 }: LobbyProps) => {
-  const [questionMakingTime, setQuestionMakingTime] = useState<number>(3 * 60);
+  const [locked, setLocked] = useState<boolean>(false);
 
+  const [questionMakingTime, setQuestionMakingTime] = useState<number>(3 * 60);
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(
     1 * 60 + 30
   );
@@ -55,6 +53,10 @@ const Lobby = ({
     socket.emit('refreshLobby', roomCode, sessionStorage.getItem('sessionID'));
   }, []);
 
+  const handleToggleRoomLock = () => {
+    socket.emit('toggleRoomLock', setLocked);
+  };
+
   return (
     <div className={styles.lobby}>
       <div className={styles.content}>
@@ -71,7 +73,9 @@ const Lobby = ({
           {roomCode}
         </div>
         <div className={styles.actions}>
-          <button className={styles.lockRoom}>Lock Room</button>
+          <button className={styles.lockRoom} onClick={handleToggleRoomLock}>
+            {locked ? 'Unlock' : 'Lock'} Room
+          </button>
           <button
             className={styles.startGame}
             disabled={players.length < 2}
@@ -547,9 +551,9 @@ const Podium = () => {
             </div>
             <div
               className={styles.points}
-              data-text={leaderboard[2]?.points + ' Pts'}
+              data-text={(leaderboard[2]?.points || 0) + ' Pts'}
             >
-              {leaderboard[2]?.points} Pts
+              {leaderboard[2]?.points || 0} Pts
             </div>
           </div>
         ) : (
@@ -565,9 +569,9 @@ const Podium = () => {
           </div>
           <div
             className={styles.points}
-            data-text={leaderboard[0]?.points + ' Pts'}
+            data-text={(leaderboard[0]?.points || 0) + ' Pts'}
           >
-            {leaderboard[0]?.points} Pts
+            {leaderboard[0]?.points || 0} Pts
           </div>
         </div>
         <div className={styles.second}>
@@ -580,9 +584,9 @@ const Podium = () => {
           </div>
           <div
             className={styles.points}
-            data-text={leaderboard[1]?.points + ' Pts'}
+            data-text={(leaderboard[1]?.points || 0) + ' Pts'}
           >
-            {leaderboard[1]?.points} Pts
+            {leaderboard[1]?.points || 0} Pts
           </div>
         </div>
       </div>
