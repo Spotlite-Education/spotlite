@@ -408,7 +408,12 @@ const QuizQuestion = ({
 
   useEffect(() => {
     socket.on('newGuess', (guesses: Guess[]) => {
-      setCorrectGuesses(guesses.filter(guess => guess.correct));
+      setCorrectGuesses(
+        guesses
+          .slice(-5)
+          .toReversed()
+          .filter(guess => guess.correct)
+      );
     });
   }, []);
 
@@ -489,7 +494,7 @@ const Leaderboard = () => {
 
   useEffect(() => {
     socket.emit('getLeaderboard', (leaderboard: Leaderboard) => {
-      setLeaderboard(leaderboard.slice(-5).toReversed() || []);
+      setLeaderboard(leaderboard.slice(0, 5) || []);
     });
   }, []);
 
