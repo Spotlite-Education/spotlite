@@ -14,8 +14,23 @@ export const formatSeconds = (time: number): string => {
   return formatted;
 };
 
-const endings = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th'];
 export const formatRank = (rank: number): string => {
-  const lastDigit = rank % 10;
-  return `${rank}${endings[lastDigit]}`;
+  const str = rank.toString();
+  if (str.length >= 2) {
+    const ending = str.slice(-2);
+    if (ending === '11' || ending === '12' || ending === '13') {
+      return str + 'th';
+    }
+  }
+
+  const ending = str[str.length - 1];
+  if (ending === '1') {
+    return str + 'st';
+  } else if (ending === '2') {
+    return str + 'nd';
+  } else if (ending === '3') {
+    return str + 'rd';
+  }
+
+  return str + 'th';
 };
