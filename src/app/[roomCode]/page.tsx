@@ -815,46 +815,31 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         <div className={styles.logo}>
           <Logo color="white" variant="bordered" />
         </div>
-        <div className={styles.prompt}>
-          Write your question out for everyone!
-        </div>
+        <div className={styles.prompt}>Your question is in the spotlite!</div>
         <div className={styles.timer} data-text={timeLeft}>
           {timeLeft}
         </div>
       </div>
       <div className={styles.content}>
-        <div className={styles.guide}>
-          <div className={styles.questionDraft}>
-            <div className={styles.subtitle}>Your question draft</div>
-            <textarea readOnly value={prompt}></textarea>
-            {/* <div className={styles.preview}>
-              {questionImageURL && <img src={questionImageURL} />}
-            </div> */}
-          </div>
-          <div className={styles.answer}>
-            <div className={styles.blur}>Hover to see your answer</div>
-            <div className={styles.subtitle}>Your Answer</div>
-            <div className={styles.answerText}>{answer}</div>
-          </div>
+        <div className={styles.promptInput}>
+          <textarea
+            value={prompt}
+            maxLength={300}
+            onChange={e => {
+              setPrompt(e.target.value);
+              syncPrompt(e.target.value);
+            }}
+          />
         </div>
-        <div>
-          <div className={styles.promptInput}>
-            <textarea
-              placeholder="Type out your question..."
-              value={prompt}
-              maxLength={300}
-              onChange={e => {
-                setPrompt(e.target.value);
-                syncPrompt(e.target.value);
-              }}
-            />
-          </div>
-          {/* <Editor
+        {/* <Editor
             width={window.innerWidth * 0.7 || 0}
             height={window.innerHeight - 10 * 10 - 7.5 * 10}
             only="draw"
             onDraw={syncDrawing}
           /> */}
+        <div className={styles.answer}>
+          <div className={styles.answerText}>{answer}</div>
+          <div className={styles.blur}>Hover to see your answer</div>
         </div>
       </div>
     </div>

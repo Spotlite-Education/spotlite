@@ -523,10 +523,10 @@
     overflow: hidden;
     // white-space: pre-line;
     // text-wrap: wrap;
-    // text-align: center;
+    text-align: center;
     border: none;
     font-size: 4rem;
-    background: none;
+    background-color: transparent;
 
     &:focus {
       outline: none;
