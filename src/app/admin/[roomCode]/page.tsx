@@ -3,6 +3,8 @@ import styles from './page.module.scss';
 import {
   useEffect,
   useState,
+  useRef,
+  FormEvent,
   SetStateAction,
   Dispatch,
   MouseEvent,
@@ -473,6 +475,10 @@ const QuizQuestion = ({
 };
 
 const AnswerScreen = ({ answer }: { answer: string }) => {
+  const handleFlagReview = () => {
+    socket.emit('startReview');
+  };
+
   return (
     <div className={styles.answerReveal}>
       <div className={styles.logo}>
@@ -480,6 +486,88 @@ const AnswerScreen = ({ answer }: { answer: string }) => {
       </div>
       <div className={styles.title}> The answer was:</div>
       <div className={styles.answer}>{answer}</div>
+      <button className={styles.flagReview} onClick={handleFlagReview}>
+        Flag & Review
+      </button>
+    </div>
+  );
+};
+
+const FlagReview = ({
+  prevQuestion,
+  prevAnswer,
+}: {
+  prevQuestion: string;
+  prevAnswer: string;
+}) => {
+  // allow admin to edit the question and answer
+
+  const promptInputRef = useRef<HTMLTextAreaElement>(null);
+  const answerInputRef = useRef<HTMLInputElement>(null);
+  const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
+
+  const [imageURL, setImageURL] = useState('');
+  const [prompt, setPrompt] = useState(prevQuestion);
+
+  const [answer, setAnswer] = useState<string>(prevAnswer);
+
+  const handleFinish = (e: FormEvent) => {
+    e.preventDefault();
+    socket.emit('endReview', prompt, answer);
+  };
+
+  return (
+    <div className={styles.questionCreation}>
+      <div className={styles.header}>
+        <div className={styles.logo}>
+          <Logo color="white" variant="bordered" />
+        </div>
+      </div>
+      <form onSubmit={handleFinish}>
+        <div className={styles.content}>
+          <div className={styles.promptInput}>
+            <textarea
+              ref={promptInputRef}
+              disabled={
+                document.activeElement !== promptInputRef.current &&
+                canvasHovered
+              }
+              maxLength={300}
+              placeholder="Type a prompt here..."
+              onChange={e => setPrompt(e.target.value)}
+            >
+              {prompt}
+            </textarea>
+          </div>
+          {/* <Editor
+            width={window.innerWidth || 0}
+            height={window.innerHeight - 5 * 10 - 28 * 10 || 0}
+            only="draw"
+            onDrawEnd={setImageURL}
+            onCanvasHoverStart={() => setCanvasHovered(true)}
+            onCanvasHoverEnd={() => setCanvasHovered(false)}
+          /> */}
+          <div className={styles.answerWrapper}>
+            <div className={styles.input}>
+              Answer:
+              <input
+                ref={answerInputRef}
+                disabled={
+                  document.activeElement !== answerInputRef.current &&
+                  canvasHovered
+                }
+                maxLength={20}
+                value={answer}
+                onChange={e => setAnswer(e.target.value)}
+                placeholder="Type here..."
+              />
+            </div>
+            <button className={styles.submit} type="submit">
+              Finish Reviewing
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };
@@ -644,6 +732,9 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
         case 'answerQuestion':
           changeStatus('quizQuestion');
           break;
+        case 'flagReview':
+          changeStatus('flagReview');
+          break;
         case 'showingAnswer':
           changeStatus('showingAnswer');
           break;
@@ -664,7 +755,6 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
     };
 
     const handleRevealAnswer = (answer: string) => {
-      console.log(answer);
       setAnswer(answer);
     };
 
@@ -746,6 +836,8 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
             playerCount={players.length}
           />
         );
+      case 'flagReview':
+        return <FlagReview prevQuestion={question} prevAnswer={answer} />;
       case 'quizQuestion':
         return (
           <QuizQuestion
