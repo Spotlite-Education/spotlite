@@ -406,15 +406,12 @@ const QuizQuestion = ({
   hint: string;
   forceSkip: () => void;
 }) => {
-  const [correctGuesses, setCorrectGuesses] = useState<Guess[]>([]);
+  const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    socket.on('newGuess', (guesses: Guess[]) => {
-      setCorrectGuesses(
-        guesses
-          .filter(guess => guess.correct)
-          .slice(-5)
-          .toReversed()
+    socket.on('newGuess', (guessArray: Guess[]) => {
+      setGuesses(
+        guessArray.slice(0, Math.min(5, guessArray.length)).toReversed()
       );
     });
   }, []);
@@ -460,11 +457,29 @@ const QuizQuestion = ({
       ></textarea>
       {drawing && <img className={styles.questionDisplay} src={drawing} />}
       <div className={styles.correctReel}>
-        {correctGuesses.map((guess, i) => (
-          <div key={i} className={styles.guess}>
-            {guess.player.username} got it!
-          </div>
-        ))}
+        {guesses.map((guess, i) =>
+          guess.correct ? (
+            <div
+              style={{
+                opacity: (i + 1) / guesses.length,
+              }}
+              key={i}
+              className={styles.correctGuess}
+            >
+              {guess.player.username} got it!
+            </div>
+          ) : (
+            <div
+              style={{
+                opacity: (i + 1) / guesses.length,
+              }}
+              key={i}
+              className={styles.guess}
+            >
+              {guess.player.username} guessed: {guess.guess}
+            </div>
+          )
+        )}
       </div>
       <div className={styles.hintWrapper}>
         <div className={styles.questionHint}>Hint: {hint}</div>
@@ -492,7 +507,7 @@ const AnswerScreen = ({ answer }: { answer: string }) => {
       <div className={styles.title}> The answer was:</div>
       <div className={styles.answer}>{answer}</div>
       <button className={styles.flagReview} onClick={handleFlagReview}>
-        Flag & Review
+        Review/Edit Question
       </button>
     </div>
   );
