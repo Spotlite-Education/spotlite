@@ -516,9 +516,11 @@ const AnswerScreen = ({ answer }: { answer: string }) => {
 const FlagReview = ({
   prevQuestion,
   prevAnswer,
+  quizzer,
 }: {
   prevQuestion: string;
   prevAnswer: string;
+  quizzer: string;
 }) => {
   // allow admin to edit the question and answer
 
@@ -541,6 +543,9 @@ const FlagReview = ({
       <div className={styles.header}>
         <div className={styles.logo}>
           <Logo color="white" variant="bordered" />
+        </div>
+        <div className={styles.topicWrapper}>
+          <div className={styles.topic}>Reviewing {quizzer}'s question...</div>
         </div>
       </div>
       <form onSubmit={handleFinish}>
@@ -857,7 +862,13 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'flagReview':
-        return <FlagReview prevQuestion={question} prevAnswer={answer} />;
+        return (
+          <FlagReview
+            prevQuestion={question}
+            prevAnswer={answer}
+            quizzer={quizzerUsername}
+          />
+        );
       case 'quizQuestion':
         return (
           <QuizQuestion

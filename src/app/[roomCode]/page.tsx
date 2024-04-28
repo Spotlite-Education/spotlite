@@ -756,6 +756,27 @@ const AnswerResult = ({
   );
 };
 
+const FlagReview = ({
+  quizzerID,
+  quizzerUsername,
+}: {
+  quizzerID: string;
+  quizzerUsername: string;
+}) => {
+  const isQuizzer = sessionStorage.getItem('sessionToken') == quizzerID;
+  return (
+    <div className={styles.flagReview}>
+      {isQuizzer ? (
+        <div className={styles.text}>Your question is being reviewed...</div>
+      ) : (
+        <div className={styles.text}>
+          {quizzerUsername}'s question is being reviewed...
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LeaderboardPosition = ({
   rank,
   points,
@@ -905,6 +926,9 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
         case 'showingAnswer':
           changeStatus('answerResult');
           break;
+        case 'flagReview':
+          changeStatus('flagReview');
+          break;
         case 'leaderboardPosition':
           console.log('showing leaderboard');
           changeStatus('leaderboardPosition');
@@ -956,7 +980,10 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             increment={studentInfo.increment}
           />
         );
-
+      case 'flagReview':
+        return (
+          <FlagReview quizzerID={quizzerID} quizzerUsername={quizzerUsername} />
+        );
       case 'leaderboardPosition':
         return (
           <LeaderboardPosition

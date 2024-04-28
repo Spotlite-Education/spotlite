@@ -671,6 +671,21 @@
   }
 }
 
+.flagReview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--accent-color);
+
+  .text {
+    color: var(--off-white);
+    font-size: 3rem;
+  }
+}
+
 .questionAnswerWrapper {
   width: 100%;
   height: 100%;
