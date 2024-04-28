@@ -157,6 +157,7 @@ const Home = () => {
                 placeholder="Room Code"
                 maxLength={6}
                 autoCorrect="off"
+                autoFocus
                 value={roomCode}
                 onChange={e => setRoomCode(e.target.value.toUpperCase())}
               />

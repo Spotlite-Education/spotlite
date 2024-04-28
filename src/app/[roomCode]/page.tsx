@@ -387,7 +387,7 @@ const TextEditor = ({ setValue }: { setValue: Function }) => {
         onChange={mathField => setText(mathField.latex())}
       /> */}
       <textarea
-        placeholder="Type your question here!"
+        placeholder="Type your question here! Try to be creative..."
         maxLength={300}
         value={text}
         onChange={e => {
@@ -503,7 +503,7 @@ const QuestionCreation = ({
           <Logo color="white" variant="bordered" />
         </div>
         <div className={styles.topicWrapper}>
-          <div className={styles.topic}>Question Theme: {topic}</div>
+          <div className={styles.topic}>make a question about: {topic}</div>
         </div>
         <div className={styles.time} data-time={timeLeft}>
           {timeLeft}
@@ -519,8 +519,9 @@ const QuestionCreation = ({
                 canvasHovered
               }
               maxLength={300}
-              placeholder="Type a prompt here..."
+              placeholder="Type a quiz question here... try to be creative!"
               onChange={e => setPrompt(e.target.value)}
+              autoFocus
             />
           </div>
           {/* <Editor
@@ -542,7 +543,7 @@ const QuestionCreation = ({
                 }
                 maxLength={20}
                 onChange={e => setAnswer(e.target.value)}
-                placeholder="Type here..."
+                placeholder="Type here... (20 characters max)"
               />
             </div>
             <button
@@ -680,6 +681,7 @@ const AnswerQuestion = ({
               <input
                 placeholder="Type here..."
                 value={answer}
+                autoFocus
                 onChange={e => setAnswer(e.target.value)}
               />
             </div>
@@ -856,6 +858,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           <textarea
             value={prompt}
             maxLength={300}
+            autoFocus
             onChange={e => {
               setPrompt(e.target.value);
               syncPrompt(e.target.value);

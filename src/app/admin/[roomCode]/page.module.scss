@@ -96,15 +96,15 @@
         }
       }
     }
+    .anothaOne {
+      background-color: var(--accent-color);
+      width: 30rem;
+    }
   }
 
   .actions {
     display: flex;
     gap: 2.5rem;
-
-    .anothaOne {
-      background-color: var(--accent-color);
-    }
 
     .startGame {
       background-color: var(--brand-color);

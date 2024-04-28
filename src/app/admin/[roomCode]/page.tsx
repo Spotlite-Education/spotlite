@@ -36,7 +36,7 @@ const Lobby = ({
 }: LobbyProps) => {
   const [locked, setLocked] = useState<boolean>(false);
 
-  const [questionMakingTime, setQuestionMakingTime] = useState<number>(3 * 60);
+  const [questionMakingTime, setQuestionMakingTime] = useState<number>(5 * 60);
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(
     1 * 60 + 30
   );
@@ -245,7 +245,9 @@ const ChooseTopics = ({
         <Logo color="black" />
       </div>
       <div>
-        <div className={styles.title}>What theme should questions follow?</div>
+        <div className={styles.title}>
+          What themes should questions follow? (Reccomended 3+ themes)
+        </div>
         <div className={styles.topics}>
           {topics.map((topic, i) => (
             <div key={i} className={styles.topic}>
@@ -263,15 +265,21 @@ const ChooseTopics = ({
               </div>
             </div>
           ))}
+          <button
+            className={styles.anothaOne}
+            onClick={handleAddTopic}
+            disabled={topics.length >= 4}
+          >
+            add another theme
+          </button>
         </div>
       </div>
       <div className={styles.actions}>
         <button
-          className={styles.anothaOne}
-          onClick={handleAddTopic}
-          disabled={topics.length >= 4}
+          className={styles.backToLobby}
+          onClick={() => changeStatus('lobby')}
         >
-          Anotha one.
+          Back to lobby
         </button>
         <button
           className={styles.startGame}
@@ -282,12 +290,6 @@ const ChooseTopics = ({
           onClick={() => handleStartGame()}
         >
           Start game!
-        </button>
-        <button
-          className={styles.backToLobby}
-          onClick={() => changeStatus('lobby')}
-        >
-          Back to lobby
         </button>
       </div>
     </div>
@@ -340,7 +342,6 @@ const Countdown = ({
         <Logo size="md" color="white" variant="bordered" />
       </div>
       <div className={styles.title}>Create your quiz questions!</div>
-      <div className={styles.subtitle}>Try to be creative!</div>
       <div className={styles.time} data-time={timeLeft}>
         {timeLeft}
       </div>
@@ -444,7 +445,9 @@ const QuizQuestion = ({
       <div className={styles.logo}>
         <Logo color="white" variant="bordered" />
       </div>
-      <div className={styles.quizzer}>{quizzerUsername} is quizzing!</div>
+      <div className={styles.quizzer}>
+        {quizzerUsername} is in the spotlite!
+      </div>
       <div className={styles.timerWrapper}>
         <div className={styles.timer} data-text={timeLeft}>
           {timeLeft}
@@ -578,6 +581,7 @@ const FlagReview = ({
             <div className={styles.input}>
               Answer:
               <input
+                autoFocus
                 ref={answerInputRef}
                 disabled={
                   document.activeElement !== answerInputRef.current &&
