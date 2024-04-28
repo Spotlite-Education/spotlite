@@ -810,6 +810,16 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   const [questionImageURL, setQuestionImageURL] = useState('');
   const [answer, setAnswer] = useState('');
 
+  const [guesses, setGuesses] = useState<Guess[]>([]);
+
+  useEffect(() => {
+    socket.on('newGuess', (guessArray: Guess[]) => {
+      setGuesses(
+        guessArray.slice(0, Math.min(5, guessArray.length)).toReversed()
+      );
+    });
+  }, []);
+
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
       setPrompt(info.question.text);
@@ -858,6 +868,31 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
             only="draw"
             onDraw={syncDrawing}
           /> */}
+        <div className={styles.correctReel}>
+          {guesses.map((guess, i) =>
+            guess.correct ? (
+              <div
+                style={{
+                  opacity: (i + 1) / guesses.length,
+                }}
+                key={i}
+                className={styles.correctGuess}
+              >
+                {guess.player.username} got it!
+              </div>
+            ) : (
+              <div
+                style={{
+                  opacity: (i + 1) / guesses.length,
+                }}
+                key={i}
+                className={styles.guess}
+              >
+                {guess.player.username} guessed: {guess.guess}
+              </div>
+            )
+          )}
+        </div>
         <div className={styles.answer}>
           <div className={styles.answerText}>{answer}</div>
           <div className={styles.blur}>Hover to see your answer</div>
@@ -929,6 +964,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
         case 'flagReview':
           changeStatus('flagReview');
           break;
+        case 'end':
         case 'leaderboardPosition':
           console.log('showing leaderboard');
           changeStatus('leaderboardPosition');
