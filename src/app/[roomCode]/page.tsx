@@ -770,7 +770,7 @@ const FlagReview = ({
         <div className={styles.text}>Your question is being reviewed...</div>
       ) : (
         <div className={styles.text}>
-          {quizzerUsername}'s question is being reviewed...
+          {quizzerUsername}&#39;s question is being reviewed...
         </div>
       )}
     </div>

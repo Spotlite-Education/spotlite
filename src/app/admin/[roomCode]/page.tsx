@@ -545,7 +545,9 @@ const FlagReview = ({
           <Logo color="white" variant="bordered" />
         </div>
         <div className={styles.topicWrapper}>
-          <div className={styles.topic}>Reviewing {quizzer}'s question...</div>
+          <div className={styles.topic}>
+            Reviewing {quizzer}&#39;s question...
+          </div>
         </div>
       </div>
       <form onSubmit={handleFinish}>
