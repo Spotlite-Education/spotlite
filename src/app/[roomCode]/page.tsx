@@ -24,6 +24,8 @@ import { GamePlayerState } from '../types/GamePlayerState';
 import { Game } from '../types/Game';
 import { Guess } from '../types/Guess';
 import { Player } from '../types/Player';
+import { Slate } from '../components/Slate/Slate';
+import { SlateValue } from '../components/Slate/types/Properties';
 
 const IdleScreen = () => {
   return (
@@ -482,15 +484,15 @@ const QuestionCreation = ({
     });
   }, []);
 
-  const [imageURL, setImageURL] = useState('');
-  const [prompt, setPrompt] = useState('');
+  const [slate, setSlate] = useState<SlateValue>([]);
+  const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
 
   const [answer, setAnswer] = useState<string>('');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    socket.emit('submitQuestion', prompt, imageURL, answer);
+    socket.emit('submitQuestion', slate, answer);
     changeStatus('questionSubmitted');
   };
 
@@ -509,53 +511,41 @@ const QuestionCreation = ({
           {timeLeft}
         </div>
       </div>
-      <form onSubmit={handleSubmit}>
-        <div className={styles.content}>
-          <div className={styles.promptInput}>
-            <textarea
-              ref={promptInputRef}
+      <div className={styles.content}>
+        <Slate
+          value={slate}
+          setValue={setSlate}
+          undos={slateUndos}
+          setUndos={setSlateUndos}
+          size={{ fill: true }}
+          theme={{
+            border: 'none',
+            sidebar: { border: 'none', background: 'var(--canvas-color)' },
+          }}
+        />
+        <div className={styles.answerWrapper}>
+          <div className={styles.input}>
+            Answer:
+            <input
+              ref={answerInputRef}
               disabled={
-                document.activeElement !== promptInputRef.current &&
+                document.activeElement !== answerInputRef.current &&
                 canvasHovered
               }
-              maxLength={300}
-              placeholder="Type a quiz question here... try to be creative!"
-              onChange={e => setPrompt(e.target.value)}
-              autoFocus
+              maxLength={20}
+              onChange={e => setAnswer(e.target.value)}
+              placeholder="Type here... (20 characters max)"
             />
           </div>
-          {/* <Editor
-            width={window.innerWidth || 0}
-            height={window.innerHeight - 5 * 10 - 28 * 10 || 0}
-            only="draw"
-            onDrawEnd={setImageURL}
-            onCanvasHoverStart={() => setCanvasHovered(true)}
-            onCanvasHoverEnd={() => setCanvasHovered(false)}
-          /> */}
-          <div className={styles.answerWrapper}>
-            <div className={styles.input}>
-              Answer:
-              <input
-                ref={answerInputRef}
-                disabled={
-                  document.activeElement !== answerInputRef.current &&
-                  canvasHovered
-                }
-                maxLength={20}
-                onChange={e => setAnswer(e.target.value)}
-                placeholder="Type here... (20 characters max)"
-              />
-            </div>
-            <button
-              className={styles.submit}
-              disabled={(!prompt && !imageURL) || !answer}
-              type="submit"
-            >
-              Submit It!
-            </button>
-          </div>
+          <button
+            className={styles.submit}
+            disabled={slate.length === 0}
+            onClick={handleSubmit}
+          >
+            Submit It!
+          </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
@@ -808,10 +798,9 @@ const LeaderboardPosition = ({
 };
 
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
-  const [prompt, setPrompt] = useState<string>('');
-  const [questionImageURL, setQuestionImageURL] = useState('');
+  const [slate, setSlate] = useState<SlateValue>([]);
+  const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
   const [answer, setAnswer] = useState('');
-
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
@@ -824,21 +813,14 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
-      setPrompt(info.question.text);
+      setSlate(info.question.slate);
       setAnswer(info.question.answer);
-      setQuestionImageURL(info.question.imageURL);
-
-      syncPrompt(info.question.text);
     });
   }, []);
 
-  const syncPrompt = useCallback((prompt: string) => {
-    socket.emit('updateSpotlitQuestion', prompt);
-  }, []);
-
-  const syncDrawing = useCallback((imageData: string) => {
-    socket.emit('quizzerDraw', imageData);
-  }, []);
+  useEffect(() => {
+    socket.emit('quizzerDraw', slate);
+  }, [slate]);
 
   const timeLeft = formatSeconds(secondsLeft);
 
@@ -854,23 +836,21 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         </div>
       </div>
       <div className={styles.content}>
-        <div className={styles.promptInput}>
-          <textarea
-            value={prompt}
-            maxLength={300}
-            autoFocus
-            onChange={e => {
-              setPrompt(e.target.value);
-              syncPrompt(e.target.value);
-            }}
-          />
+        <Slate
+          size={{ fill: true }}
+          value={slate}
+          setValue={setSlate}
+          undos={slateUndos}
+          setUndos={setSlateUndos}
+          theme={{
+            border: 'none',
+            sidebar: { border: 'none', background: 'var(--canvas-color)' },
+          }}
+        />
+        <div className={styles.answerWrapper}>
+          <div className={styles.answerText}>{answer}</div>
+          <div className={styles.blur}>Hover to see your answer</div>
         </div>
-        {/* <Editor
-            width={window.innerWidth * 0.7 || 0}
-            height={window.innerHeight - 10 * 10 - 7.5 * 10}
-            only="draw"
-            onDraw={syncDrawing}
-          /> */}
         <div className={styles.correctReel}>
           {guesses.map((guess, i) =>
             guess.correct ? (
@@ -895,10 +875,6 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
               </div>
             )
           )}
-        </div>
-        <div className={styles.answer}>
-          <div className={styles.answerText}>{answer}</div>
-          <div className={styles.blur}>Hover to see your answer</div>
         </div>
       </div>
     </div>

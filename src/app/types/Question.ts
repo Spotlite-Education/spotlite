@@ -1,8 +1,8 @@
 import { CanvasAction } from '../[roomCode]/page';
+import { SlateValue } from '../components/Slate/types/Properties';
 
 export type Question = {
-  text: string;
-  imageURL: string;
+  slate: SlateValue;
   answer: Answer;
 };
 

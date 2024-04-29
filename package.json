@@ -13,6 +13,7 @@
     "@tldraw/tldraw": "^1.29.2",
     "@types/socket.io": "^3.0.2",
     "@types/socket.io-client": "^3.0.0",
+    "firebase": "^10.11.1",
     "framer-motion": "^10.16.16",
     "jotai": "^2.6.3",
     "next": "14.0.4",
@@ -25,6 +26,7 @@
     "react-math-keyboard": "^1.5.6",
     "react-mathquill": "^1.0.3",
     "react-textarea-autosize": "^8.5.3",
+    "react-tiny-popover": "^8.0.4",
     "sass": "^1.69.5",
     "scss": "^0.2.4",
     "socket.io-client": "^4.7.2"

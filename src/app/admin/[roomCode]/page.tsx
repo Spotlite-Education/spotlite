@@ -18,6 +18,9 @@ import { FinalLeaderboard, type Leaderboard } from '@/app/types/Leaderboard';
 import { Player } from '@/app/types/Player';
 import { useRouter } from 'next/navigation';
 import { Guess } from '@/app/types/Guess';
+import { Slate } from '@/app/components/Slate/Slate';
+import { SlateValue } from '@/app/components/Slate/types/Properties';
+import { Question } from '@/app/types/Question';
 
 interface LobbyProps {
   roomCode: string;
@@ -246,7 +249,7 @@ const ChooseTopics = ({
       </div>
       <div>
         <div className={styles.title}>
-          What themes should questions follow? (Reccomended 3+ themes)
+          What themes should questions follow? (Recomended 3+ themes)
         </div>
         <div className={styles.topics}>
           {topics.map((topic, i) => (
@@ -389,19 +392,15 @@ const RevealQuizzer = ({
 };
 
 const QuizQuestion = ({
-  quizzerID,
   quizzerUsername,
   secondsLeft,
-  question,
   correct,
   playerCount,
   hint,
   forceSkip,
 }: {
-  quizzerID: string;
   quizzerUsername: string;
   secondsLeft: number;
-  question: string;
   correct: number;
   playerCount: number;
   hint: string;
@@ -417,10 +416,10 @@ const QuizQuestion = ({
     });
   }, []);
 
-  const [drawing, setDrawing] = useState<string>('');
+  const [slate, setSlate] = useState<SlateValue>([]);
 
   useEffect(() => {
-    const handleSyncDrawing = (imageData: string) => setDrawing(imageData);
+    const handleSyncDrawing = (slate: SlateValue) => setSlate(slate);
     socket.on('syncDrawing', handleSyncDrawing);
 
     return () => {
@@ -438,7 +437,6 @@ const QuizQuestion = ({
       splitHint += '\xa0';
     }
   }
-  hint = splitHint;
 
   return (
     <div className={styles.quizQuestionWrapper}>
@@ -453,12 +451,18 @@ const QuizQuestion = ({
           {timeLeft}
         </div>
       </div>
-      <textarea
-        readOnly
-        className={styles.questionPrompt}
-        value={question}
-      ></textarea>
-      {drawing && <img className={styles.questionDisplay} src={drawing} />}
+      <Slate
+        readonly
+        value={slate}
+        setValue={() => {}}
+        undos={[]}
+        setUndos={() => {}}
+        size={{ fill: true }}
+        theme={{
+          border: 'none',
+          sidebar: { border: 'none', background: 'var(--canvas-color)' },
+        }}
+      />
       <div className={styles.correctReel}>
         {guesses.map((guess, i) =>
           guess.correct ? (
@@ -485,7 +489,7 @@ const QuizQuestion = ({
         )}
       </div>
       <div className={styles.hintWrapper}>
-        <div className={styles.questionHint}>Hint: {hint}</div>
+        <div className={styles.questionHint}>Hint: {splitHint}</div>
         <div className={styles.correctAnswers}>
           {correct}/{playerCount - 1} correct
         </div>
@@ -517,28 +521,27 @@ const AnswerScreen = ({ answer }: { answer: string }) => {
 };
 
 const FlagReview = ({
-  prevQuestion,
-  prevAnswer,
   quizzer,
+  quizzerId,
 }: {
-  prevQuestion: string;
-  prevAnswer: string;
   quizzer: string;
+  quizzerId: string;
 }) => {
   // allow admin to edit the question and answer
+  const [slate, setSlate] = useState<SlateValue>([]);
+  const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
+  const [answer, setAnswer] = useState<string>('');
 
-  const promptInputRef = useRef<HTMLTextAreaElement>(null);
-  const answerInputRef = useRef<HTMLInputElement>(null);
-  const [canvasHovered, setCanvasHovered] = useState<boolean>(false);
-
-  const [imageURL, setImageURL] = useState('');
-  const [prompt, setPrompt] = useState(prevQuestion);
-
-  const [answer, setAnswer] = useState<string>(prevAnswer);
+  useEffect(() => {
+    socket.emit('getStudentQuestion', quizzerId, (question: Question) => {
+      setSlate(question.slate);
+      setAnswer(question.answer);
+    });
+  }, []);
 
   const handleFinish = (e: FormEvent) => {
     e.preventDefault();
-    socket.emit('endReview', prompt, answer);
+    socket.emit('endReview', slate, answer);
   };
 
   return (
@@ -553,52 +556,34 @@ const FlagReview = ({
           </div>
         </div>
       </div>
-      <form onSubmit={handleFinish}>
-        <div className={styles.content}>
-          <div className={styles.promptInput}>
-            <textarea
-              ref={promptInputRef}
-              disabled={
-                document.activeElement !== promptInputRef.current &&
-                canvasHovered
-              }
-              maxLength={300}
-              placeholder="Type a prompt here..."
-              onChange={e => setPrompt(e.target.value)}
-            >
-              {prompt}
-            </textarea>
+      <div className={styles.content}>
+        <Slate
+          value={slate}
+          setValue={setSlate}
+          undos={slateUndos}
+          setUndos={setSlateUndos}
+          size={{ fill: true }}
+          theme={{
+            border: 'none',
+            sidebar: { border: 'none', background: 'var(--canvas-color)' },
+          }}
+        />
+        <div className={styles.answerWrapper}>
+          <div className={styles.input}>
+            Answer:
+            <input
+              autoFocus
+              maxLength={20}
+              value={answer}
+              onChange={e => setAnswer(e.target.value)}
+              placeholder="Type here..."
+            />
           </div>
-          {/* <Editor
-            width={window.innerWidth || 0}
-            height={window.innerHeight - 5 * 10 - 28 * 10 || 0}
-            only="draw"
-            onDrawEnd={setImageURL}
-            onCanvasHoverStart={() => setCanvasHovered(true)}
-            onCanvasHoverEnd={() => setCanvasHovered(false)}
-          /> */}
-          <div className={styles.answerWrapper}>
-            <div className={styles.input}>
-              Answer:
-              <input
-                autoFocus
-                ref={answerInputRef}
-                disabled={
-                  document.activeElement !== answerInputRef.current &&
-                  canvasHovered
-                }
-                maxLength={20}
-                value={answer}
-                onChange={e => setAnswer(e.target.value)}
-                placeholder="Type here..."
-              />
-            </div>
-            <button className={styles.submit} type="submit">
-              Finish Reviewing
-            </button>
-          </div>
+          <button className={styles.submit} onClick={handleFinish}>
+            Finish Reviewing
+          </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
@@ -732,10 +717,10 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(0);
   const [topics, setTopics] = useState<string[]>(['']);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
-  const [question, setQuestion] = useState('');
-  const [hint, setHint] = useState('');
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [answer, setAnswer] = useState('');
+  const [question, setQuestion] = useState<SlateValue>([]);
+  const [hint, setHint] = useState<string>('');
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [answer, setAnswer] = useState<string>('');
 
   const changeStatus = (newStatus: string) => {
     setStatus(newStatus);
@@ -777,7 +762,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
       }
     };
 
-    const handleUpdateSpotlitQuestion = (question: string) => {
+    const handleUpdateSpotlitQuestion = (question: SlateValue) => {
       setQuestion(question);
     };
 
@@ -868,20 +853,12 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
           />
         );
       case 'flagReview':
-        return (
-          <FlagReview
-            prevQuestion={question}
-            prevAnswer={answer}
-            quizzer={quizzerUsername}
-          />
-        );
+        return <FlagReview quizzer={quizzerUsername} quizzerId={quizzerID} />;
       case 'quizQuestion':
         return (
           <QuizQuestion
-            quizzerID={quizzerID}
             quizzerUsername={quizzerUsername}
             secondsLeft={secondsLeft}
-            question={question}
             correct={correctAnswers}
             playerCount={players.length}
             hint={hint}
