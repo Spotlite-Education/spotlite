@@ -484,6 +484,7 @@ const QuestionCreation = ({
     });
   }, []);
 
+  const [question, setQuestion] = useState<string>('');
   const [slate, setSlate] = useState<SlateValue>([]);
   const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
 
@@ -492,7 +493,7 @@ const QuestionCreation = ({
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    socket.emit('submitQuestion', slate, answer);
+    socket.emit('submitQuestion', question, answer);
     changeStatus('questionSubmitted');
   };
 
@@ -512,7 +513,7 @@ const QuestionCreation = ({
         </div>
       </div>
       <div className={styles.content}>
-        <Slate
+        {/* <Slate
           value={slate}
           setValue={setSlate}
           undos={slateUndos}
@@ -528,6 +529,14 @@ const QuestionCreation = ({
             },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
+        /> */}
+        <textarea
+          className={styles.textarea}
+          value={question}
+          onChange={e => setQuestion(e.target.value)}
+          autoFocus
+          placeholder="Write your question here! Try to be creative..."
+          maxLength={400}
         />
         <div className={styles.answerWrapper}>
           <div className={styles.input}>
@@ -545,7 +554,7 @@ const QuestionCreation = ({
           </div>
           <button
             className={styles.submit}
-            disabled={slate.length === 0}
+            disabled={question.length === 0 || answer.length === 0}
             onClick={handleSubmit}
           >
             Submit It!
@@ -806,6 +815,7 @@ const LeaderboardPosition = ({
 const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   const [slate, setSlate] = useState<SlateValue>([]);
   const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
+  const [question, setQuestion] = useState<string>();
   const [answer, setAnswer] = useState('');
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
@@ -819,18 +829,16 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
-      console.log(info.question.slate);
-      setSlate(info.question.slate);
+      setQuestion(info.question.text);
       setAnswer(info.question.answer);
-      socket.emit('quizzerDraw', info.question.slate);
     });
   }, []);
 
   useEffect(() => {
-    if (slate.length > 0) {
-      socket.emit('quizzerDraw', slate);
-    }
-  }, [slate]);
+    if (!question) return;
+
+    socket.emit('quizzerDraw', question);
+  }, [question]);
 
   const timeLeft = formatSeconds(secondsLeft);
 
@@ -846,7 +854,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
         </div>
       </div>
       <div className={styles.content}>
-        <Slate
+        {/* <Slate
           size={{ fill: true }}
           value={slate}
           setValue={setSlate}
@@ -862,6 +870,14 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
             },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
+        /> */}
+        <textarea
+          className={styles.textarea}
+          value={question}
+          onChange={e => setQuestion(e.target.value)}
+          autoFocus
+          placeholder="Write your question here! Try to be creative..."
+          maxLength={400}
         />
         <div className={styles.answerWrapper}>
           <div className={styles.answerText}>{answer}</div>
@@ -947,6 +963,14 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           changeStatus('showQuizzer');
           break;
         case 'answerQuestion':
+          setQuizzerID(game.quizzer.id);
+          setQuizzerUsername(game.quizzer.username);
+          socket.emit('getStudentInfo', (info: StudentInfo) => {
+            setStudentInfo(info);
+          });
+          setIsQuizzer(
+            sessionStorage.getItem('sessionToken') == game.quizzer.id
+          );
           if (isQuizzer) {
             changeStatus('questionSpotlight');
           } else if (status != 'answerResult') {
@@ -961,7 +985,6 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
           break;
         case 'end':
         case 'leaderboardPosition':
-          console.log('showing leaderboard');
           changeStatus('leaderboardPosition');
           break;
       }

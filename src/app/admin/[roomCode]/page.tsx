@@ -417,9 +417,10 @@ const QuizQuestion = ({
   }, []);
 
   const [slate, setSlate] = useState<SlateValue>([]);
+  const [question, setQuestion] = useState<string>('');
 
   useEffect(() => {
-    const handleSyncDrawing = (slate: SlateValue) => setSlate(slate);
+    const handleSyncDrawing = (question: string) => setQuestion(question);
     socket.on('syncDrawing', handleSyncDrawing);
 
     return () => {
@@ -451,7 +452,7 @@ const QuizQuestion = ({
           {timeLeft}
         </div>
       </div>
-      <Slate
+      {/* <Slate
         readonly
         value={slate}
         setValue={() => {}}
@@ -468,6 +469,13 @@ const QuizQuestion = ({
           },
           sidebar: { border: 'none', background: 'var(--canvas-color)' },
         }}
+      /> */}
+      <textarea
+        className={styles.textarea}
+        value={question}
+        onChange={e => setQuestion(e.target.value)}
+        maxLength={400}
+        readOnly
       />
       <div className={styles.correctReel}>
         {guesses.map((guess, i) =>
@@ -536,18 +544,19 @@ const FlagReview = ({
   // allow admin to edit the question and answer
   const [slate, setSlate] = useState<SlateValue>([]);
   const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
+  const [question, setQuestion] = useState<string>('');
   const [answer, setAnswer] = useState<string>('');
 
   useEffect(() => {
     socket.emit('getStudentQuestion', quizzerId, (question: Question) => {
-      setSlate(question.slate);
+      setQuestion(question.text);
       setAnswer(question.answer);
     });
   }, []);
 
   const handleFinish = (e: FormEvent) => {
     e.preventDefault();
-    socket.emit('endReview', slate, answer);
+    socket.emit('endReview', question, answer);
   };
 
   return (
@@ -563,7 +572,7 @@ const FlagReview = ({
         </div>
       </div>
       <div className={styles.content}>
-        <Slate
+        {/* <Slate
           value={slate}
           setValue={setSlate}
           undos={slateUndos}
@@ -579,6 +588,14 @@ const FlagReview = ({
             },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
+        /> */}
+        <textarea
+          className={styles.textarea}
+          value={question}
+          onChange={e => setQuestion(e.target.value)}
+          autoFocus
+          placeholder="Write your question here! Try to be creative..."
+          maxLength={400}
         />
         <div className={styles.answerWrapper}>
           <div className={styles.input}>
