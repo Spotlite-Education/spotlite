@@ -522,6 +522,7 @@ const QuestionCreation = ({
             border: 'none',
             canvas: {
               note: {
+                border: 'none',
                 background: 'var(--canvas-color)',
               },
             },
@@ -851,6 +852,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
             border: 'none',
             canvas: {
               note: {
+                border: 'none',
                 background: 'var(--canvas-color)',
               },
             },

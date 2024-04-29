@@ -462,6 +462,7 @@ const QuizQuestion = ({
           border: 'none',
           canvas: {
             note: {
+              border: 'none',
               background: 'var(--canvas-color)',
             },
           },
@@ -572,6 +573,7 @@ const FlagReview = ({
             border: 'none',
             canvas: {
               note: {
+                border: 'none',
                 background: 'var(--canvas-color)',
               },
             },
