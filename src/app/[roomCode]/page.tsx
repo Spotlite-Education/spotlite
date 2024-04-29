@@ -640,8 +640,8 @@ const AnswerQuestion = ({
   };
 
   useEffect(() => {
-    const handleChatUpdate = (guesses: Guess[]) => {
-      setGuesses(guesses);
+    const handleChatUpdate = (guess: Guess) => {
+      setGuesses(prev => [...prev, guess]);
     };
 
     socket.on('newGuess', handleChatUpdate);
@@ -709,8 +709,8 @@ const AnswerResult = ({
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    const handleNewGuess = (guesses: Guess[]) => {
-      setGuesses(guesses);
+    const handleNewGuess = (guess: Guess) => {
+      setGuesses(prev => [...prev, guess]);
     };
 
     socket.on('newGuess', handleNewGuess);
@@ -820,12 +820,14 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    socket.on('newGuess', (guessArray: Guess[]) => {
-      setGuesses(
-        guessArray.slice(0, Math.min(5, guessArray.length)).toReversed()
-      );
+    socket.on('newGuess', (guess: Guess) => {
+      setGuesses(prev => [...prev, guess]);
     });
   }, []);
+
+  const latestGuesses = guesses
+    .slice(0, Math.min(5, guesses.length))
+    .toReversed();
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
@@ -884,7 +886,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           <div className={styles.blur}>Hover to see your answer</div>
         </div>
         <div className={styles.correctReel}>
-          {guesses.map((guess, i) =>
+          {latestGuesses.map((guess, i) =>
             guess.correct ? (
               <div
                 style={{

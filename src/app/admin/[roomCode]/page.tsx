@@ -409,12 +409,14 @@ const QuizQuestion = ({
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    socket.on('newGuess', (guessArray: Guess[]) => {
-      setGuesses(
-        guessArray.slice(0, Math.min(5, guessArray.length)).toReversed()
-      );
+    socket.on('newGuess', (guess: Guess) => {
+      setGuesses(prev => [...prev, guess]);
     });
   }, []);
+
+  const latestGuesses = guesses
+    .slice(0, Math.min(5, guesses.length))
+    .toReversed();
 
   const [slate, setSlate] = useState<SlateValue>([]);
   const [question, setQuestion] = useState<string>('');
