@@ -819,13 +819,17 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
 
   useEffect(() => {
     socket.emit('getStudentInfo', (info: GamePlayerState) => {
+      console.log(info.question.slate);
       setSlate(info.question.slate);
       setAnswer(info.question.answer);
+      socket.emit('quizzerDraw', info.question.slate);
     });
   }, []);
 
   useEffect(() => {
-    socket.emit('quizzerDraw', slate);
+    if (slate.length > 0) {
+      socket.emit('quizzerDraw', slate);
+    }
   }, [slate]);
 
   const timeLeft = formatSeconds(secondsLeft);
