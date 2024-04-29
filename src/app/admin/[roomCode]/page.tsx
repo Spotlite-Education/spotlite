@@ -393,6 +393,7 @@ const RevealQuizzer = ({
 
 const QuizQuestion = ({
   quizzerUsername,
+  quizzerID,
   secondsLeft,
   correct,
   playerCount,
@@ -400,6 +401,7 @@ const QuizQuestion = ({
   forceSkip,
 }: {
   quizzerUsername: string;
+  quizzerID: string;
   secondsLeft: number;
   correct: number;
   playerCount: number;
@@ -422,6 +424,10 @@ const QuizQuestion = ({
   const [question, setQuestion] = useState<string>('');
 
   useEffect(() => {
+    socket.emit('getStudentQuestion', quizzerID, (question: Question) => {
+      setQuestion(question.text);
+    });
+
     const handleSyncDrawing = (question: string) => setQuestion(question);
     socket.on('syncDrawing', handleSyncDrawing);
 
@@ -889,6 +895,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
         return (
           <QuizQuestion
             quizzerUsername={quizzerUsername}
+            quizzerID={quizzerID}
             secondsLeft={secondsLeft}
             correct={correctAnswers}
             playerCount={players.length}
