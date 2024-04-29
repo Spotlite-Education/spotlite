@@ -520,6 +520,11 @@ const QuestionCreation = ({
           size={{ fill: true }}
           theme={{
             border: 'none',
+            canvas: {
+              note: {
+                background: 'var(--canvas-color)',
+              },
+            },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
         />
@@ -844,6 +849,11 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           setUndos={setSlateUndos}
           theme={{
             border: 'none',
+            canvas: {
+              note: {
+                background: 'var(--canvas-color)',
+              },
+            },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
         />

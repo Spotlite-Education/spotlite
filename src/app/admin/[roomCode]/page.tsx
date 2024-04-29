@@ -460,6 +460,11 @@ const QuizQuestion = ({
         size={{ fill: true }}
         theme={{
           border: 'none',
+          canvas: {
+            note: {
+              background: 'var(--canvas-color)',
+            },
+          },
           sidebar: { border: 'none', background: 'var(--canvas-color)' },
         }}
       />
@@ -565,6 +570,11 @@ const FlagReview = ({
           size={{ fill: true }}
           theme={{
             border: 'none',
+            canvas: {
+              note: {
+                background: 'var(--canvas-color)',
+              },
+            },
             sidebar: { border: 'none', background: 'var(--canvas-color)' },
           }}
         />
