@@ -554,7 +554,10 @@ const QuestionCreation = ({
           </div>
           <button
             className={styles.submit}
-            disabled={question.length === 0 || answer.length === 0}
+            disabled={
+              question.replace(/\s/g, '').length === 0 ||
+              answer.replace(/\s/g, '').length === 0
+            }
             onClick={handleSubmit}
           >
             Submit It!

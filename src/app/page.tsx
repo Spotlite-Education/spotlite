@@ -97,7 +97,7 @@ const Home = () => {
   const handleJoin = (e: FormEvent) => {
     e.preventDefault();
 
-    if (username.length === 0) {
+    if (username.replace(/\s/g, '').length === 0) {
       return;
     }
 
