@@ -644,7 +644,7 @@ const AnswerQuestion = ({
 
   useEffect(() => {
     const handleChatUpdate = (guess: Guess) => {
-      setGuesses(prev => [...prev, guess]);
+      setGuesses(prev => [guess, ...prev]);
     };
 
     socket.on('newGuess', handleChatUpdate);

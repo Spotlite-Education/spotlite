@@ -412,14 +412,20 @@ const QuizQuestion = ({
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    socket.on('newGuess', (guess: Guess) => {
-      setGuesses(prev => [...prev, guess]);
-    });
-  }, []);
+    // This is called twice for some reason
+    const handleNewGuess = (guess: Guess) => {
+      if (guesses.length >= 5) {
+        setGuesses(prev => [...prev.slice(1), guess]);
+      } else {
+        setGuesses(prev => [...prev, guess]);
+      }
+    };
+    socket.on('newGuess', (guess: Guess) => handleNewGuess(guess));
 
-  const latestGuesses = guesses
-    .slice(0, Math.min(5, guesses.length))
-    .toReversed();
+    return () => {
+      socket.off('newGuess', handleNewGuess);
+    };
+  }, []);
 
   const [slate, setSlate] = useState<SlateValue>([]);
   const [question, setQuestion] = useState<string>('');
