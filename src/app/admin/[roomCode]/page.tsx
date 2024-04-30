@@ -412,7 +412,6 @@ const QuizQuestion = ({
   const [guesses, setGuesses] = useState<Guess[]>([]);
 
   useEffect(() => {
-    // This is called twice for some reason
     const handleNewGuess = (guess: Guess) => {
       if (guesses.length >= 5) {
         setGuesses(prev => [...prev.slice(1), guess]);
@@ -420,7 +419,7 @@ const QuizQuestion = ({
         setGuesses(prev => [...prev, guess]);
       }
     };
-    socket.on('newGuess', (guess: Guess) => handleNewGuess(guess));
+    socket.on('newGuess', handleNewGuess);
 
     return () => {
       socket.off('newGuess', handleNewGuess);
