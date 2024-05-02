@@ -883,6 +883,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
           autoFocus
           placeholder="Write your question here! Try to be creative..."
           maxLength={400}
+          readOnly
         />
         <div className={styles.answerWrapper}>
           <div className={styles.answerText}>{answer}</div>
