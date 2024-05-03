@@ -248,9 +248,7 @@ const ChooseTopics = ({
         <Logo color="black" />
       </div>
       <div>
-        <div className={styles.title}>
-          What themes should questions follow? (Recomended 3+ themes)
-        </div>
+        <div className={styles.title}>What topics should questions follow?</div>
         <div className={styles.topics}>
           {topics.map((topic, i) => (
             <div key={i} className={styles.topic}>
@@ -258,7 +256,7 @@ const ChooseTopics = ({
               <div className={styles.inputWrapper}>
                 <input
                   autoFocus
-                  placeholder="Enter a theme here!!"
+                  placeholder="Enter a topic here!!"
                   value={topic}
                   onChange={e => handleEditTopic(i, e.target.value)}
                   maxLength={40}
@@ -274,7 +272,7 @@ const ChooseTopics = ({
             onClick={handleAddTopic}
             disabled={topics.length >= 15}
           >
-            add another theme
+            Add another topic
           </button>
         </div>
       </div>
