@@ -272,7 +272,7 @@ const ChooseTopics = ({
           <button
             className={styles.anothaOne}
             onClick={handleAddTopic}
-            disabled={topics.length >= 4}
+            disabled={topics.length > 15}
           >
             add another theme
           </button>
@@ -758,7 +758,7 @@ const AdminPage = ({ params }: { params: { roomCode: string } }) => {
   const [quizzerUsername, setQuizzerUsername] = useState('');
   const [questionCreatingTime, setQuestionCreatingTime] = useState<number>(0);
   const [questionAnsweringTime, setQuestionAnsweringTime] = useState<number>(0);
-  const [topics, setTopics] = useState<string[]>(['']);
+  const [topics, setTopics] = useState<string[]>(['', '', '']);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const [question, setQuestion] = useState<SlateValue>([]);
   const [hint, setHint] = useState<string>('');
