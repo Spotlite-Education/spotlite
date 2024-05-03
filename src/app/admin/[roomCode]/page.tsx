@@ -255,7 +255,7 @@ const ChooseTopics = ({
               <div className={styles.index}>{i + 1}.</div>
               <div className={styles.inputWrapper}>
                 <input
-                  autoFocus
+                  autoFocus={i === 0}
                   placeholder="Enter a topic here!!"
                   value={topic}
                   onChange={e => handleEditTopic(i, e.target.value)}
