@@ -272,7 +272,7 @@ const ChooseTopics = ({
           <button
             className={styles.anothaOne}
             onClick={handleAddTopic}
-            disabled={topics.length > 15}
+            disabled={topics.length >= 15}
           >
             add another theme
           </button>
@@ -289,7 +289,7 @@ const ChooseTopics = ({
           className={styles.startGame}
           disabled={
             topics.length === 0 ||
-            topics.filter(topic => topic.length > 0).length === 0
+            topics.filter(topic => topic.length > 0).length !== topics.length
           }
           onClick={() => handleStartGame()}
         >
