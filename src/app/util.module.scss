@@ -1,3 +1,14 @@
+@mixin grid-bg {
+  background-size: var(--grid-tile-size) var(--grid-tile-size);
+  background-image: linear-gradient(
+      to right,
+      var(--grid-color) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-position: center;
+}
+
 @mixin text-shadow($x: 4px, $y: 4px) {
   text-shadow: $x $y rgba(0, 0, 0, 0.25);
 }

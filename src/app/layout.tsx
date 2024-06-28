@@ -1,11 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { COMICO, PP_NEUE_MONTREAL } from './util/fonts';
-import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
-import './theme-config.css';
+import { COMICO, PANGOLIN } from './util/fonts';
 import './globals.scss';
-import { Providers } from './components/Providers';
 
 export const metadata: Metadata = {
   title: 'Spotlite!',
@@ -17,12 +12,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log(PANGOLIN.className);
+
   return (
     <html lang="en">
       <body
-        className={`${COMICO.className} ${COMICO.variable} ${PP_NEUE_MONTREAL.variable}`}
+        className={`${PANGOLIN.className} ${PANGOLIN.variable} ${COMICO.variable}`}
       >
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );

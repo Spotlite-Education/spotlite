@@ -1,220 +1,84 @@
-.wrapper {
+@use './util.module.scss' as util;
+
+.main {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+
+  @include util.grid-bg();
 }
 
-.home {
-  position: relative;
+.header {
   width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: 1fr auto;
+  height: 10rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2.5rem 5rem;
 
-  .spotlight {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 40rem;
-    height: 40rem;
-    z-index: -1;
+  .spotlite {
+    width: 4.5rem;
+    height: 4.5rem;
     border-radius: 99rem;
-    background-color: var(--brand-color);
-    background-blend-mode: difference;
-    transition: opacity 0.5s, top 0.35s ease-out, left 0.35s ease-out;
-  }
-
-  .corner {
-    position: absolute;
-    top: -35rem;
-    right: -50rem;
-    width: 100rem;
-    height: 50rem;
-    transform: rotate(20deg);
-    background-color: var(--brand-color);
+    background-color: var(--orange);
   }
 
   .teacherMode {
-    position: absolute;
-    top: 3.5rem;
-    right: 3rem;
-    transform: rotate(5deg);
-    color: var(--off-white);
-    font-size: 2.5rem;
-  }
-
-  .content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 10rem;
-  }
-
-  .title {
-    color: var(--accent-color);
-    font-size: 15rem;
-  }
-
-  .roomCodeInputWrapper {
-    position: relative;
-    width: 55rem;
-    margin-bottom: 7.5rem;
-
-    &::after {
-      content: '_________';
-      pointer-events: none;
-      position: absolute;
-      bottom: -2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      width: max-content;
-      display: inline-block;
-      color: var(--accent-color);
-      font-size: 10rem;
-    }
-  }
-
-  .roomCodeInput {
-    position: relative;
-    width: 100%;
-    height: auto;
-    font-size: 10rem;
-    text-align: center;
-    border: none;
-    letter-spacing: 5px;
-    background: none;
-
-    &::placeholder {
-      opacity: 0.5;
-      font-size: 6.5rem;
-      letter-spacing: normal;
-    }
-
-    &:focus {
-      outline: none;
-    }
-  }
-
-  .play {
-    padding: 0.5rem 2.5rem;
-    border: none;
+    padding: 1rem 2.5rem;
     border-radius: 99rem;
     color: var(--off-white);
-    font-size: 2.5rem;
-    background-color: var(--accent-color);
-  }
-
-  .footer {
-    width: 100%;
-    height: 5rem;
-    display: grid;
-    grid-template-columns: 25% 50% 25%;
-    align-items: center;
-    padding: 0 2.5rem;
-    color: var(--off-white);
-    background-color: var(--brand-color);
-
-    * {
-      font-size: 1.4rem;
-    }
-
-    .legal {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .center {
-      display: flex;
-      justify-content: center;
-    }
-
-    .copyright {
-      display: flex;
-      justify-content: flex-end;
-    }
+    font-size: 2rem;
+    background-color: var(--purple);
   }
 }
 
-.nameSelect {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-rows: 1fr auto;
+.centerContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5rem;
+  .tag {
+    padding: 0.75rem 2rem;
+    border-radius: 99rem;
+    font-size: 1.8rem;
+    background-color: var(--canvas-color);
+  }
 
-    .logo {
-      position: absolute;
-      top: 2.5rem;
-      left: 2.5rem;
-    }
+  .roomCodeInput {
+    margin-top: 5rem;
 
-    .iconNameWrapper {
-      display: flex;
-      gap: 10rem;
+    input {
+      padding: 1rem 2.5rem;
+      border: none;
+      font-size: 5rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1rem;
+      background: none;
 
-      .title {
-        font-size: 3.5rem;
-        text-align: center;
-        margin: 2rem;
+      &:focus {
+        outline: none;
       }
 
-      .icon {
-        background-color: transparent;
-
-        .iconImg {
-          width: 25rem;
-          height: 25rem;
-        }
-        :hover {
-          transform: scale(1.1);
-        }
-      }
-      .inputWrapper {
-        position: relative;
-
-        &::after {
-          pointer-events: none;
-          content: '______________';
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-          color: var(--brand-color);
-          font-size: 7.5rem;
-        }
-
-        input {
-          width: 14ch;
-          border: none;
-          font-size: 5rem;
-          text-align: center;
-          background: none;
-
-          &:focus {
-            outline: none;
-          }
-
-          &::placeholder {
-            opacity: 0.5;
-            color: var(--brand-color);
-          }
-        }
+      &::placeholder {
+        text-transform: none;
+        letter-spacing: 0.1rem;
       }
     }
   }
 
-  .footer {
-    width: 100%;
-    height: 5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--off-white);
-    background-color: var(--brand-color);
+  .join {
+    margin-top: 2.5rem;
+    background-color: var(--purple);
   }
+}
+
+.footer {
+  height: 10rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5rem;
 }

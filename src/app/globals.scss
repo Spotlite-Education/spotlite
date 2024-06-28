@@ -1,18 +1,21 @@
 :root {
-  --off-white: rgb(252, 249, 245);
-  --dark-text: #1b1b1b;
+  --off-white: #fcf9f5;
+  --off-dark: #1b1b1b;
 
-  color: var(--dark-text);
+  color: var(--off-dark);
   font-size: 62.5%;
 
-  --brand-color: #ffa800;
-  --accent-color: rgb(128, 0, 255);
+  --orange: #ffbd5a;
+  --orange-shadow: #ffdda9;
 
-  --canvas-color: #f8f7f4;
+  --purple: #8000ff;
+  --purple-shadow: #c495ff;
+
+  --canvas-color: #f4ede8;
   --correct-color: #37d200;
 
-  --input-fill-primary: rgba(255, 247, 221, 0.51);
-  --input-text-color: #da8506;
+  --grid-color: rgba(74, 174, 255, 0.15);
+  --grid-tile-size: 80px;
 
   background-color: var(--off-white);
 }
@@ -22,9 +25,8 @@
   padding: 0;
   margin: 0;
 
-  font-family: var(--font-redhat);
+  font-family: var(--font-pangolin);
   font-size: 1.8rem;
-  font-weight: 700;
 }
 
 button,

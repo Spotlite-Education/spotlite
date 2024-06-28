@@ -1,55 +1,114 @@
 'use client';
+import { useEffect, useState } from 'react';
 import styles from './page.module.scss';
 import { useRouter } from 'next/navigation';
-import { SOCKET_URL } from '../../context/socket';
-import socket from '../../context/socket';
-import { Logo } from '../components/Logo';
 import { UnstyledLink } from '../components/UnstyledLink';
-import { MouseEvent } from 'react';
+import Image from 'next/image';
 
-const HostRoom = () => {
+const TeacherLanding = () => {
+  const [creatingGame, setCreatingGame] = useState(false);
   const router = useRouter();
 
-  const handleCreateRoom = (e: MouseEvent<HTMLButtonElement>) => {
-    fetch(SOCKET_URL + '/createRoom', { method: 'POST' })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        sessionStorage.setItem('sessionToken', data.admin.id);
-        socket.emit('join', 'admin', data.room.code, data.admin.id);
-        router.push('/admin/' + data.room.code);
+  // validate session on page load, rejoining game if possible
+  useEffect(() => {
+    const validateSession = async () => {
+      const sessionID = sessionStorage.getItem('sessionID');
+      if (!sessionID) {
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          'http://localhost:8000/api/game/validateSession',
+          {
+            method: 'POST',
+            body: JSON.stringify({ sessionID }),
+          }
+        );
+
+        if (res.status === 200) {
+          const { valid } = await res.json();
+          if (valid) {
+            router.replace('/play');
+          } else {
+            sessionStorage.removeItem('sessionID');
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    validateSession();
+  }, []);
+
+  const handleCreateGame = async () => {
+    if (creatingGame) return;
+
+    try {
+      setCreatingGame(true);
+
+      const res = await fetch('http://localhost:8000/api/game/create', {
+        method: 'POST',
       });
+
+      if (res.status === 200) {
+        const { adminSessionID } = await res.json();
+        if (!adminSessionID) {
+          return;
+        }
+
+        sessionStorage.setItem('sessionID', adminSessionID);
+        router.push('/play');
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCreatingGame(false);
+    }
   };
 
   return (
-    <main className={styles.wrapper}>
-      <div className={styles.content}>
-        <div className={styles.corner} />
-        <UnstyledLink href="/">
-          <div className={styles.studentMode}>Student Mode!</div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <UnstyledLink
+          href="https://spotlite-education.vercel.app"
+          target="_blank"
+        >
+          <div className={styles.spotlite} />
         </UnstyledLink>
-
-        <Logo size="xl" />
-        <div className={styles.forTeachers}>For Teachers</div>
-        <button className={styles.hostGame} onClick={handleCreateRoom}>
+        <UnstyledLink href="/">
+          <button className={styles.studentMode}>Student Mode!</button>
+        </UnstyledLink>
+      </div>
+      <div className={styles.centerContent}>
+        <Image
+          priority
+          src="/Spotlite_Logo.svg"
+          width={550}
+          height={150}
+          alt="Spotlite Logo"
+        />
+        <div className={styles.tag}>For Teachers</div>
+        <button
+          className={styles.createGame}
+          onClick={handleCreateGame}
+          disabled={creatingGame}
+        >
           Create Game!
         </button>
       </div>
       <div className={styles.footer}>
-        <div className={styles.legal}>
-          <UnstyledLink href="/">Terms & Conditions</UnstyledLink>
-          <UnstyledLink href="/">Privacy Policy</UnstyledLink>
-        </div>
-        <div className={styles.center}>
-          <UnstyledLink href="/">
-            See what other creative minds have made at spotlite.org
-          </UnstyledLink>
-        </div>
-        <div className={styles.copyright}>Copyright © 2024 Spotlite</div>
+        <UnstyledLink
+          href="https://spotlite-education.vercel.app/contact"
+          target="_blank"
+        >
+          Contact Us!
+        </UnstyledLink>
+        <span>;)</span>
       </div>
     </main>
   );
 };
 
-export default HostRoom;
+export default TeacherLanding;

@@ -1,187 +1,92 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import socket, { SOCKET_URL } from '../context/socket';
-import { Logo } from './components/Logo';
-import { UnstyledLink } from './components/UnstyledLink';
+import { useEffect, useState } from 'react';
 import styles from './page.module.scss';
-import { FaChevronRight } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
+import { UnstyledLink } from './components/UnstyledLink';
+import Image from 'next/image';
 
-const NameSelect = ({
-  roomCode,
-  handleJoin,
-  handleChangeUsername,
-}: {
-  roomCode: string;
-  handleJoin: (e: React.FormEvent<HTMLFormElement>) => void;
-  handleChangeUsername: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => {
-  const icons = [
-    'catscaled.png',
-    'dogscaled.png',
-    'frogscaled.png',
-    'bunnyscaled.png',
-    'horsescaled.png',
-  ];
-  const [currentIconIndex, setCurrentIconIndex] = useState(1);
-  const [currentIcon, setCurrentIcon] = useState('/catscaled.png');
+const StudentLanding = () => {
+  const [roomCode, setRoomCode] = useState<string>('');
+  const router = useRouter();
 
-  const changeIcon = () => {
-    setCurrentIcon('/' + icons[currentIconIndex % icons.length]);
-    setCurrentIconIndex(currentIconIndex + 1);
-  };
-
-  return (
-    <div className={styles.nameSelect}>
-      <div className={styles.content}>
-        <div className={styles.logo}>
-          <Logo color="black" />
-        </div>
-        <div className={styles.iconNameWrapper}>
-          <button onClick={changeIcon} className={styles.icon}>
-            <img className={styles.iconImg} src={currentIcon}></img>
-          </button>
-          <div>
-            <div className={styles.title}>What&apos;s your name?</div>
-            <div className={styles.inputWrapper}>
-              <form style={{ all: 'unset' }} onSubmit={e => handleJoin(e)}>
-                <input
-                  maxLength={15}
-                  placeholder="Name Here"
-                  autoFocus
-                  onChange={e => handleChangeUsername(e)}
-                />
-                <FaChevronRight></FaChevronRight>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className={styles.footer}>You are joining room {roomCode}</div>
-    </div>
-  );
-};
-
-const Spotlight = () => {
-  const [pos, setPos] = useState<{ x: string; y: string }>();
-
+  // validate session on page load, rejoining game if possible
   useEffect(() => {
-    const changePosition = setInterval(() => {
-      setPos({
-        x: `${Math.random() * 85 + 5}%`,
-        y: `${Math.random() * 85 + 5}%`,
-      });
-    }, (Math.random() * 3 + 1) * 1000);
+    const validateSession = async () => {
+      const sessionID = sessionStorage.getItem('sessionID');
+      if (!sessionID) {
+        return;
+      }
 
-    return () => {
-      clearInterval(changePosition);
+      try {
+        const res = await fetch(
+          'http://localhost:8000/api/game/validateSession',
+          {
+            method: 'POST',
+            body: JSON.stringify({ sessionID }),
+          }
+        );
+
+        if (res.status === 200) {
+          const { valid } = await res.json();
+          if (valid) {
+            router.replace('/play');
+          } else {
+            sessionStorage.removeItem('sessionID');
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
     };
+
+    validateSession();
   }, []);
 
   return (
-    <div
-      className={styles.spotlight}
-      style={{ opacity: pos ? 0.65 : 0, top: pos?.y, left: pos?.x }}
-    />
-  );
-};
-
-const Home = () => {
-  const [roomCode, setRoomCode] = useState('');
-
-  const [chooseUser, setChooseUser] = useState(false);
-  const [username, setUsername] = React.useState('');
-
-  const router = useRouter();
-
-  const handleJoin = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (username.replace(/\s/g, '').length === 0) {
-      return;
-    }
-
-    socket.emit(
-      'join',
-      username,
-      roomCode,
-      sessionStorage.getItem('sessionToken')
-    );
-    router.push('/' + roomCode);
-  };
-
-  const handleChangeUsername = (e: ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
-  };
-
-  const handleSubmitRoomCode = (e: FormEvent) => {
-    e.preventDefault();
-    fetch(SOCKET_URL + '/authenticate?roomCode=' + roomCode.toUpperCase(), {
-      method: 'GET',
-    })
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        if (data.sessionToken != null) {
-          sessionStorage.setItem('sessionToken', data.sessionToken);
-          setChooseUser(true);
-        }
-      });
-  };
-
-  return (
-    <main className={styles.wrapper}>
-      {chooseUser ? (
-        <NameSelect
-          roomCode={roomCode}
-          handleJoin={handleJoin}
-          handleChangeUsername={handleChangeUsername}
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <UnstyledLink
+          href="https://spotlite-education.vercel.app"
+          target="_blank"
+        >
+          <div className={styles.spotlite} />
+        </UnstyledLink>
+        <UnstyledLink href="/host">
+          <button className={styles.teacherMode}>Teacher Mode!</button>
+        </UnstyledLink>
+      </div>
+      <div className={styles.centerContent}>
+        <Image
+          priority
+          src="/Spotlite_Logo.svg"
+          width={550}
+          height={150}
+          alt="Spotlite Logo"
         />
-      ) : (
-        <div className={styles.home}>
-          <div className={styles.content}>
-            <Spotlight />
-            <div className={styles.corner} />
-            <UnstyledLink href="/host">
-              <div className={styles.teacherMode}>Teacher Mode!</div>
-            </UnstyledLink>
-
-            <Logo size="xl" />
-            <form
-              className={styles.roomCodeInputWrapper}
-              onSubmit={e => handleSubmitRoomCode(e)}
-            >
-              <input
-                className={styles.roomCodeInput}
-                placeholder="Room Code"
-                maxLength={6}
-                autoCorrect="off"
-                autoFocus
-                value={roomCode}
-                onChange={e => setRoomCode(e.target.value.toUpperCase())}
-              />
-            </form>
-            <button className={styles.play} onClick={handleSubmitRoomCode}>
-              Play!
-            </button>
-          </div>
-          <div className={styles.footer}>
-            <div className={styles.legal}>
-              <UnstyledLink href="/">Terms & Conditions</UnstyledLink>
-              <UnstyledLink href="/">Privacy Policy</UnstyledLink>
-            </div>
-            <div className={styles.center}>
-              <UnstyledLink href="/">
-                See what other creative minds have made at spotlite.org
-              </UnstyledLink>
-            </div>
-            <div className={styles.copyright}>Copyright © 2024 Spotlite</div>
-          </div>
+        <div className={styles.tag}>For Students</div>
+        <div className={styles.roomCodeInput}>
+          <input
+            value={roomCode}
+            onChange={e => setRoomCode(e.target.value)}
+            placeholder="Room Code"
+            maxLength={6}
+          />
         </div>
-      )}
+        <button className={styles.join} disabled={roomCode.length !== 6}>
+          Join Game!
+        </button>
+      </div>
+      <div className={styles.footer}>
+        <UnstyledLink
+          href="https://spotlite-education.vercel.app/contact"
+          target="_blank"
+        >
+          Contact Us!
+        </UnstyledLink>
+        <span>;)</span>
+      </div>
     </main>
   );
 };
 
-export default Home;
+export default StudentLanding;
