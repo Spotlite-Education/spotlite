@@ -12,8 +12,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log(PANGOLIN.className);
-
   return (
     <html lang="en">
       <body
