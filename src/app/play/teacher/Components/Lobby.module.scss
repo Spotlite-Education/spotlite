@@ -1,0 +1,181 @@
+@use '../../../util.module.scss' as util;
+
+.main {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include util.grid-bg();
+}
+
+.settings {
+  position: absolute;
+  top: 12.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 0 1.5rem;
+  border-radius: 10px;
+  color: var(--off-white);
+  background-color: var(--purple);
+
+  .timeSetting {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .label {
+      font-size: 2rem;
+    }
+
+    .buttons {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      button {
+        width: 3.5rem;
+        height: 3.5rem;
+        padding: 0;
+        border-radius: 99rem;
+        color: var(--off-white);
+        text-align: center;
+        background-color: var(--purple-shadow);
+      }
+    }
+  }
+
+  .buttonSetting {
+    height: 3.5rem;
+    padding: 0 2rem;
+    color: var(--off-dark);
+    font-size: 1.8rem;
+    background-color: var(--orange);
+  }
+}
+
+.centerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .tag {
+    padding: 0.75rem 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 99rem;
+    background-color: var(--canvas-color);
+  }
+
+  .roomCode {
+    color: var(--purple);
+    font-size: 12.5rem;
+  }
+
+  .selectTopics {
+    margin-top: 5rem;
+    background-color: var(--purple);
+  }
+}
+
+.chooseTopics {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+
+  .centerContent {
+    width: 100%;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .title {
+      color: var(--purple);
+      font-size: 7.5rem;
+    }
+
+    .buttonRow {
+      display: flex;
+      gap: 3.5rem;
+
+      button {
+        margin-top: 3.5rem;
+        margin-bottom: 6.5rem;
+      }
+
+      .goBack,
+      .addTopic {
+        background-color: var(--purple);
+      }
+
+      .startGame {
+        color: var(--off-dark);
+        background-color: var(--orange);
+      }
+    }
+
+    .topicsNarrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3.5rem;
+    }
+
+    .topicsWide {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      row-gap: 3.5rem;
+      column-gap: 5rem;
+    }
+
+    .topic {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+
+      .index {
+        min-width: 4rem;
+        min-height: 4rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 99rem;
+        color: var(--off-white);
+        background-color: var(--purple);
+      }
+
+      input {
+        width: min(35rem, 100%);
+        height: 4rem;
+        border: none;
+        font-size: 3rem;
+        background: none;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .removeTopic {
+        width: 10rem;
+        height: 3.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--off-dark);
+        background-color: var(--canvas-color);
+      }
+    }
+  }
+
+  @include util.grid-bg();
+}
