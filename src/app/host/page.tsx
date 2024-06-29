@@ -4,43 +4,15 @@ import styles from './page.module.scss';
 import { useRouter } from 'next/navigation';
 import { UnstyledLink } from '../components/UnstyledLink';
 import Image from 'next/image';
+import { useValidateSession } from '../hooks/useValidateSession';
 
 const TeacherLanding = () => {
   const [creatingGame, setCreatingGame] = useState(false);
   const router = useRouter();
 
-  // validate session on page load, rejoining game if possible
-  useEffect(() => {
-    const validateSession = async () => {
-      const sessionID = sessionStorage.getItem('sessionID');
-      if (!sessionID) {
-        return;
-      }
-
-      try {
-        const res = await fetch(
-          'http://localhost:8000/api/game/validateSession',
-          {
-            method: 'POST',
-            body: JSON.stringify({ sessionID }),
-          }
-        );
-
-        if (res.status === 200) {
-          const { valid } = await res.json();
-          if (valid) {
-            router.replace('/play');
-          } else {
-            sessionStorage.removeItem('sessionID');
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    validateSession();
-  }, []);
+  useValidateSession({
+    validCallback: () => router.replace('/play'),
+  });
 
   const handleCreateGame = async () => {
     if (creatingGame) return;
@@ -59,7 +31,7 @@ const TeacherLanding = () => {
         }
 
         sessionStorage.setItem('sessionID', adminSessionID);
-        router.push('/play');
+        router.replace('/play');
       }
     } catch (error) {
       console.error(error);
@@ -85,7 +57,7 @@ const TeacherLanding = () => {
         <Image
           priority
           src="/Spotlite_Logo.svg"
-          width={550}
+          width={600}
           height={150}
           alt="Spotlite Logo"
         />

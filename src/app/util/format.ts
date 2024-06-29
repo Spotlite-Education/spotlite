@@ -1,17 +1,8 @@
-// formats seconds into hh:mm:ss
-export const formatSeconds = (time: number): string => {
-  const hours = Math.floor(time / (60 * 60));
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-
-  let formatted = '';
-  if (hours > 0) {
-    formatted += hours + ':';
-  }
-  formatted += minutes + ':';
-  formatted += seconds < 10 ? '0' + seconds : seconds;
-
-  return formatted;
+// formats seconds into mm:ss
+export const formatSeconds = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 export const formatRank = (rank: number): string => {
