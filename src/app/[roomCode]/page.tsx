@@ -489,12 +489,28 @@ const QuestionCreation = ({
   const [slateUndos, setSlateUndos] = useState<SlateValue>([]);
 
   const [answer, setAnswer] = useState<string>('');
+  const [verified, setVerified] = useState<boolean>(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     socket.emit('submitQuestion', question, answer);
     changeStatus('questionSubmitted');
+  };
+
+  const handleVerify = () => {
+    socket.emit(
+      'verifyQuestion',
+      question,
+      answer,
+      (correct: boolean, feedback: string) => {
+        if (correct) {
+          setVerified(true);
+        } else {
+          alert(feedback);
+        }
+      },
+    );
   };
 
   const timeLeft = formatSeconds(secondsLeft);
@@ -553,11 +569,18 @@ const QuestionCreation = ({
             />
           </div>
           <button
-            className={styles.submit}
+            className={styles.verify}
             disabled={
               question.replace(/\s/g, '').length === 0 ||
               answer.replace(/\s/g, '').length === 0
             }
+            onClick={handleVerify}
+          >
+            Verify Question
+          </button>
+          <button
+            className={styles.submit}
+            disabled={!verified}
             onClick={handleSubmit}
           >
             Submit It!
@@ -678,7 +701,7 @@ const AnswerQuestion = ({
                   <div className={styles.guesser}>{guess.player.username}:</div>
                   <div className={styles.guess}>{guess.guess}</div>
                 </div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -745,7 +768,7 @@ const AnswerResult = ({
                 <div key={i} className={styles.guess}>
                   {guess.player.username}: {guess.guess}
                 </div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -911,7 +934,7 @@ const QuestionSpotlight = ({ secondsLeft }: { secondsLeft: number }) => {
               >
                 {guess.player.username} guessed: {guess.guess}
               </div>
-            )
+            ),
           )}
         </div>
       </div>
@@ -937,7 +960,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
   const [isQuizzer, setIsQuizzer] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0.2 * 60);
   const [studentInfo, setStudentInfo] = useState<StudentInfo>(
-    {} as StudentInfo
+    {} as StudentInfo,
   );
 
   const changeStatus = (newStatus: string) => {
@@ -964,7 +987,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             setStudentInfo(info);
           });
           setIsQuizzer(
-            sessionStorage.getItem('sessionToken') == game.quizzer.id
+            sessionStorage.getItem('sessionToken') == game.quizzer.id,
           );
           changeStatus('showQuizzer');
           break;
@@ -975,7 +998,7 @@ const Room = ({ params }: { params: { roomCode: string } }) => {
             setStudentInfo(info);
           });
           setIsQuizzer(
-            sessionStorage.getItem('sessionToken') == game.quizzer.id
+            sessionStorage.getItem('sessionToken') == game.quizzer.id,
           );
           if (isQuizzer) {
             changeStatus('questionSpotlight');

@@ -397,6 +397,11 @@
         }
       }
 
+      .verify {
+        font-size: 3rem;
+        background-color: var(--accent-color);
+      }
+
       .submit {
         font-size: 3rem;
         background-color: var(--brand-color);
@@ -620,7 +625,9 @@
       background-color: transparent;
       backdrop-filter: blur(10px);
       font-size: 2.5rem;
-      transition: backdrop-filter 0.15s, color 0.15s;
+      transition:
+        backdrop-filter 0.15s,
+        color 0.15s;
       background: rgba(255, 255, 255, 0.6);
       user-select: none;
 
