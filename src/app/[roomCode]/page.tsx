@@ -12,7 +12,13 @@ import { formatRank, formatSeconds } from '../util/format';
 import { useRouter } from 'next/navigation';
 import socket from '../../context/socket';
 import { Logo } from '../components/Logo';
-import { MdClose, MdDelete, MdFunctions, MdTextFields } from 'react-icons/md';
+import {
+  MdClose,
+  MdDelete,
+  MdCheck,
+  MdFunctions,
+  MdTextFields,
+} from 'react-icons/md';
 import { RiAddFill, RiEraserFill, RiSubtractFill } from 'react-icons/ri';
 import { Inset, Popover } from '@radix-ui/themes';
 import { RgbColorPicker } from 'react-colorful';
@@ -499,18 +505,13 @@ const QuestionCreation = ({
   };
 
   const handleVerify = () => {
-    socket.emit(
-      'verifyQuestion',
-      question,
-      answer,
-      (correct: boolean, feedback: string) => {
-        if (correct) {
-          setVerified(true);
-        } else {
-          alert(feedback);
-        }
-      },
-    );
+    socket.emit('verifyQuestion', question, answer, (feedback: string) => {
+      if (feedback.toUpperCase().startsWith('CORRECT')) {
+        setVerified(true);
+      } else {
+        alert(feedback);
+      }
+    });
   };
 
   const timeLeft = formatSeconds(secondsLeft);
@@ -549,7 +550,10 @@ const QuestionCreation = ({
         <textarea
           className={styles.textarea}
           value={question}
-          onChange={e => setQuestion(e.target.value)}
+          onChange={e => {
+            setQuestion(e.target.value);
+            if (verified) setVerified(false);
+          }}
           autoFocus
           placeholder="Write your question here! Try to be creative..."
           maxLength={400}
@@ -564,7 +568,10 @@ const QuestionCreation = ({
                 canvasHovered
               }
               maxLength={20}
-              onChange={e => setAnswer(e.target.value)}
+              onChange={e => {
+                setAnswer(e.target.value);
+                if (verified) setVerified(false);
+              }}
               placeholder="Type here... (20 characters max)"
             />
           </div>
@@ -576,7 +583,21 @@ const QuestionCreation = ({
             }
             onClick={handleVerify}
           >
-            Verify Question
+            {verified ? (
+              <>
+                Verified!
+                <MdCheck
+                  style={{
+                    color: 'white',
+                    transform: 'scale(2)',
+                    marginLeft: '2rem',
+                    marginRight: '1rem',
+                  }}
+                />
+              </>
+            ) : (
+              <>Verify question</>
+            )}
           </button>
           <button
             className={styles.submit}
