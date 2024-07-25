@@ -1,0 +1,20 @@
+@use '../../../util.module.scss' as util;
+
+.wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  @include util.grid-bg();
+
+  .title {
+    margin-bottom: 2rem;
+    font-size: 3.5rem;
+  }
+
+  .secondsLeft {
+    color: var(--purple);
+    font-size: 15rem;
+  }
+}

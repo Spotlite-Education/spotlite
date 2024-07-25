@@ -31,10 +31,18 @@
   font-size: 1.8rem;
 }
 
+body {
+  cursor: url('/cursors/default.png') 3 3, default;
+}
+
+input:hover {
+  cursor: url('/cursors/text.png') 16 18, text;
+}
+
 button,
 a {
   &:hover {
-    cursor: pointer;
+    cursor: url('/cursors/pointer.png') 16 16, pointer;
   }
 }
 

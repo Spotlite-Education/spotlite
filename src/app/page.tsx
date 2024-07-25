@@ -50,7 +50,6 @@ const UsernameCharacterSelect = ({
     try {
       setLoading(true);
       const characterID = CHARACTERS[characterIndex];
-      console.log({ gameID, username, characterID });
 
       const res = await fetch('http://localhost:8000/api/game/join', {
         method: 'POST',
@@ -74,6 +73,12 @@ const UsernameCharacterSelect = ({
             break;
           case 'game/nonexistent':
             clearGameID();
+            break;
+          case 'game/full_capacity':
+            setError('Game is full!');
+            break;
+          case 'game/locked':
+            setError('Game is locked!');
             break;
           default:
             setError('Sorry, an unknown error occurred!');
@@ -101,23 +106,36 @@ const UsernameCharacterSelect = ({
           radiusY={50}
         />
       </div>
-      <input
-        className={styles.usernameInput}
-        value={username}
-        onChange={e => {
-          setUsername(e.target.value);
-          setError('');
+      <form
+        className={styles.form}
+        onSubmit={e => {
+          e.preventDefault();
+          if (!allowJoin || loading) {
+            return;
+          }
+
+          handleAttemptJoinGame();
         }}
-        placeholder="Your Username"
-        maxLength={20}
-      />
-      <button
-        className={styles.join}
-        onClick={handleAttemptJoinGame}
-        disabled={!allowJoin || loading}
       >
-        Join Game!
-      </button>
+        <input
+          className={styles.usernameInput}
+          value={username}
+          onChange={e => {
+            setUsername(e.target.value);
+            setError('');
+          }}
+          placeholder="Your Username"
+          maxLength={20}
+          autoFocus
+        />
+        <button
+          className={styles.join}
+          type="submit"
+          disabled={!allowJoin || loading}
+        >
+          Join Game!
+        </button>
+      </form>
       <span className={styles.error}>{error}</span>
     </div>
   );
@@ -195,21 +213,34 @@ const StudentLanding = () => {
           alt="Spotlite Logo"
         />
         <div className={styles.tag}>For Students</div>
-        <div className={styles.roomCodeInput}>
-          <input
-            value={roomCode}
-            onChange={e => setRoomCode(e.target.value)}
-            placeholder="Room Code"
-            maxLength={6}
-          />
-        </div>
-        <button
-          className={styles.join}
-          disabled={roomCode.length !== 6 || checkingGameJoinable}
-          onClick={handleCheckGameJoinable}
+        <form
+          className={styles.form}
+          onSubmit={e => {
+            e.preventDefault();
+            if (roomCode.length !== 6 || checkingGameJoinable) {
+              return;
+            }
+
+            handleCheckGameJoinable();
+          }}
         >
-          Join Game!
-        </button>
+          <div className={styles.roomCodeInput}>
+            <input
+              value={roomCode}
+              onChange={e => setRoomCode(e.target.value.toUpperCase())}
+              placeholder="Room Code"
+              maxLength={6}
+              autoFocus
+            />
+          </div>
+          <button
+            className={styles.join}
+            type="submit"
+            disabled={roomCode.length !== 6 || checkingGameJoinable}
+          >
+            Join Game!
+          </button>
+        </form>
       </div>
       <div className={styles.footer}>
         <UnstyledLink

@@ -1,5 +1,11 @@
 @use './util.module.scss' as util;
 
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .main {
   width: 100vw;
   height: 100vh;
@@ -70,6 +76,7 @@
   }
 
   .join {
+    width: max-content;
     margin-top: 2.5rem;
     background-color: var(--purple);
   }
@@ -116,6 +123,7 @@
 
   .join {
     padding: 1rem 2.5rem;
+    margin-top: 3.5rem;
     border-radius: 99rem;
     color: var(--off-white);
     background-color: var(--purple);

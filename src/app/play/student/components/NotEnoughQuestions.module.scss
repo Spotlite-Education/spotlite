@@ -1,0 +1,30 @@
+@use '../../../util.module.scss' as util;
+
+.wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  @include util.grid-bg();
+
+  .title {
+    margin-bottom: 1.5rem;
+    font-size: 10rem;
+
+    &.submitted {
+      color: var(--purple);
+    }
+    &.notSubmitted {
+      color: var(--red);
+    }
+  }
+
+  .description {
+    max-width: 75ch;
+    font-size: 2rem;
+    text-align: center;
+    line-height: 150%;
+  }
+}

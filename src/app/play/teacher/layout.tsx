@@ -7,7 +7,6 @@ import { UnstyledLink } from '@/app/components/UnstyledLink';
 
 const EnsureTeacher = ({ children }: { children: React.ReactNode }) => {
   const gameState = useContext(GameStateContext);
-  const router = useRouter();
 
   if (!gameState) {
     return null;

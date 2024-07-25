@@ -5,9 +5,13 @@ import styles from './Lobby.module.scss';
 import { useState } from 'react';
 
 const ChooseTopics = ({
+  roomCode,
+  numPlayers,
   cachedTopics,
   returnToLobby,
 }: {
+  roomCode: string;
+  numPlayers: number;
   cachedTopics: string[];
   returnToLobby: Function;
 }) => {
@@ -35,9 +39,18 @@ const ChooseTopics = ({
 
   const nonEmptyTopics = topics.filter(topic => topic.trim() !== '').length;
 
+  const [startingGame, setStartingGame] = useState<boolean>(false);
+  const handleStartGame = () => {
+    if (startingGame) return;
+
+    setStartingGame(true);
+    socket.emit('startGame', topics);
+  };
+
   return (
     <main className={styles.chooseTopics}>
       <div className={styles.centerContent}>
+        <span className={styles.roomCode}>Room Code: {roomCode}</span>
         <span className={styles.title}>Question Topics</span>
         <span>4 Required to Start Game</span>
         <div className={styles.buttonRow}>
@@ -54,7 +67,11 @@ const ChooseTopics = ({
           >
             Add Another
           </button>
-          <button className={styles.startGame} disabled={nonEmptyTopics < 4}>
+          <button
+            className={styles.startGame}
+            disabled={nonEmptyTopics < 4 || numPlayers < 2}
+            onClick={handleStartGame}
+          >
             Start Game
           </button>
         </div>
@@ -70,6 +87,7 @@ const ChooseTopics = ({
                 value={topic}
                 placeholder="Enter Topic Here..."
                 onChange={e => handleUpdateTopic(i, e.target.value)}
+                maxLength={20}
               />
               {topics.length > 4 ? (
                 <button
@@ -88,9 +106,12 @@ const ChooseTopics = ({
 };
 
 export const Lobby = ({ gameState }: { gameState: GameState }) => {
-  const [cachedTopics, setCachedTopics] = useState<string[]>(
-    new Array(4).fill('')
-  );
+  const [cachedTopics, setCachedTopics] = useState<string[]>([
+    'Topic 1',
+    'Topic 2',
+    'Topic 3',
+    'Topic 4',
+  ]);
   const [choosingTopics, setChoosingTopics] = useState(false);
 
   const returnToLobbyAndCacheTopics = (topics: string[]) => {
@@ -101,6 +122,8 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
   if (choosingTopics) {
     return (
       <ChooseTopics
+        roomCode={gameState.ID}
+        numPlayers={gameState.players.length}
         cachedTopics={cachedTopics}
         returnToLobby={returnToLobbyAndCacheTopics}
       />
@@ -124,23 +147,25 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
     socket.emit('toggleRoomLock');
   };
 
+  const gameSettings = gameState.settings!;
+
   return (
     <main className={styles.main}>
       <div className={styles.settings}>
         <div className={styles.timeSetting}>
           <span className={styles.label}>
             Question Making:{' '}
-            {formatSeconds(gameState.settings.questionMakingTimeSeconds)}
+            {formatSeconds(gameSettings.questionMakingTimeSeconds)}
           </span>
           <div className={styles.buttons}>
             <button
               className={styles.button}
               onClick={() =>
                 handleUpdateQuestionMakingTime(
-                  gameState.settings.questionMakingTimeSeconds + 30
+                  gameSettings.questionMakingTimeSeconds + 30
                 )
               }
-              disabled={gameState.settings.questionMakingTimeSeconds >= 60 * 10}
+              disabled={gameSettings.questionMakingTimeSeconds >= 60 * 10}
             >
               +
             </button>
@@ -148,10 +173,10 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
               className={styles.button}
               onClick={() =>
                 handleUpdateQuestionMakingTime(
-                  gameState.settings.questionMakingTimeSeconds - 30
+                  gameSettings.questionMakingTimeSeconds - 30
                 )
               }
-              disabled={gameState.settings.questionMakingTimeSeconds <= 30}
+              disabled={gameSettings.questionMakingTimeSeconds <= 30}
             >
               –
             </button>
@@ -160,19 +185,17 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
         <div className={styles.timeSetting}>
           <span className={styles.label}>
             Question Answering:{' '}
-            {formatSeconds(gameState.settings.questionAnsweringTimeSeconds)}
+            {formatSeconds(gameSettings.questionAnsweringTimeSeconds)}
           </span>
           <div className={styles.buttons}>
             <button
               className={styles.button}
               onClick={() =>
                 handleUpdateQuestionAnsweringTime(
-                  gameState.settings.questionAnsweringTimeSeconds + 30
+                  gameSettings.questionAnsweringTimeSeconds + 30
                 )
               }
-              disabled={
-                gameState.settings.questionAnsweringTimeSeconds >= 60 * 10
-              }
+              disabled={gameSettings.questionAnsweringTimeSeconds >= 60 * 10}
             >
               +
             </button>
@@ -180,10 +203,10 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
               className={styles.button}
               onClick={() =>
                 handleUpdateQuestionAnsweringTime(
-                  gameState.settings.questionAnsweringTimeSeconds - 30
+                  gameSettings.questionAnsweringTimeSeconds - 30
                 )
               }
-              disabled={gameState.settings.questionAnsweringTimeSeconds <= 30}
+              disabled={gameSettings.questionAnsweringTimeSeconds <= 30}
             >
               –
             </button>
@@ -194,7 +217,7 @@ export const Lobby = ({ gameState }: { gameState: GameState }) => {
           style={{ width: '14.5rem' }}
           onClick={handleToggleRoomLock}
         >
-          {gameState.settings.locked ? 'Unlock Room' : 'Lock Room'}
+          {gameSettings.locked ? 'Unlock Room' : 'Lock Room'}
         </button>
       </div>
       <div className={styles.centerContent}>

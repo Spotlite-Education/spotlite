@@ -1,3 +1,4 @@
+'use client';
 import { GameState } from '@/types/GameState';
 import { createContext } from 'react';
 

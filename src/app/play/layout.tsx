@@ -19,10 +19,17 @@ const Play = ({ children }: { children: React.ReactNode }) => {
     socket.on('connect', handleSocketConnect);
 
     const handleGameStateUpdate = (gameState: GameState) => {
+      console.log(gameState);
       setGameState(gameState);
     };
 
     socket.on('gameStateUpdate', handleGameStateUpdate);
+
+    const handleServerRequestGameStateUpdate = () => {
+      socket.emit('queryGameState');
+    };
+
+    socket.on('requestGameStateUpdate', handleServerRequestGameStateUpdate);
 
     // a socket should connect joining a game
     socket.connect();
@@ -30,6 +37,7 @@ const Play = ({ children }: { children: React.ReactNode }) => {
     return () => {
       socket.off('connect', handleSocketConnect);
       socket.off('gameStateUpdate', handleGameStateUpdate);
+      socket.off('requestGameStateUpdate', handleServerRequestGameStateUpdate);
     };
   });
 
