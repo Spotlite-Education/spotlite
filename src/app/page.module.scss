@@ -12,6 +12,8 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   @include util.grid-bg();
+  background-position: top left;
+  @include util.pan-bg();
 }
 
 .header {
@@ -128,6 +130,7 @@
   align-items: center;
   gap: 5rem;
   @include util.grid-bg();
+  @include util.pan-bg();
 
   .form {
     position: relative;
