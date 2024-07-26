@@ -25,7 +25,7 @@
   }
 
   .studentMode {
-    padding: 1rem 2.5rem;
+    padding: 0.75rem 2rem;
     border-radius: 99rem;
     color: var(--off-dark);
     font-size: 2rem;
@@ -42,12 +42,12 @@
   .tag {
     padding: 0.75rem 2rem;
     border-radius: 99rem;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     background-color: var(--canvas-color);
   }
 
   .createGame {
-    margin-top: 10rem;
+    margin-top: 5rem;
     background-color: var(--purple);
   }
 }
@@ -55,7 +55,8 @@
 .footer {
   height: 10rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 2.5rem;
   padding: 0 5rem;
 }

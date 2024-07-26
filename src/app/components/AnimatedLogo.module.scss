@@ -1,0 +1,13 @@
+.animatedLogo {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  margin-bottom: 2rem;
+
+  .char {
+    display: inline-block;
+    color: var(--purple);
+    font-size: 7.5rem;
+    -webkit-text-stroke: 5px var(--purple);
+  }
+}

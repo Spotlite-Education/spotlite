@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from './page.module.scss';
 import { useRouter } from 'next/navigation';
 import { UnstyledLink } from '../components/UnstyledLink';
-import Image from 'next/image';
 import { useValidateSession } from '../hooks/useValidateSession';
+import { motion } from 'framer-motion';
+import { AnimatedLogo } from '../components/AnimatedLogo';
 
 const TeacherLanding = () => {
   const [creatingGame, setCreatingGame] = useState(false);
@@ -43,41 +44,52 @@ const TeacherLanding = () => {
   return (
     <main className={styles.main}>
       <div className={styles.header}>
+        <div />
+        <UnstyledLink href="/">
+          <motion.button
+            className={styles.studentMode}
+            initial={{ rotate: 180, scale: 0, opacity: 0 }}
+            animate={{ rotate: 0, scale: 1, opacity: 1 }}
+            transition={{ delay: 0.65 }}
+          >
+            Student Mode!
+          </motion.button>
+        </UnstyledLink>
+      </div>
+      <div className={styles.centerContent}>
+        <AnimatedLogo />
+        <motion.div
+          className={styles.tag}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          For Teachers
+        </motion.div>
+        <motion.button
+          className={styles.createGame}
+          onClick={handleCreateGame}
+          disabled={creatingGame}
+          initial={{ scale: 0, rotate: 180, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ delay: 0.85 }}
+        >
+          Create Game!
+        </motion.button>
+      </div>
+      <div className={styles.footer}>
         <UnstyledLink
           href="https://spotlite-education.vercel.app"
           target="_blank"
         >
-          <div className={styles.spotlite} />
+          About Spotlite
         </UnstyledLink>
-        <UnstyledLink href="/">
-          <button className={styles.studentMode}>Student Mode!</button>
-        </UnstyledLink>
-      </div>
-      <div className={styles.centerContent}>
-        <Image
-          priority
-          src="/Spotlite_Logo.svg"
-          width={600}
-          height={150}
-          alt="Spotlite Logo"
-        />
-        <div className={styles.tag}>For Teachers</div>
-        <button
-          className={styles.createGame}
-          onClick={handleCreateGame}
-          disabled={creatingGame}
-        >
-          Create Game!
-        </button>
-      </div>
-      <div className={styles.footer}>
         <UnstyledLink
           href="https://spotlite-education.vercel.app/contact"
           target="_blank"
         >
-          Contact Us!
+          Contact Us
         </UnstyledLink>
-        <span>;)</span>
       </div>
     </main>
   );
