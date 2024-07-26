@@ -1,24 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './page.module.scss';
 import { useRouter } from 'next/navigation';
 import { UnstyledLink } from './components/UnstyledLink';
-import Image from 'next/image';
 import { useValidateSession } from './hooks/useValidateSession';
-import { RingSelect } from './components/RingSelect';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useAnimate } from 'framer-motion';
 import { AnimatedLogo } from './components/AnimatedLogo';
-
-const CHARACTERS = ['bunny', 'cat', 'dog', 'frog', 'horse'];
-const CHARACTER_PREVIEWS = CHARACTERS.map(characterID => (
-  <Image
-    className={styles.characterPreview}
-    width={150}
-    height={150}
-    src={`/characters/${characterID}.png`}
-    alt={'Character: ' + characterID}
-  />
-));
 
 const UsernameCharacterSelect = ({
   clearGameID,
@@ -28,16 +15,10 @@ const UsernameCharacterSelect = ({
   gameID: string;
 }) => {
   const router = useRouter();
-
-  const [characterIndex, setCharacterIndex] = useState<number>(0);
   const [username, setUsername] = useState<string>('');
 
   const canJoinGame = () => {
-    return (
-      username.replace(/\s+/g, '').trim().length >= 3 &&
-      characterIndex >= 0 &&
-      characterIndex < CHARACTERS.length
-    );
+    return username.replace(/\s+/g, '').trim().length >= 3;
   };
 
   const allowJoin = canJoinGame();
@@ -51,17 +32,17 @@ const UsernameCharacterSelect = ({
 
     try {
       setLoading(true);
-      const characterID = CHARACTERS[characterIndex];
 
       const res = await fetch('http://localhost:8000/api/game/join', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ gameID, username, characterID }),
+        body: JSON.stringify({ gameID, username }),
       });
 
       const { sessionID, error } = await res.json();
+      console.log(sessionID, error);
       if (!sessionID) {
         switch (error) {
           case 'game/invalid_username':
@@ -69,9 +50,6 @@ const UsernameCharacterSelect = ({
             break;
           case 'game/username_taken':
             setError('Username taken!');
-            break;
-          case 'game/invalid_character':
-            setError('Invalid character!');
             break;
           case 'game/nonexistent':
             clearGameID();
@@ -97,17 +75,59 @@ const UsernameCharacterSelect = ({
     }
   };
 
+  const [pencilScope, animate] = useAnimate();
+  const PENCIL_JITTER = 10;
+
+  useEffect(() => {
+    const pencilAnimation = async () => {
+      // show pencil
+      await animate(pencilScope.current, { scale: 1 });
+
+      // move pencil
+      await animate(
+        pencilScope.current,
+        {
+          x: 465,
+          y: [0, -5, 2.5, 0],
+          rotate: [
+            0,
+            PENCIL_JITTER,
+            0,
+            -PENCIL_JITTER,
+            0,
+            PENCIL_JITTER,
+            0,
+            -PENCIL_JITTER,
+            0,
+            PENCIL_JITTER,
+            0,
+            -PENCIL_JITTER,
+          ],
+        },
+        { duration: 0.5 }
+      );
+
+      // drop pencil
+      await animate(
+        pencilScope.current,
+        { x: 465 + 50, y: -100, rotate: 30, opacity: 1 },
+        {
+          delay: 0.05,
+          ease: 'circOut',
+        }
+      );
+      animate(
+        pencilScope.current,
+        { x: 465 + 100, y: 150, scale: 0, rotate: 65, opacity: 0 },
+        { ease: 'circIn' }
+      );
+    };
+
+    pencilAnimation();
+  }, []);
+
   return (
     <div className={styles.usernameCharacterSelect}>
-      <div className={styles.characterSelect}>
-        <RingSelect
-          items={CHARACTER_PREVIEWS}
-          selectedIndex={characterIndex}
-          onSelect={setCharacterIndex}
-          radiusX={200}
-          radiusY={50}
-        />
-      </div>
       <form
         className={styles.form}
         onSubmit={e => {
@@ -119,8 +139,11 @@ const UsernameCharacterSelect = ({
           handleAttemptJoinGame();
         }}
       >
-        <input
+        <motion.input
           className={styles.usernameInput}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.75 }}
           value={username}
           onChange={e => {
             setUsername(e.target.value);
@@ -130,13 +153,54 @@ const UsernameCharacterSelect = ({
           maxLength={20}
           autoFocus
         />
-        <button
-          className={styles.join}
-          type="submit"
-          disabled={!allowJoin || loading}
+        <div className={styles.joinWrapper}>
+          <AnimatePresence mode="popLayout">
+            {allowJoin && !loading && (
+              <motion.button
+                className={styles.join}
+                type="submit"
+                initial={{ x: '-50%', y: 10, rotate: -30, opacity: 0 }}
+                animate={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+                exit={{ x: '50%', y: 10, rotate: 30, opacity: 0 }}
+                disabled={!allowJoin || loading}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+        <motion.img
+          ref={pencilScope}
+          className={styles.pencil}
+          width="166.5"
+          height="175.95"
+          src="/assets/pencil.svg"
+          initial={{ x: 7.5, scale: 0 }}
+        />
+        <svg
+          width="47.5rem"
+          height="2rem"
+          viewBox="0 0 475 20"
+          className={styles.underline}
         >
-          Join Game!
-        </button>
+          <motion.path
+            d="M 10 10 C 76.16 5 158.33 15 237.5 10 C 316.67 5 392.83 15 465 10"
+            fill="none"
+            stroke="var(--purple)"
+            strokeWidth="6.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{
+              opacity: 0,
+              strokeDasharray: 455.2,
+              strokeDashoffset: 455.2,
+            }}
+            animate={{ opacity: 1, strokeDashoffset: 0 }}
+            transition={{
+              delay: 0.3,
+              duration: 0.518,
+              opacity: { duration: 0 },
+            }}
+          />
+        </svg>
       </form>
       <span className={styles.error}>{error}</span>
     </div>

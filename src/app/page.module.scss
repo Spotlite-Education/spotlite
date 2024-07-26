@@ -129,33 +129,60 @@
   gap: 5rem;
   @include util.grid-bg();
 
-  .characterSelect {
-    margin-bottom: 5rem;
-
-    .characterPreview {
-      object-fit: contain;
-      margin-bottom: 7.5rem;
-    }
+  .form {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 
   .usernameInput {
-    width: 100%;
+    width: 40rem;
     border: none;
-    font-size: 6.5rem;
+    font-size: 5rem;
     text-align: center;
     background: none;
+
+    &::placeholder {
+      opacity: 0.5;
+    }
 
     &:focus {
       outline: none;
     }
   }
 
+  .joinWrapper {
+    width: 5rem;
+    height: 100%;
+    margin-right: -5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .join {
-    padding: 1rem 2.5rem;
-    margin-top: 3.5rem;
-    border-radius: 99rem;
-    color: var(--off-white);
-    background-color: var(--purple);
+    width: 2.5rem;
+    height: 2.5rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-image: url('/assets/arrow.svg');
+    background-color: transparent;
+  }
+
+  .pencil {
+    position: absolute;
+    bottom: -8px;
+    left: -40px;
+    transform-origin: bottom left;
+  }
+
+  .underline {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .error {
