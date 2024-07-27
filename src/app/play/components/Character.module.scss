@@ -1,0 +1,33 @@
+@keyframes animate {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes animate-inverse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.wrapper {
+  .original {
+    animation: animate 0.8s infinite step-end;
+  }
+
+  .scaled {
+    animation: animate-inverse 0.8s infinite step-end;
+  }
+}

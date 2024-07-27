@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { COMICO, PANGOLIN } from './util/fonts';
 import './globals.scss';
+import { Providers } from './components/Providers';
 
 export const metadata: Metadata = {
   title: 'Spotlite!',
@@ -17,7 +18,7 @@ export default function RootLayout({
       <body
         className={`${PANGOLIN.className} ${PANGOLIN.variable} ${COMICO.variable}`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

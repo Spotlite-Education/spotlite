@@ -5,11 +5,43 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useValidateSession } from '../hooks/useValidateSession';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CharacterContext } from '@/context/CharacterContext';
 
 export const socket = io('http://localhost:8000', { autoConnect: false });
 
 const Play = ({ children }: { children: React.ReactNode }) => {
   const [gameState, setGameState] = useState<GameState | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const fetchCharacter = async () => {
+    try {
+      const res = await fetch(
+        'http://localhost:8000/api/game/requestCharacter',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionID: sessionStorage.getItem('sessionID'),
+          }),
+        }
+      );
+
+      const { curves } = await res.json();
+      console.log({ curves });
+      return curves;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const characterQuery = useQuery({
+    queryKey: ['character'],
+    queryFn: fetchCharacter,
+  });
 
   useEffect(() => {
     const handleSocketConnect = () => {
@@ -18,9 +50,17 @@ const Play = ({ children }: { children: React.ReactNode }) => {
 
     socket.on('connect', handleSocketConnect);
 
-    const handleGameStateUpdate = (gameState: GameState) => {
-      console.log(gameState);
-      setGameState(gameState);
+    const handleGameStateUpdate = (newGameState: GameState) => {
+      console.log(newGameState);
+
+      const shouldFetchCharacter =
+        !characterQuery.data && newGameState.playerInfo?.characterSubmitted;
+
+      if (shouldFetchCharacter) {
+        queryClient.invalidateQueries({ queryKey: ['character'] });
+      }
+
+      setGameState(newGameState);
     };
 
     socket.on('gameStateUpdate', handleGameStateUpdate);
@@ -39,7 +79,7 @@ const Play = ({ children }: { children: React.ReactNode }) => {
       socket.off('gameStateUpdate', handleGameStateUpdate);
       socket.off('requestGameStateUpdate', handleServerRequestGameStateUpdate);
     };
-  });
+  }, []);
 
   const router = useRouter();
 
@@ -55,7 +95,9 @@ const Play = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <GameStateContext.Provider value={gameState}>
-      {children}
+      <CharacterContext.Provider value={characterQuery.data || null}>
+        {children}
+      </CharacterContext.Provider>
     </GameStateContext.Provider>
   );
 };

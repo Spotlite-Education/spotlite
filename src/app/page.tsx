@@ -42,7 +42,7 @@ const UsernameCharacterSelect = ({
       });
 
       const { sessionID, error } = await res.json();
-      console.log(sessionID, error);
+
       if (!sessionID) {
         switch (error) {
           case 'game/invalid_username':
@@ -76,10 +76,10 @@ const UsernameCharacterSelect = ({
   };
 
   const [pencilScope, animate] = useAnimate();
-  const PENCIL_JITTER = 10;
-
   useEffect(() => {
     const pencilAnimation = async () => {
+      const PENCIL_JITTER = 10;
+
       // show pencil
       await animate(pencilScope.current, { scale: 1 });
 
@@ -128,6 +128,14 @@ const UsernameCharacterSelect = ({
 
   return (
     <div className={styles.usernameCharacterSelect}>
+      <motion.span
+        className={styles.prompt}
+        initial={{ y: -100, scale: 2, rotate: 180, opacity: 0 }}
+        animate={{ y: 0, scale: 1, rotate: 0, opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        What&apos;s your name?
+      </motion.span>
       <form
         className={styles.form}
         onSubmit={e => {

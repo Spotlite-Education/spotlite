@@ -132,6 +132,12 @@
   @include util.grid-bg();
   @include util.pan-bg();
 
+  .prompt {
+    margin-bottom: 2.5rem;
+    font-size: 4rem;
+    -webkit-text-stroke: 1px currentColor;
+  }
+
   .form {
     position: relative;
     display: flex;

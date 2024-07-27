@@ -9,6 +9,7 @@
   align-items: center;
 
   @include util.grid-bg();
+  @include util.pan-bg();
 }
 
 .settings {

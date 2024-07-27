@@ -1,6 +1,6 @@
 export type BasicPlayerInfo = {
   username: string;
-  characterID: string;
+  characterSubmitted: boolean;
   points: number;
 };
 

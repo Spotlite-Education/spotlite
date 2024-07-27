@@ -9,23 +9,117 @@
   justify-content: center;
   align-items: center;
   @include util.grid-bg();
+  @include util.pan-bg();
+}
 
-  .title {
-    margin-bottom: 1.5rem;
-    color: var(--purple);
-    font-size: 10rem;
+.prompt {
+  margin-bottom: 1rem;
+  font-size: 4rem;
+  -webkit-text-stroke: 1px currentColor;
+}
+
+.noEraser {
+  margin-bottom: 2rem;
+  color: gray;
+}
+
+.editorWrapper {
+  position: relative;
+}
+
+.canvasWrapper {
+  position: relative;
+}
+
+.frame {
+  position: relative;
+
+  .pencilWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(20px, calc(-100% + 40px));
+
+    .pencil {
+      transform-origin: bottom left;
+    }
+  }
+}
+
+.canvas {
+  position: absolute;
+  top: 50%;
+  left: calc(50% - 5px);
+  transform: translate(-50%, -50%);
+  width: calc(100% - 95px);
+  height: calc(100% - 90px);
+  border-radius: 20px;
+  border-bottom-left-radius: 60px;
+
+  &:hover {
+    cursor: none;
   }
 
-  .prompt {
-    padding: 1rem 2.5rem;
-    border-radius: 99rem;
-    font-size: 2rem;
-    background-color: var(--canvas-color);
+  .paintbrushWrapper {
+    width: min-content;
+    pointer-events: none;
+    transform: translateY(-100%);
+    transform-origin: bottom left;
+  }
+}
+
+.colors {
+  position: absolute;
+  top: 50%;
+  right: -12rem;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+
+  .color {
+    &:hover {
+      cursor: url('/cursors/pointer.png') 16 16, pointer;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.submitPrompt {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  font-size: 3rem;
+  -webkit-text-stroke: 0.75px currentColor;
+
+  button {
+    background-color: var(--purple);
+  }
+}
+
+.waitingRoom {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  @include util.grid-bg();
+  @include util.pan-bg();
+
+  .title {
+    margin-bottom: 2rem;
+    color: var(--purple);
+    font-size: 5rem;
+    -webkit-text-stroke: 1px currentColor;
   }
 
   .tip {
-    width: 100%;
-    margin-top: 7.5rem;
-    text-align: center;
+    margin-top: 2rem;
   }
 }
