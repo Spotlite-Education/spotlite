@@ -194,9 +194,12 @@
     transform: translateX(-50%);
   }
 
-  .error {
+  .errorWrapper {
     height: 1rem;
-    color: var(--red);
-    font-size: 2.5rem;
+
+    .error {
+      color: var(--red);
+      font-size: 2.5rem;
+    }
   }
 }

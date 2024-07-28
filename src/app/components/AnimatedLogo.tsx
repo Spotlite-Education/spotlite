@@ -5,7 +5,7 @@ const CHAR_VARIANTS = [
   {
     initial: {
       x: -250,
-      y: 150,
+      y: -150,
       scale: 2,
       rotate: -12.32 + 180,
       opacity: 0,

@@ -210,7 +210,20 @@ const UsernameCharacterSelect = ({
           />
         </svg>
       </form>
-      <span className={styles.error}>{error}</span>
+      <div className={styles.errorWrapper}>
+        <AnimatePresence mode="popLayout">
+          {error && (
+            <motion.span
+              className={styles.error}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+            >
+              {error}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

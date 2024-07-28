@@ -31,7 +31,6 @@ const Play = ({ children }: { children: React.ReactNode }) => {
       );
 
       const { curves } = await res.json();
-      console.log({ curves });
       return curves;
     } catch (err) {
       console.error(err);
